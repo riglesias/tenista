@@ -4,47 +4,59 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a monorepo for the **Tenista** tennis league platform, consisting of:
-- **tenista-app**: React Native mobile application (iOS/Android/Web)
-- **tenista-admin**: Next.js admin panel for platform management
+Turborepo + pnpm monorepo for the **Tenista** tennis league platform:
+- **apps/app** — Expo 53 React Native mobile app (iOS/Android/Web)
+- **apps/admin** — Next.js 15 admin panel
+- **apps/landing** — Next.js 15 landing page (tenista.app)
+- **packages/** — Shared packages (empty for now)
 
-Both applications share the same Supabase backend (Project ID: `zktbpqsqocblwjhcezum`).
+All apps share the same Supabase backend (Project ID: `zktbpqsqocblwjhcezum`).
 
 ## Getting Started
 
-### Monorepo Structure
-This is a **monorepo** with two independent applications that share the same Supabase backend:
-- Root directory contains minimal coordination files (`.mcp.json`, this `CLAUDE.md`)
-- Each app has its own `package.json`, `node_modules`, and independent development workflow
-- **Important:** When working on a specific app, always `cd` into its directory first
-
 ### Initial Setup
 ```bash
-# Install dependencies for both projects
-cd tenista-app && npm install
-cd ../tenista-admin && npm install
+corepack enable
+pnpm install          # Installs all workspace dependencies
 ```
 
 ### Environment Configuration
 
-**tenista-app** requires `.env`:
+**apps/app** requires `.env`:
 ```
 EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
 EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-**tenista-admin** requires `.env.local`:
+**apps/admin** requires `.env.local`:
 ```
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key  # Not yet implemented, but required for RLS bypass
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
+
+**apps/landing** requires `.env.local`:
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
 ```
 
 ## Development Commands
 
-### Mobile App (tenista-app)
+### Turborepo (from root)
 ```bash
-cd tenista-app
+pnpm dev              # All apps
+pnpm dev:app          # Expo mobile only
+pnpm dev:admin        # Next.js admin only
+pnpm dev:landing      # Next.js landing only
+pnpm build            # Build all buildable apps
+pnpm lint             # Lint all apps
+pnpm clean            # Clean all build artifacts
+```
+
+### Mobile App (apps/app)
+```bash
+cd apps/app
 
 # Start development server
 npm start
@@ -71,9 +83,9 @@ npm run update:preview
 npm run update:production
 ```
 
-### Admin Panel (tenista-admin)
+### Admin Panel (apps/admin)
 ```bash
-cd tenista-admin
+cd apps/admin
 
 # Development
 npm run dev          # Start dev server at localhost:3000
@@ -88,7 +100,7 @@ npm run lint         # Run ESLint
 
 ## Architecture
 
-### Mobile App (tenista-app)
+### Mobile App (apps/app)
 
 **Tech Stack:**
 - React Native with Expo 53
@@ -138,7 +150,7 @@ hooks/              # Custom React hooks
 - Web Client ID (Android): `251208589749-revsauposkj7bqt2ofu27b4k1cf9i3a1.apps.googleusercontent.com`
 - Both package names must be registered in Google Cloud Console
 
-### Admin Panel (tenista-admin)
+### Admin Panel (apps/admin)
 
 **Tech Stack:**
 - Next.js 15.4.6 with App Router and Turbopack
@@ -549,18 +561,23 @@ export default async function YourFeaturePage() {
 
 ## Deployment
 
-### Mobile App
+### Mobile App (apps/app)
 - Use EAS Build for production builds
 - Environment variables must be prefixed with `EXPO_PUBLIC_`
 - OTA updates work for JS/config changes only
 - Native code changes require new builds
-- Monitor via Expo dashboard
 
-### Admin Panel
-- Deploy to Vercel (recommended)
-- Set environment variables in Vercel dashboard
-- Configure domain and SSL
-- Enable automatic deployments from Git
+### Admin Panel (apps/admin) — Vercel
+- **Project:** `tenista-admin` → `tenista-admin.vercel.app`
+- **Root Directory:** `apps/admin`
+- **GitHub Repo:** `riglesias/tenista` (monorepo)
+- Deploys automatically on push to main
+
+### Landing Page (apps/landing) — Vercel
+- **Project:** `tenista-landing` → `www.tenista.app`
+- **Root Directory:** `apps/landing`
+- **GitHub Repo:** `riglesias/tenista` (monorepo)
+- Deploys automatically on push to main
 
 ## Project Status
 
