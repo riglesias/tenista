@@ -1,0 +1,63 @@
+{
+  "title": "Settings",
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "editAvailability": "Edit Availability",
+    "editLocation": "Edit Location",
+    "editHomecourt": "Edit Home Court",
+    "editHomecourtAndClub": "Homecourt or Club",
+    "editFlag": "Edit Flag",
+    "editRating": "Edit Rating",
+    "editClub": "Club",
+    "noHomecourt": "No homecourt set",
+    "memberSince": "Member since {{date}}"
+  },
+  "language": {
+    "title": "Language",
+    "selectLanguage": "Select Language",
+    "english": "English",
+    "spanish": "Spanish",
+    "currentLanguage": "Current: {{language}}"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "darkMode": "Dark Mode",
+    "darkThemeEnabled": "Dark theme enabled",
+    "lightThemeEnabled": "Light theme enabled"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "playNow": "Play Now Notifications",
+    "playNowDescription": "Get notified when players are ready to play",
+    "matchResult": "Match Result Notifications",
+    "matchResultDescription": "Get notified when match results are submitted",
+    "webNotAvailable": "Push notifications are not available on web",
+    "devBuildRequired": "Push notifications require a production build"
+  },
+  "account": {
+    "title": "Account Management",
+    "deleteAccount": "Delete",
+    "deletingAccount": "Deleting Account...",
+    "logout": "Logout"
+  },
+  "version": "Version {{version}} ({{buildNumber}})",
+  "alerts": {
+    "logoutConfirmTitle": "Confirm Logout",
+    "logoutConfirmMessage": "Are you sure you want to log out?",
+    "logoutError": "Failed to log out. Please try again.",
+    "unexpectedError": "An unexpected error occurred during logout.",
+    "updateError": "Failed to update profile. Please try again.",
+    "avatarError": "An unexpected error occurred while updating your profile picture.",
+    "notificationError": "Failed to update notification settings",
+    "failedToLoadProfile": "Failed to load profile"
+  },
+  "deleteModal": {
+    "title": "Delete Account",
+    "warning": "This action cannot be undone. All your data will be permanently deleted.",
+    "confirmText": "Type DELETE to confirm",
+    "placeholder": "Type DELETE",
+    "deleteButton": "Delete Account",
+    "cancelButton": "Cancel"
+  }
+}

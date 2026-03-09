@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Remember we are using Nextjs 15.
+Prioritize using Shadcn components. If there's no component that solves the use case, then radix and then custom.
+File Naming Convention:
+Server-only files should include 'use server' directive at the top
+Client-only files should include 'use client' directive at the top
+Consider adding .server.ts or .client.ts suffixes to help visually identify file types
+Code Organization:
+Create separate directories for server and client code when possible
+Keep server actions in a dedicated /actions directory
+Use a clear pattern for data fetching:
+Server components: Fetch data directly
+Client components: Use server actions through function calls
+Component Pattern:
+Use server components for initial data loading
+Create client-side wrappers for interactive elements
+Pass server-loaded data to client components via props
+API Boundary:
+Never import server-specific code in client components (like next/headers)
+Use server actions ('use server') for database operations
+Keep type definitions shared between client and server
+Error Handling:
+Implement proper error boundaries between server and client code
+Use try/catch blocks for async server actions called from client components

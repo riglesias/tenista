@@ -1,0 +1,86 @@
+{
+  "buttons": {
+    "continue": "Continue",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "retry": "Retry",
+    "close": "Close",
+    "delete": "Delete",
+    "edit": "Edit",
+    "submit": "Submit",
+    "skip": "Skip",
+    "logout": "Logout",
+    "login": "Login",
+    "signUp": "Sign Up",
+    "signIn": "Sign In"
+  },
+  "labels": {
+    "loading": "Loading...",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "phone": "Phone",
+    "or": "or",
+    "search": "Search",
+    "noResults": "No results found",
+    "optional": "Optional",
+    "required": "Required"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "time": {
+    "memberSince": "Member since {{date}}",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago"
+  },
+  "tabs": {
+    "community": "Community",
+    "league": "Competitions",
+    "results": "Results",
+    "settings": "Settings"
+  },
+  "days": {
+    "all": "All",
+    "today": "Today",
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday"
+  },
+  "timeSlots": {
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening"
+  },
+  "ratings": {
+    "levels": {
+      "1_0": { "level": "New Player", "description": "Just starting to play tennis." },
+      "1_5": { "level": "Beginner", "description": "Working primarily on getting the ball in play." },
+      "2_0": { "level": "Beginner", "description": "Knows all strokes but lacks court experience." },
+      "2_5": { "level": "Beginner Plus", "description": "Learning to judge where the ball is going. Starting to develop court coverage." },
+      "3_0": { "level": "Intermediate", "description": "Fairly consistent when hitting medium-paced shots. Most common doubles formation is one-up, one-back." },
+      "3_5": { "level": "Intermediate Plus", "description": "Improved stroke dependability with directional control on moderate shots. Developing teamwork in doubles." },
+      "4_0": { "level": "Advanced Intermediate", "description": "Dependable strokes, including directional control and depth on both forehand and backhand sides." },
+      "4_5": { "level": "Advanced", "description": "Starting to use power and spin. Beginning to handle pace. Sound footwork. Control of depth of shots." },
+      "5_0": { "level": "Advanced Plus", "description": "Good shot anticipation. Frequently have an outstanding shot. Can regularly hit winners." },
+      "5_5": { "level": "Elite", "description": "Highly skilled player with tournament experience. Potential college or professional level." },
+      "6_0": { "level": "Tournament Player", "description": "Has obtained a sectional and/or national ranking. Solid competitor at collegiate level." },
+      "6_5": { "level": "Elite Tournament Player", "description": "Has extensive satellite tournament experience. Potential for professional career." },
+      "7_0": { "level": "Professional", "description": "Current world-class player. Plays professionally." }
+    }
+  }
+}

@@ -1,0 +1,198 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Set Lato as the default font family for all text elements */
+  * {
+    font-family: 'Lato_400Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* Font weight variations */
+  .font-light {
+    font-family: 'Lato_300Light', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  .font-bold,
+  .font-semibold,
+  .font-extrabold {
+    font-family: 'Lato_700Bold', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  :root {
+    --radius: 0.625rem;
+    
+    /* Main theme colors - these are the primary colors used throughout the app */
+    --background: 255 255 255;
+    --foreground: 17 24 39;
+    --card: 255 255 255;
+    --card-foreground: 17 24 39;
+    --popover: 255 255 255;
+    --popover-foreground: 17 24 39;
+    --primary: 59 130 246;
+    --primary-foreground: 255 255 255;
+    --secondary: 243 244 246;
+    --secondary-foreground: 17 24 39;
+    --muted: 243 244 246;
+    --muted-foreground: 107 114 128;
+    --accent: 243 244 246;
+    --accent-foreground: 17 24 39;
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+    --border: 229 231 235;
+    --input: 229 231 235;
+    --ring: 147 197 253;
+
+    /* Unified color system - all components should use these */
+    --color-background-0: 255 255 255;
+    --color-background-50: 249 250 251;
+    --color-background-100: 243 244 246;
+    --color-background-200: 229 231 235;
+    --color-background-700: 55 65 81;
+    --color-background-800: 31 41 55;
+    --color-background-900: 17 24 39;
+    --color-background-950: 3 7 18;
+    
+    --color-foreground: 17 24 39;
+    --color-muted: 107 114 128;
+    --color-muted-foreground: 75 85 99;
+    
+    --color-primary-0: 255 255 255;
+    --color-primary-50: 239 246 255;
+    --color-primary-100: 219 234 254;
+    --color-primary-200: 191 219 254;
+    --color-primary-300: 147 197 253;
+    --color-primary-400: 96 165 250;
+    --color-primary-500: 59 130 246;
+    --color-primary-600: 37 99 235;
+    --color-primary-700: 29 78 216;
+    --color-primary-800: 30 64 175;
+    --color-primary-900: 30 58 138;
+    --color-primary-950: 23 37 84;
+    --color-primary-foreground: 255 255 255;
+    
+    --color-outline-200: 229 231 235;
+    --color-outline-700: 55 65 81;
+    
+    --color-typography-0: 255 255 255;
+    --color-typography-50: 249 250 251;
+    --color-typography-400: 156 163 175;
+    --color-typography-600: 75 85 99;
+    --color-typography-700: 55 65 81;
+    --color-typography-900: 17 24 39;
+    
+    /* Success colors */
+    --color-success-500: 34 197 94;
+    --color-success-600: 22 163 74;
+    
+    /* Tab bar colors using unified system */
+    --color-tab-background: var(--color-background-0);
+    --color-tab-icon-active: var(--color-primary-500);
+    --color-tab-icon-inactive: var(--color-muted);
+  }
+
+  .dark {
+    /* Main theme colors for dark mode */
+    --background: 3 7 18;
+    --foreground: 249 250 251;
+    --card: 17 24 39;
+    --card-foreground: 249 250 251;
+    --popover: 31 41 55;
+    --popover-foreground: 249 250 251;
+    --primary: 132 254 12;
+    --primary-foreground: 17 24 39;
+    --secondary: 31 41 55;
+    --secondary-foreground: 249 250 251;
+    --muted: 31 41 55;
+    --muted-foreground: 156 163 175;
+    --accent: 55 65 81;
+    --accent-foreground: 249 250 251;
+    --destructive: 239 68 68;
+    --destructive-foreground: 249 250 251;
+    --border: 55 65 81;
+    --input: 55 65 81;
+    --ring: 132 254 12;
+
+    /* Unified dark mode colors */
+    --color-background-0: 3 7 18;
+    --color-background-50: 17 24 39;
+    --color-background-100: 31 41 55;
+    --color-background-200: 55 65 81;
+    --color-background-700: 156 163 175;
+    --color-background-800: 209 213 219;
+    --color-background-900: 229 231 235;
+    --color-background-950: 249 250 251;
+    
+    --color-foreground: 249 250 251;
+    --color-muted: 156 163 175;
+    --color-muted-foreground: 107 114 128;
+    
+    /* Primary green color palette for dark mode */
+    --color-primary-50: 240 253 208;
+    --color-primary-100: 220 252 146;
+    --color-primary-200: 190 250 84;
+    --color-primary-300: 160 248 42;
+    --color-primary-400: 146 251 27;
+    --color-primary-500: 132 254 12;
+    --color-primary-600: 118 228 11;
+    --color-primary-700: 104 202 10;
+    --color-primary-800: 90 176 9;
+    --color-primary-900: 76 150 8;
+    --color-primary-950: 62 124 7;
+    --color-primary-foreground: 17 24 39;
+    
+    --color-outline-200: 55 65 81;
+    --color-outline-700: 156 163 175;
+    
+    --color-typography-0: 3 7 18;
+    --color-typography-50: 17 24 39;
+    --color-typography-400: 107 114 128;
+    --color-typography-600: 156 163 175;
+    --color-typography-700: 209 213 219;
+    --color-typography-900: 249 250 251;
+    
+    /* Tab bar colors for dark mode */
+    --color-tab-background: var(--color-background-0);
+    --color-tab-icon-active: var(--color-primary-500);
+    --color-tab-icon-inactive: var(--color-muted);
+  }
+}
+
+@layer components {
+  /* Onboarding Components */
+  .onboarding-container {
+    @apply flex-1 bg-gray-900 px-6 py-8;
+  }
+  
+  .onboarding-title {
+    @apply text-4xl font-bold text-white mb-8;
+  }
+  
+  .onboarding-field-label {
+    @apply text-white text-lg mb-2;
+  }
+  
+  .onboarding-input {
+    @apply bg-gray-800 text-white px-4 py-3 rounded-lg text-lg border border-gray-700 focus:border-blue-500 focus:outline-none;
+  }
+  
+  .onboarding-button-primary {
+    @apply bg-white text-black py-4 rounded-lg text-lg font-semibold;
+  }
+  
+  .onboarding-button-secondary {
+    @apply bg-transparent text-white py-4 rounded-lg text-lg font-semibold border border-gray-600;
+  }
+  
+  .onboarding-radio-group {
+    @apply flex flex-row gap-6;
+  }
+  
+  .onboarding-radio-label {
+    @apply flex flex-row items-center gap-2 text-white text-lg;
+  }
+  
+  .onboarding-link {
+    @apply text-gray-400 text-sm underline;
+  }
+}

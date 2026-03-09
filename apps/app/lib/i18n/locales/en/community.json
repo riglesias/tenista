@@ -1,0 +1,85 @@
+{
+  "title": "Community",
+  "header": {
+    "availableToday": "Available Today",
+    "playNowMode": "Play Now Mode",
+    "availablePlayers": "Available Players"
+  },
+  "tabs": {
+    "players": "Players",
+    "courts": "Courts"
+  },
+  "players": {
+    "title": "Players",
+    "searchPlaceholder": "Search players...",
+    "noPlayers": "No players found",
+    "noPlayersMessage": "Try adjusting your filters or check back later for new players in your area.",
+    "clearFilters": "Clear Filters",
+    "availableNow": "Available Now",
+    "lookingToPlayNow": "Looking to play now",
+    "unknownCity": "Unknown City",
+    "other": "Other",
+    "rating": "Rating: {{rating}}",
+    "viewProfile": "View Profile"
+  },
+  "courts": {
+    "title": "Courts",
+    "searchPlaceholder": "Search courts...",
+    "noCourts": "No courts found",
+    "public": "Public",
+    "private": "Private",
+    "indoor": "Indoor",
+    "outdoor": "Outdoor",
+    "courts": "{{count}} courts",
+    "hasLights": "Has lights",
+    "viewDetails": "View Details"
+  },
+  "recentActivity": {
+    "title": "Recent Activity",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "competitive": "Competitive",
+    "practice": "Practice"
+  },
+  "playNow": {
+    "title": "Play Now",
+    "subtitle": "Find players available to play right now",
+    "available": "I'm Available",
+    "notAvailable": "Not Available",
+    "availableUntil": "Available until {{time}}",
+    "lookingForMatch": "Looking for a match",
+    "sendRequest": "Send Request",
+    "requestSent": "Request Sent",
+    "modal": {
+      "title": "Enable Play Now Mode",
+      "subtitle": "Get noticed by players looking for a match today",
+      "priorityTitle": "Priority Placement",
+      "priorityDescription": "Show up at the top of the player list for the next 24 hours",
+      "notificationsTitle": "Instant Notifications",
+      "notificationsDescription": "Notify players who have subscribed to Play Now alerts in your city",
+      "cancel": "Cancel",
+      "enable": "Enable Play Now",
+      "enabling": "Enabling..."
+    }
+  },
+  "filters": {
+    "title": "Filters",
+    "rating": "Rating",
+    "ratingRange": "NTRP Rating Range",
+    "distance": "Distance",
+    "availability": "Availability",
+    "clear": "Clear All",
+    "apply": "Apply Filters"
+  },
+  "loading": "Loading available players...",
+  "errors": {
+    "loadPlayers": "Could not load players. Please try again.",
+    "updateAvailability": "Failed to update availability. Please try again.",
+    "unexpected": "An unexpected error occurred."
+  },
+  "emptyState": {
+    "setAvailability": "Set your availability",
+    "setAvailabilityMessage": "Please set your availability in your profile to see players available today.",
+    "editAvailability": "Edit Availability"
+  }
+}

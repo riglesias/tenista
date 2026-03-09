@@ -1,0 +1,148 @@
+{
+  "title": "Matches",
+  "submitResult": {
+    "title": "Submit Result",
+    "loading": "Loading...",
+    "errorLoadingData": "Error loading data",
+    "noOpponentSelected": "No opponent selected",
+    "couldNotLoadOpponent": "Could not load opponent data",
+    "couldNotLoadData": "Could not load data",
+    "matchVs": "Match vs {{name}}",
+    "selectOpponent": "Select Opponent",
+    "searchOpponent": "Search for opponent...",
+    "dateAndTime": "Date and time",
+    "matchDate": "Match Date",
+    "numberOfSets": "Number of sets",
+    "sets": "{{count}} Set",
+    "sets_plural": "{{count}} Sets",
+    "typeOfGame": "Type of game",
+    "competitive": "Competitive",
+    "practice": "Practice",
+    "competition": "Competition *",
+    "status": {
+      "active": "Active",
+      "inProgress": "In Progress",
+      "upcoming": "Upcoming",
+      "ended": "Ended"
+    },
+    "competitionTypes": {
+      "league": "League",
+      "playoff": "Playoff",
+      "championship": "Championship"
+    },
+    "comingSoon": "Coming Soon",
+    "notAvailable": "Not Available",
+    "typeOfMatch": "Type of match",
+    "matchType": "Match Type",
+    "singles": "Singles",
+    "doubles": "Doubles",
+    "doublesSoon": "Doubles (soon)",
+    "gameType": "Game Type",
+    "score": "Score",
+    "set": "Set {{number}}",
+    "yourScore": "Your Score",
+    "opponentScore": "Opponent Score",
+    "winner": "Winner",
+    "you": "You",
+    "opponent": "Opponent",
+    "submit": "Submit Result",
+    "updateResult": "Update Result",
+    "submitting": "Submitting...",
+    "submittingResult": "Submitting match result...",
+    "updatingResult": "Updating match result...",
+    "resultUpdated": "Result updated successfully",
+    "editTitle": "Edit Result",
+    "editingResult": "Editing Result",
+    "editWarning": "Changing the winner may update ladder positions",
+    "validation": {
+      "selectCompetition": "Please select a competition for competitive matches",
+      "mustHaveWinner": "The match must have a clear winner",
+      "enterScoresForSet": "Please enter scores for Set {{number}}",
+      "cannotEndInTie": "Set {{number}} cannot end in a tie",
+      "winByTwoGames": "Set {{number}}: When score goes beyond 6, must win by exactly 2 games (e.g., 8-6, 9-7)",
+      "mustWinWithSix": "Set {{number}}: A set must be won with at least 6 games",
+      "invalidScoreSix": "Set {{number}}: Invalid score. When winning 6 games, opponent must have 4 or fewer",
+      "sevenGamesRule": "Set {{number}}: 7 games can only be won against 5 or 6 games",
+      "invalidScoreExceedSeven": "Set {{number}}: Invalid score. Regular sets cannot exceed 7 games"
+    }
+  },
+  "history": {
+    "title": "Match History",
+    "noMatches": "No matches found",
+    "won": "Won",
+    "lost": "Lost",
+    "vs": "vs"
+  },
+  "result": {
+    "title": "Match Result",
+    "verified": "Verified",
+    "pending": "Pending Verification",
+    "score": "Score",
+    "date": "Date",
+    "type": "Type"
+  },
+  "alerts": {
+    "submitSuccess": "Match result submitted successfully!",
+    "submitError": "Failed to submit match result. Please try again.",
+    "selectOpponent": "Please select an opponent",
+    "enterScores": "Please enter scores for all sets",
+    "editMatch": "Edit Match",
+    "editMatchMessage": "Edit match functionality will be implemented later.",
+    "cancel": "Cancel"
+  },
+  "matchCard": {
+    "competitive": "Competitive",
+    "practice": "Practice",
+    "match": "Match",
+    "options": "Match Options",
+    "editScore": "Edit Score",
+    "reportMatch": "Report Match"
+  },
+  "report": {
+    "title": "Report Match",
+    "incorrectResult": "Incorrect Result",
+    "neverPlayed": "Never Played",
+    "selectReason": "Why are you reporting this match?",
+    "submit": "Submit Report",
+    "submitting": "Submitting...",
+    "success": "Report submitted successfully",
+    "error": "Failed to submit report",
+    "alreadyReported": "You already have a pending report for this match"
+  },
+  "results": {
+    "title": "My Results",
+    "loading": "Loading...",
+    "leagueRanking": "League Ranking",
+    "notInLeague": "Not in any league",
+    "joinLeagueMessage": "Join a league to see your ranking",
+    "pastMatches": "Past Matches",
+    "noMatchesFound": "No matches found",
+    "submitFirstMatch": "Submit your first match to see it here",
+    "stats": {
+      "played": "Played",
+      "won": "Won",
+      "lost": "Lost",
+      "points": "points"
+    },
+    "completedCompetitions": "Completed Competitions",
+    "ended": "Ended {{date}}",
+    "finalPosition": "{{position}} of {{total}}",
+    "noCompletedCompetitions": "No completed competitions yet",
+    "tournamentResult": {
+      "champion": "Champion",
+      "finalist": "Finalist",
+      "semifinalist": "Semifinalist",
+      "quarterfinalist": "Quarterfinalist",
+      "roundX": "Round {{round}}"
+    }
+  },
+  "celebration": {
+    "youWin": "You Win!",
+    "youLose": "You Lose",
+    "shareResult": "Share Result",
+    "done": "Done",
+    "victoryTitle": "Victory!",
+    "defeatTitle": "Better luck next time.",
+    "shareDescription": "Share with your friends"
+  }
+}

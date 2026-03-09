@@ -1,0 +1,63 @@
+{
+  "title": "Configuración",
+  "profile": {
+    "title": "Perfil",
+    "editProfile": "Editar Perfil",
+    "editAvailability": "Editar Disponibilidad",
+    "editLocation": "Editar Ubicación",
+    "editHomecourt": "Editar Cancha Principal",
+    "editHomecourtAndClub": "Cancha habitual o Club",
+    "editFlag": "Editar Bandera",
+    "editRating": "Editar Nivel",
+    "editClub": "Club",
+    "noHomecourt": "Sin cancha principal",
+    "memberSince": "Miembro desde {{date}}"
+  },
+  "language": {
+    "title": "Idioma",
+    "selectLanguage": "Seleccionar Idioma",
+    "english": "Inglés",
+    "spanish": "Español",
+    "currentLanguage": "Actual: {{language}}"
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "darkMode": "Modo Oscuro",
+    "darkThemeEnabled": "Tema oscuro activado",
+    "lightThemeEnabled": "Tema claro activado"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "playNow": "Notificaciones de Jugar Ahora",
+    "playNowDescription": "Recibe alertas cuando jugadores estén listos para jugar",
+    "matchResult": "Notificaciones de Resultados",
+    "matchResultDescription": "Recibe alertas cuando se envíen resultados de partidos",
+    "webNotAvailable": "Las notificaciones push no están disponibles en la web",
+    "devBuildRequired": "Las notificaciones push requieren una versión de producción"
+  },
+  "account": {
+    "title": "Gestión de Cuenta",
+    "deleteAccount": "Eliminar",
+    "deletingAccount": "Eliminando Cuenta...",
+    "logout": "Cerrar Sesión"
+  },
+  "version": "Versión {{version}} ({{buildNumber}})",
+  "alerts": {
+    "logoutConfirmTitle": "Confirmar Cierre de Sesión",
+    "logoutConfirmMessage": "¿Estás seguro de que quieres cerrar sesión?",
+    "logoutError": "Error al cerrar sesión. Por favor intenta de nuevo.",
+    "unexpectedError": "Ocurrió un error inesperado al cerrar sesión.",
+    "updateError": "Error al actualizar el perfil. Por favor intenta de nuevo.",
+    "avatarError": "Ocurrió un error inesperado al actualizar tu foto de perfil.",
+    "notificationError": "Error al actualizar la configuración de notificaciones",
+    "failedToLoadProfile": "Error al cargar el perfil"
+  },
+  "deleteModal": {
+    "title": "Eliminar Cuenta",
+    "warning": "Esta acción no se puede deshacer. Todos tus datos serán eliminados permanentemente.",
+    "confirmText": "Escribe ELIMINAR para confirmar",
+    "placeholder": "Escribe ELIMINAR",
+    "deleteButton": "Eliminar Cuenta",
+    "cancelButton": "Cancelar"
+  }
+}

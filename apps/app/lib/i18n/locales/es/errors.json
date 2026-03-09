@@ -1,0 +1,29 @@
+{
+  "network": {
+    "offline": "Parece que estás sin conexión. Por favor verifica tu conexión.",
+    "timeout": "La solicitud tardó demasiado. Por favor intenta de nuevo.",
+    "serverError": "Algo salió mal. Por favor intenta más tarde.",
+    "connectionFailed": "Error al conectar con el servidor."
+  },
+  "auth": {
+    "invalidCredentials": "Correo o contraseña inválidos.",
+    "emailInUse": "Este correo ya está registrado.",
+    "weakPassword": "La contraseña es muy débil. Por favor usa una más segura.",
+    "userNotFound": "No se encontró una cuenta con este correo.",
+    "sessionExpired": "Tu sesión ha expirado. Por favor inicia sesión de nuevo.",
+    "unauthorized": "No tienes autorización para realizar esta acción."
+  },
+  "validation": {
+    "required": "Este campo es requerido.",
+    "invalidEmail": "Por favor ingresa un correo electrónico válido.",
+    "invalidPhone": "Por favor ingresa un número de teléfono válido.",
+    "tooShort": "Debe tener al menos {{min}} caracteres.",
+    "tooLong": "Debe tener como máximo {{max}} caracteres."
+  },
+  "generic": {
+    "somethingWentWrong": "Algo salió mal.",
+    "tryAgain": "Por favor intenta de nuevo.",
+    "contactSupport": "Si el problema persiste, por favor contacta a soporte.",
+    "success": "Éxito"
+  }
+}

@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+STYLING RULES: 
+- Follow atomic design and reuse components from `/components`.
+- Do not use inline styles.
+- All buttons must use the <PrimaryButton> component with consistent layout.
+- Position navigation buttons in a fixed bottom container.
+- Use spacing scale from theme.
+- Wrap every screen with <AppScreen> for padding and safe areas.
+- Follow React Native accessibility best practices.
+- Never hardcode colors or dimensions; use values from `theme.ts`.
+- Always use Tailwind CSS.
+- Always use Lucide icons.

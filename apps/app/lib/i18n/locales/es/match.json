@@ -1,0 +1,148 @@
+{
+  "title": "Partidos",
+  "submitResult": {
+    "title": "Enviar Resultado",
+    "loading": "Cargando...",
+    "errorLoadingData": "Error al cargar datos",
+    "noOpponentSelected": "Ningún oponente seleccionado",
+    "couldNotLoadOpponent": "No se pudo cargar los datos del oponente",
+    "couldNotLoadData": "No se pudieron cargar los datos",
+    "matchVs": "Partido vs {{name}}",
+    "selectOpponent": "Seleccionar Oponente",
+    "searchOpponent": "Buscar oponente...",
+    "dateAndTime": "Fecha y hora",
+    "matchDate": "Fecha del Partido",
+    "numberOfSets": "Número de sets",
+    "sets": "{{count}} Set",
+    "sets_plural": "{{count}} Sets",
+    "typeOfGame": "Tipo de juego",
+    "competitive": "Competitivo",
+    "practice": "Práctica",
+    "competition": "Competición *",
+    "status": {
+      "active": "Activo",
+      "inProgress": "En Progreso",
+      "upcoming": "Próximo",
+      "ended": "Finalizado"
+    },
+    "competitionTypes": {
+      "league": "Liga",
+      "playoff": "Playoff",
+      "championship": "Campeonato"
+    },
+    "comingSoon": "Próximamente",
+    "notAvailable": "No Disponible",
+    "typeOfMatch": "Tipo de partido",
+    "matchType": "Tipo de Partido",
+    "singles": "Individual",
+    "doubles": "Dobles",
+    "doublesSoon": "Dobles (pronto)",
+    "gameType": "Tipo de Juego",
+    "score": "Marcador",
+    "set": "Set {{number}}",
+    "yourScore": "Tu Marcador",
+    "opponentScore": "Marcador del Oponente",
+    "winner": "Ganador",
+    "you": "Tú",
+    "opponent": "Oponente",
+    "submit": "Enviar Resultado",
+    "updateResult": "Actualizar Resultado",
+    "submitting": "Enviando...",
+    "submittingResult": "Enviando resultado del partido...",
+    "updatingResult": "Actualizando resultado del partido...",
+    "resultUpdated": "Resultado actualizado exitosamente",
+    "editTitle": "Editar Resultado",
+    "editingResult": "Editando Resultado",
+    "editWarning": "Cambiar el ganador puede actualizar las posiciones de la escalerilla",
+    "validation": {
+      "selectCompetition": "Por favor selecciona una competición para partidos competitivos",
+      "mustHaveWinner": "El partido debe tener un ganador claro",
+      "enterScoresForSet": "Por favor ingresa los marcadores del Set {{number}}",
+      "cannotEndInTie": "El Set {{number}} no puede terminar en empate",
+      "winByTwoGames": "Set {{number}}: Cuando el marcador supera 6, debe ganar por exactamente 2 juegos (ej. 8-6, 9-7)",
+      "mustWinWithSix": "Set {{number}}: Un set debe ganarse con al menos 6 juegos",
+      "invalidScoreSix": "Set {{number}}: Marcador inválido. Al ganar 6 juegos, el oponente debe tener 4 o menos",
+      "sevenGamesRule": "Set {{number}}: 7 juegos solo se puede ganar contra 5 o 6 juegos",
+      "invalidScoreExceedSeven": "Set {{number}}: Marcador inválido. Los sets regulares no pueden superar 7 juegos"
+    }
+  },
+  "history": {
+    "title": "Historial de Partidos",
+    "noMatches": "No se encontraron partidos",
+    "won": "Ganado",
+    "lost": "Perdido",
+    "vs": "vs"
+  },
+  "result": {
+    "title": "Resultado del Partido",
+    "verified": "Verificado",
+    "pending": "Pendiente de Verificación",
+    "score": "Marcador",
+    "date": "Fecha",
+    "type": "Tipo"
+  },
+  "alerts": {
+    "submitSuccess": "¡Resultado del partido enviado exitosamente!",
+    "submitError": "Error al enviar el resultado. Por favor intenta de nuevo.",
+    "selectOpponent": "Por favor selecciona un oponente",
+    "enterScores": "Por favor ingresa los marcadores de todos los sets",
+    "editMatch": "Editar Partido",
+    "editMatchMessage": "La función de editar partido se implementará más adelante.",
+    "cancel": "Cancelar"
+  },
+  "matchCard": {
+    "competitive": "Competitivo",
+    "practice": "Práctica",
+    "match": "Partido",
+    "options": "Opciones del Partido",
+    "editScore": "Editar Marcador",
+    "reportMatch": "Reportar Partido"
+  },
+  "report": {
+    "title": "Reportar Partido",
+    "incorrectResult": "Resultado Incorrecto",
+    "neverPlayed": "Nunca se Jugó",
+    "selectReason": "¿Por qué estás reportando este partido?",
+    "submit": "Enviar Reporte",
+    "submitting": "Enviando...",
+    "success": "Reporte enviado exitosamente",
+    "error": "Error al enviar el reporte",
+    "alreadyReported": "Ya tienes un reporte pendiente para este partido"
+  },
+  "results": {
+    "title": "Mis Resultados",
+    "loading": "Cargando...",
+    "leagueRanking": "Clasificación de Liga",
+    "notInLeague": "No estás en ninguna liga",
+    "joinLeagueMessage": "Únete a una liga para ver tu clasificación",
+    "pastMatches": "Partidos Anteriores",
+    "noMatchesFound": "No se encontraron partidos",
+    "submitFirstMatch": "Envía tu primer partido para verlo aquí",
+    "stats": {
+      "played": "Jugados",
+      "won": "Ganados",
+      "lost": "Perdidos",
+      "points": "puntos"
+    },
+    "completedCompetitions": "Competiciones Finalizadas",
+    "ended": "Finalizó {{date}}",
+    "finalPosition": "{{position}} de {{total}}",
+    "noCompletedCompetitions": "No hay competiciones finalizadas aún",
+    "tournamentResult": {
+      "champion": "Campeón",
+      "finalist": "Finalista",
+      "semifinalist": "Semifinalista",
+      "quarterfinalist": "Cuartofinalista",
+      "roundX": "Ronda {{round}}"
+    }
+  },
+  "celebration": {
+    "youWin": "¡Ganaste!",
+    "youLose": "Perdiste",
+    "shareResult": "Compartir",
+    "done": "Listo",
+    "victoryTitle": "¡Victoria!",
+    "defeatTitle": "La próxima será.",
+    "shareDescription": "Comparte con tus amigos"
+  }
+}

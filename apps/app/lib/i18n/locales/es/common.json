@@ -1,0 +1,86 @@
+{
+  "buttons": {
+    "continue": "Continuar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo",
+    "retry": "Reintentar",
+    "close": "Cerrar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "submit": "Enviar",
+    "skip": "Omitir",
+    "logout": "Cerrar Sesión",
+    "login": "Iniciar Sesión",
+    "signUp": "Registrarse",
+    "signIn": "Iniciar Sesión"
+  },
+  "labels": {
+    "loading": "Cargando...",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "name": "Nombre",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "or": "o",
+    "search": "Buscar",
+    "noResults": "No se encontraron resultados",
+    "optional": "Opcional",
+    "required": "Requerido"
+  },
+  "validation": {
+    "required": "Este campo es requerido",
+    "invalidEmail": "Por favor ingresa un correo electrónico válido",
+    "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
+    "passwordMismatch": "Las contraseñas no coinciden"
+  },
+  "time": {
+    "memberSince": "Miembro desde {{date}}",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "Hace {{count}} días"
+  },
+  "tabs": {
+    "community": "Comunidad",
+    "league": "Compite",
+    "results": "Resultados",
+    "settings": "Ajustes"
+  },
+  "days": {
+    "all": "Todos",
+    "today": "Hoy",
+    "sunday": "Domingo",
+    "monday": "Lunes",
+    "tuesday": "Martes",
+    "wednesday": "Miércoles",
+    "thursday": "Jueves",
+    "friday": "Viernes",
+    "saturday": "Sábado"
+  },
+  "timeSlots": {
+    "morning": "Mañana",
+    "afternoon": "Tarde",
+    "evening": "Noche"
+  },
+  "ratings": {
+    "levels": {
+      "1_0": { "level": "Principiante Total", "description": "Recién empezando a jugar tenis." },
+      "1_5": { "level": "Principiante", "description": "Se enfoca principalmente en mantener la pelota en juego." },
+      "2_0": { "level": "Principiante", "description": "Conoce todos los golpes pero le falta experiencia en cancha." },
+      "2_5": { "level": "Principiante Avanzado", "description": "Aprendiendo a anticipar la dirección de la pelota. Empezando a cubrir la cancha." },
+      "3_0": { "level": "Intermedio", "description": "Bastante consistente con golpes a velocidad media. La formación de dobles más común es uno en la red y uno atrás." },
+      "3_5": { "level": "Intermedio Avanzado", "description": "Mayor confiabilidad en los golpes con control direccional en tiros moderados. Desarrollando el juego en equipo en dobles." },
+      "4_0": { "level": "Avanzado Intermedio", "description": "Golpes confiables, incluyendo control direccional y profundidad tanto de derecha como de revés." },
+      "4_5": { "level": "Avanzado", "description": "Empieza a usar potencia y efecto. Comenzando a manejar la velocidad. Buen juego de pies. Control de profundidad." },
+      "5_0": { "level": "Avanzado Plus", "description": "Buena anticipación. Frecuentemente tiene un golpe excepcional. Puede conectar winners regularmente." },
+      "5_5": { "level": "Élite", "description": "Jugador altamente hábil con experiencia en torneos. Nivel potencial universitario o profesional." },
+      "6_0": { "level": "Jugador de Torneo", "description": "Ha obtenido ranking seccional y/o nacional. Competidor sólido a nivel universitario." },
+      "6_5": { "level": "Jugador Élite de Torneo", "description": "Amplia experiencia en torneos satélite. Potencial para carrera profesional." },
+      "7_0": { "level": "Profesional", "description": "Jugador de clase mundial. Juega profesionalmente." }
+    }
+  }
+}

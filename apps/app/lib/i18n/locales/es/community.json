@@ -1,0 +1,85 @@
+{
+  "title": "Comunidad",
+  "header": {
+    "availableToday": "Disponible Hoy",
+    "playNowMode": "Modo Jugar Ahora",
+    "availablePlayers": "Jugadores Disponibles"
+  },
+  "tabs": {
+    "players": "Jugadores",
+    "courts": "Canchas"
+  },
+  "players": {
+    "title": "Jugadores",
+    "searchPlaceholder": "Buscar jugadores...",
+    "noPlayers": "No se encontraron jugadores",
+    "noPlayersMessage": "Intenta ajustar tus filtros o vuelve más tarde para ver nuevos jugadores en tu área.",
+    "clearFilters": "Limpiar Filtros",
+    "availableNow": "Disponible Ahora",
+    "lookingToPlayNow": "Busca jugar ahora",
+    "unknownCity": "Ciudad Desconocida",
+    "other": "Otro",
+    "rating": "Nivel: {{rating}}",
+    "viewProfile": "Ver Perfil"
+  },
+  "courts": {
+    "title": "Canchas",
+    "searchPlaceholder": "Buscar canchas...",
+    "noCourts": "No se encontraron canchas",
+    "public": "Pública",
+    "private": "Privada",
+    "indoor": "Techada",
+    "outdoor": "Al aire libre",
+    "courts": "{{count}} canchas",
+    "hasLights": "Con iluminación",
+    "viewDetails": "Ver Detalles"
+  },
+  "recentActivity": {
+    "title": "Actividad Reciente",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "competitive": "Competitivo",
+    "practice": "Práctica"
+  },
+  "playNow": {
+    "title": "Jugar Ahora",
+    "subtitle": "Encuentra jugadores disponibles para jugar ahora mismo",
+    "available": "Estoy Disponible",
+    "notAvailable": "No Disponible",
+    "availableUntil": "Disponible hasta {{time}}",
+    "lookingForMatch": "Buscando partido",
+    "sendRequest": "Enviar Solicitud",
+    "requestSent": "Solicitud Enviada",
+    "modal": {
+      "title": "Activar Modo Jugar Ahora",
+      "subtitle": "Hazte notar por jugadores buscando partido hoy",
+      "priorityTitle": "Posición Prioritaria",
+      "priorityDescription": "Aparece en la parte superior de la lista de jugadores por las próximas 24 horas",
+      "notificationsTitle": "Notificaciones Instantáneas",
+      "notificationsDescription": "Notifica a jugadores suscritos a alertas de Jugar Ahora en tu ciudad",
+      "cancel": "Cancelar",
+      "enable": "Activar Jugar Ahora",
+      "enabling": "Activando..."
+    }
+  },
+  "filters": {
+    "title": "Filtros",
+    "rating": "Nivel",
+    "ratingRange": "Rango de Nivel NTRP",
+    "distance": "Distancia",
+    "availability": "Disponibilidad",
+    "clear": "Limpiar Todo",
+    "apply": "Aplicar Filtros"
+  },
+  "loading": "Cargando jugadores disponibles...",
+  "errors": {
+    "loadPlayers": "No se pudieron cargar los jugadores. Por favor intenta de nuevo.",
+    "updateAvailability": "Error al actualizar disponibilidad. Por favor intenta de nuevo.",
+    "unexpected": "Ocurrió un error inesperado."
+  },
+  "emptyState": {
+    "setAvailability": "Configura tu disponibilidad",
+    "setAvailabilityMessage": "Por favor configura tu disponibilidad en tu perfil para ver jugadores disponibles hoy.",
+    "editAvailability": "Editar Disponibilidad"
+  }
+}
