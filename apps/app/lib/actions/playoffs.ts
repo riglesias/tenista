@@ -729,6 +729,146 @@ export async function startPlayoffTournament(tournamentId: string): Promise<void
 }
 
 /**
+ * Suspend an in-progress playoff tournament
+ */
+export async function suspendPlayoffTournament(tournamentId: string): Promise<void> {
+  const { error } = await supabase
+    .from('playoff_tournaments')
+    .update({ status: 'suspended' })
+    .eq('id', tournamentId)
+
+  if (error) {
+    throw new Error(`Failed to suspend tournament: ${error.message}`)
+  }
+}
+
+/**
+ * Resume a suspended playoff tournament
+ */
+export async function resumePlayoffTournament(tournamentId: string): Promise<void> {
+  const { error } = await supabase
+    .from('playoff_tournaments')
+    .update({ status: 'in_progress' })
+    .eq('id', tournamentId)
+
+  if (error) {
+    throw new Error(`Failed to resume tournament: ${error.message}`)
+  }
+}
+
+/**
+ * Advance to the next round of a playoff tournament.
+ * Marks the current in_progress round as completed and the next round as in_progress.
+ * Also updates the tournament's current_round field.
+ */
+export async function advancePlayoffRound(tournamentId: string): Promise<void> {
+  // Get all rounds ordered by round_number
+  const { data: rounds, error: roundsError } = await supabase
+    .from('playoff_rounds')
+    .select('id, round_number, status')
+    .eq('playoff_tournament_id', tournamentId)
+    .order('round_number')
+
+  if (roundsError) {
+    throw new Error(`Failed to get rounds: ${roundsError.message}`)
+  }
+
+  if (!rounds || rounds.length === 0) {
+    throw new Error('No rounds found for this tournament')
+  }
+
+  // Find the current in_progress round
+  const currentRound = rounds.find(r => r.status === 'in_progress')
+  if (!currentRound) {
+    // If no round is in_progress, start the first not_started round
+    const firstNotStarted = rounds.find(r => r.status === 'not_started')
+    if (!firstNotStarted) {
+      throw new Error('All rounds are already completed')
+    }
+
+    const { error } = await supabase
+      .from('playoff_rounds')
+      .update({ status: 'in_progress' })
+      .eq('id', firstNotStarted.id)
+
+    if (error) {
+      throw new Error(`Failed to start round: ${error.message}`)
+    }
+
+    // Update tournament current_round
+    await supabase
+      .from('playoff_tournaments')
+      .update({ current_round: firstNotStarted.round_number })
+      .eq('id', tournamentId)
+
+    return
+  }
+
+  // Verify all matches in current round are completed or bye
+  const { data: matches, error: matchesError } = await supabase
+    .from('playoff_matches')
+    .select('id, status')
+    .eq('playoff_round_id', currentRound.id)
+
+  if (matchesError) {
+    throw new Error(`Failed to check round matches: ${matchesError.message}`)
+  }
+
+  const incompleteMatches = (matches || []).filter(
+    m => m.status !== 'completed' && m.status !== 'bye'
+  )
+
+  if (incompleteMatches.length > 0) {
+    throw new Error(
+      `Cannot advance: ${incompleteMatches.length} match(es) in the current round are not yet completed`
+    )
+  }
+
+  // Mark current round as completed
+  const { error: completeError } = await supabase
+    .from('playoff_rounds')
+    .update({ status: 'completed' })
+    .eq('id', currentRound.id)
+
+  if (completeError) {
+    throw new Error(`Failed to complete current round: ${completeError.message}`)
+  }
+
+  // Find the next round
+  const nextRound = rounds.find(
+    r => r.round_number > currentRound.round_number && r.status === 'not_started'
+  )
+
+  if (nextRound) {
+    // Start next round
+    const { error: startError } = await supabase
+      .from('playoff_rounds')
+      .update({ status: 'in_progress' })
+      .eq('id', nextRound.id)
+
+    if (startError) {
+      throw new Error(`Failed to start next round: ${startError.message}`)
+    }
+
+    // Update tournament current_round
+    await supabase
+      .from('playoff_tournaments')
+      .update({ current_round: nextRound.round_number })
+      .eq('id', tournamentId)
+  } else {
+    // No more rounds — mark tournament as completed
+    const { error: tournamentError } = await supabase
+      .from('playoff_tournaments')
+      .update({ status: 'completed' })
+      .eq('id', tournamentId)
+
+    if (tournamentError) {
+      throw new Error(`Failed to complete tournament: ${tournamentError.message}`)
+    }
+  }
+}
+
+/**
  * Reset playoff tournament to not_started state
  * DEV/TEST ONLY - not exposed in UI
  * Clears all match results and resets statuses while keeping the bracket structure

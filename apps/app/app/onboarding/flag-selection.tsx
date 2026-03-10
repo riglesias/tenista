@@ -13,7 +13,6 @@ import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React, { useEffect, useMemo, useState } from 'react';
 import {
-    Alert,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -21,6 +20,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 // Helper function to detect user's country based on timezone
 const getDefaultCountryFromLocale = (): Country | null => {
   try {
@@ -82,7 +82,7 @@ const getDefaultCountryFromLocale = (): Country | null => {
     return countries.find(country => country.code === 'US') || null;
     
   } catch (error) {
-    console.log('Error detecting country from timezone:', error);
+    // silently handled
     // Return United States as fallback
     return countries.find(country => country.code === 'US') || null;
   }
@@ -97,6 +97,7 @@ export default function FlagSelection() {
   const { t } = useTranslation('onboarding');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [loading, setLoading] = useState(false);
@@ -154,7 +155,7 @@ export default function FlagSelection() {
     if (!user) return;
 
     if (!selectedCountry) {
-      Alert.alert(t('flag.requiredField'), t('flag.selectCountryMessage'));
+      showToast(t('flag.selectCountryMessage'), { type: 'error' });
       return;
     }
 
@@ -166,14 +167,12 @@ export default function FlagSelection() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('flag.saveError'));
-        console.error('Country save error:', error);
+        showToast(t('flag.saveError'), { type: 'error' });
       } else {
         router.push('/onboarding/location' as any);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Country save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -230,7 +229,7 @@ export default function FlagSelection() {
           <View style={styles.exampleRow}>
             <View style={styles.playerInfo}>
               <CountryFlag countryCode={selectedCountry?.code} size="lg" />
-              <Text style={[styles.playerName, { color: colors.foreground }]}>{playerName || 'Your Name'}</Text>
+              <Text style={[styles.playerName, { color: colors.foreground }]}>{playerName || t('flag.yourName')}</Text>
             </View>
             <View style={styles.scoreContainer}>
               <Text style={[styles.score, { color: colors.mutedForeground }]}>0</Text>

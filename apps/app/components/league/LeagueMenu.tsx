@@ -5,13 +5,14 @@ import { retireFromLeague } from '@/lib/actions/leagues.actions'
 import React from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-    Alert,
     Modal,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 interface LeagueMenuProps {
   visible: boolean
@@ -30,32 +31,30 @@ export default function LeagueMenu({
 }: LeagueMenuProps) {
   const { theme } = useTheme()
   const { t } = useTranslation('league')
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
 
   const handleLeaveLeague = async () => {
     if (!playerId) return
 
     onClose()
 
-    Alert.alert(
-      t('alerts.retireFromLeague'),
-      t('alerts.leaveWarning'),
-      [
-        { text: t('alerts.cancel'), style: 'cancel' },
-        {
-          text: t('list.leaveLeague'),
-          style: 'destructive',
-          onPress: async () => {
-            const { error } = await retireFromLeague(leagueId, playerId)
-            if (error) {
-              Alert.alert(t('alerts.error'), (error as any)?.message || 'Failed to leave league')
-            } else {
-              Alert.alert(t('alerts.success'), 'You have left the league')
-              onLeagueLeft()
-            }
-          },
-        },
-      ]
-    )
+    confirm({
+      title: t('alerts.retireFromLeague'),
+      message: t('alerts.leaveWarning'),
+      confirmText: t('list.leaveLeague'),
+      cancelText: t('alerts.cancel'),
+      destructive: true,
+      onConfirm: async () => {
+        const { error } = await retireFromLeague(leagueId, playerId)
+        if (error) {
+          showToast((error as any)?.message || 'Failed to leave league', { type: 'error' })
+        } else {
+          showToast('You have left the league', { type: 'success' })
+          onLeagueLeft()
+        }
+      },
+    })
   }
 
   return (

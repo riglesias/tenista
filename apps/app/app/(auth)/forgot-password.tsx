@@ -1,12 +1,12 @@
 'use client'
 
+import { useAppToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { router } from 'expo-router'
 import React, { useState } from 'react'
 import {
-    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -26,6 +26,7 @@ export default function ForgotPassword() {
   const { t } = useTranslation('auth')
   const { t: tCommon } = useTranslation('common')
   const { t: tErrors } = useTranslation('errors')
+  const { showToast } = useAppToast()
 
   const validateForm = () => {
     if (!email.trim()) {
@@ -42,22 +43,16 @@ export default function ForgotPassword() {
   const handleResetPassword = async () => {
     const validationError = validateForm()
     if (validationError) {
-      if (Platform.OS === 'web') {
-        window.alert(validationError)
-      } else {
-        Alert.alert(t('alerts.error'), validationError)
-      }
+      showToast(validationError, { type: 'error' })
       return
     }
 
     setLoading(true)
 
     try {
-      console.log('Attempting password reset for:', email)
       const { error } = await resetPassword(email.trim().toLowerCase())
 
       if (error) {
-        console.error('Password reset error:', error)
         let errorMessage = tErrors('generic.somethingWentWrong')
 
         // Handle common Supabase errors
@@ -71,35 +66,17 @@ export default function ForgotPassword() {
           errorMessage = error.message
         }
 
-        if (Platform.OS === 'web') {
-          window.alert(errorMessage)
-        } else {
-          Alert.alert(t('alerts.error'), errorMessage)
-        }
+        showToast(errorMessage, { type: 'error' })
       } else {
-        console.log('Password reset email sent successfully')
         const successMessage = t('forgotPassword.successMessage')
 
-        if (Platform.OS === 'web') {
-          window.alert(successMessage)
-          router.back()
-        } else {
-          Alert.alert(
-            t('forgotPassword.successTitle'),
-            successMessage,
-            [{ text: 'OK', onPress: () => router.back() }]
-          )
-        }
+        showToast(successMessage, { type: 'success' })
+        router.back()
       }
     } catch (err) {
-      console.error('Unexpected password reset error:', err)
       const errorMessage = tErrors('generic.somethingWentWrong')
 
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage)
-      } else {
-        Alert.alert(t('alerts.error'), errorMessage)
-      }
+      showToast(errorMessage, { type: 'error' })
     } finally {
       setLoading(false)
     }

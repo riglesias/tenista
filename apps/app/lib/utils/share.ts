@@ -32,7 +32,7 @@ export async function shareMatchResult(
 
     return true
   } catch (error) {
-    console.error('Error sharing:', error)
+    // silently handled
     return false
   }
 }
@@ -61,7 +61,6 @@ export async function captureViewAsImage(
 ): Promise<string | null> {
   try {
     if (!viewRef.current) {
-      console.error('View ref is not available')
       return null
     }
 
@@ -75,7 +74,7 @@ export async function captureViewAsImage(
 
     return uri
   } catch (error) {
-    console.error('Error capturing view:', error)
+    // silently handled
     return null
   }
 }
@@ -89,7 +88,6 @@ export async function shareImage(uri: string): Promise<boolean> {
   try {
     const isAvailable = await Sharing.isAvailableAsync()
     if (!isAvailable) {
-      console.error('Sharing is not available on this device')
       return false
     }
 
@@ -104,7 +102,7 @@ export async function shareImage(uri: string): Promise<boolean> {
 
     return true
   } catch (error) {
-    console.error('Error sharing image:', error)
+    // silently handled
     return false
   }
 }
@@ -126,7 +124,7 @@ export async function saveImageToLibrary(uri: string): Promise<{ success: boolea
     await MediaLibrary.saveToLibraryAsync(uri)
     return { success: true }
   } catch (error) {
-    console.error('Error saving image:', error)
+    // silently handled
     return { success: false, error: 'Failed to save image' }
   }
 }
@@ -197,7 +195,7 @@ export async function shareToInstagramStory(uri: string): Promise<{ success: boo
     // Instagram not installed, use fallback
     return { success: false, fallback: true }
   } catch (error) {
-    console.error('Error sharing to Instagram:', error)
+    // silently handled
     // Fall back to regular share
     return { success: false, fallback: true }
   }

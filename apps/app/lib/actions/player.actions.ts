@@ -11,7 +11,7 @@ async function getImageManipulator() {
     try {
       ImageManipulator = await import('expo-image-manipulator')
     } catch (error) {
-      console.warn('expo-image-manipulator not available (running in Expo Go?)')
+      // expo-image-manipulator not available
       return null
     }
   }
@@ -59,7 +59,7 @@ export async function createOrUpdatePlayerProfile(
       return { data, error: null }
     }
   } catch (error) {
-    console.error('Error creating/updating player profile:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -86,7 +86,7 @@ export async function getPlayerProfile(userId?: string) {
     if (error && error.code !== 'PGRST116') throw error // PGRST116 is "no rows returned"
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching player profile:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -102,7 +102,7 @@ export async function getPlayerById(playerId: string) {
     if (error && error.code !== 'PGRST116') throw error // PGRST116 is "no rows returned"
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching player by ID:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -119,7 +119,7 @@ export async function togglePlayerActiveStatus(playerId: string, isActive: boole
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error toggling player active status:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -139,7 +139,7 @@ export async function getAllPlayers(includeInactive: boolean = false) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching players:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -149,7 +149,6 @@ async function resizeImage(uri: string): Promise<string> {
   try {
     const manipulator = await getImageManipulator()
     if (!manipulator) {
-      console.warn('ImageManipulator not available, using original image')
       return uri
     }
     const result = await manipulator.manipulateAsync(
@@ -159,7 +158,6 @@ async function resizeImage(uri: string): Promise<string> {
     )
     return result.uri
   } catch (error) {
-    console.warn('Image resize failed, using original:', error)
     return uri // Fallback to original if resize fails
   }
 }
@@ -174,10 +172,9 @@ async function deleteOldAvatars(userId: string): Promise<void> {
     if (existingFiles?.length) {
       const filesToDelete = existingFiles.map(f => `${userId}/${f.name}`)
       await supabase.storage.from('avatars').remove(filesToDelete)
-      console.log(`Deleted ${filesToDelete.length} old avatar(s) for user ${userId}`)
+      // Old avatars deleted
     }
   } catch (error) {
-    console.warn('Failed to delete old avatars:', error)
     // Non-critical, continue with upload
   }
 }
@@ -196,12 +193,8 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
       throw new Error('No authenticated session');
     }
 
-    console.log(`Uploading avatar for platform: ${Platform.OS}`);
-    console.log(`Original file URI: ${avatarUri}`);
-
     // Resize image before upload for better performance
     const resizedUri = await resizeImage(avatarUri);
-    console.log(`Resized file URI: ${resizedUri}`);
 
     // Delete old avatars to prevent storage bloat
     await deleteOldAvatars(userId);
@@ -225,8 +218,6 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
         uploadData = await response.blob();
       }
       
-      console.log(`Web upload - Blob size: ${uploadData.size} bytes`);
-      
       // Use Supabase's standard upload for web
       const { data, error } = await supabase.storage
         .from('avatars')
@@ -237,7 +228,6 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
         });
 
       if (error) {
-        console.error('Web upload error:', error);
         return { url: null, error };
       }
 
@@ -260,8 +250,6 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
         const baseUrl = projectUrl.replace('/object/public/avatars/dummy', '');
         const uploadUrl = `${baseUrl}/object/avatars/${fileName}`;
         
-        console.log(`Mobile upload - Using FileSystem.uploadAsync`);
-        
         const uploadResult = await FileSystem.uploadAsync(
           uploadUrl,
           resizedUri,
@@ -278,7 +266,6 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
         );
 
         if (uploadResult.status !== 200 && uploadResult.status !== 201) {
-          console.error('Mobile upload failed with status:', uploadResult.status);
           throw new Error(`Upload failed with status ${uploadResult.status}`);
         }
 
@@ -291,12 +278,8 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
         
       } catch (mobileError) {
         // Fallback for mobile if FileSystem fails
-        console.log('Mobile FileSystem upload failed, falling back to blob upload:', mobileError);
-
         const response = await fetch(resizedUri);
         const blob = await response.blob();
-        
-        console.log(`Mobile fallback - Blob size: ${blob.size} bytes`);
         
         const { data, error } = await supabase.storage
           .from('avatars')
@@ -307,7 +290,6 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
           });
 
         if (error) {
-          console.error('Mobile fallback upload error:', error);
           return { url: null, error };
         }
 
@@ -319,7 +301,6 @@ export async function uploadAvatar(userId: string, avatarUri: string): Promise<{
       }
     }
   } catch (error) {
-    console.error('Avatar upload exception:', error);
     return { url: null, error };
   }
 } 

@@ -13,7 +13,6 @@ import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
-    Alert,
     StyleSheet,
     Text,
     TextInput,
@@ -22,6 +21,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 
 export default function Contact() {
   const { user } = useAuth();
@@ -32,6 +32,7 @@ export default function Contact() {
   const { t } = useTranslation('onboarding');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneCountryCode, setPhoneCountryCode] = useState('+1');
@@ -93,7 +94,7 @@ export default function Contact() {
     if (!user) return;
     
     if (!phoneNumber) {
-      Alert.alert(t('contact.requiredField'), t(isUS ? 'contact.enterPhoneNumber' : 'contact.enterPhoneNumberWhatsApp'));
+      showToast(t(isUS ? 'contact.enterPhoneNumber' : 'contact.enterPhoneNumberWhatsApp'), { type: 'error' });
       return;
     }
 
@@ -105,14 +106,12 @@ export default function Contact() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('contact.saveError'));
-        console.error('Phone save error:', error);
+        showToast(t('contact.saveError'), { type: 'error' });
       } else {
         router.push('/onboarding/rating-selection' as any);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Phone save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

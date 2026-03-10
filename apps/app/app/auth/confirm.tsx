@@ -27,15 +27,12 @@ export default function AuthConfirm() {
           })
 
           if (error) {
-            console.error('Email confirmation error:', error)
             router.replace('/(auth)/sign-in?error=confirmation_failed')
           } else {
             // Success! User is now confirmed
-            console.log('Email confirmed successfully')
             router.replace('/(auth)/sign-in?success=email_confirmed')
           }
         } catch (error) {
-          console.error('Confirmation error:', error)
           router.replace('/(auth)/sign-in?error=confirmation_failed')
         }
       } else if (token && type === 'recovery') {
@@ -47,19 +44,17 @@ export default function AuthConfirm() {
           })
 
           if (error) {
-            console.error('Password reset confirmation error:', error)
             router.replace('/(auth)/sign-in?error=reset_failed')
           } else {
             // Success! Redirect to password reset
             router.replace('/(auth)/reset-password?token=' + token)
           }
         } catch (error) {
-          console.error('Recovery confirmation error:', error)
           router.replace('/(auth)/sign-in?error=reset_failed')
         }
       } else {
         // Invalid or missing parameters
-        console.error('Invalid confirmation parameters:', { token, type })
+        // Invalid or missing parameters
         router.replace('/(auth)/sign-in?error=invalid_link')
       }
     }

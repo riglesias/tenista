@@ -1,12 +1,15 @@
 import { Stack } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function AuthLayout() {
+  const { t } = useTranslation('auth');
+
   return (
     <Stack>
       <Stack.Screen
         name="sign-in"
         options={{
-          title: 'Sign In',
+          title: t('layout.signInTitle'),
           headerShown: false
         }}
       />
@@ -17,7 +20,7 @@ export default function AuthLayout() {
           headerTransparent: true,
           headerTitle: '',
           headerTintColor: '#ffffff',
-          headerBackTitle: 'Back',
+          headerBackTitle: t('layout.back'),
         }}
       />
       <Stack.Screen
@@ -27,7 +30,7 @@ export default function AuthLayout() {
           headerTransparent: true,
           headerTitle: '',
           headerTintColor: '#ffffff',
-          headerBackTitle: 'Back',
+          headerBackTitle: t('layout.back'),
         }}
       />
       <Stack.Screen
@@ -37,13 +40,13 @@ export default function AuthLayout() {
           headerTransparent: true,
           headerTitle: '',
           headerTintColor: '#ffffff',
-          headerBackTitle: 'Back',
+          headerBackTitle: t('layout.back'),
         }}
       />
       <Stack.Screen
         name="email-confirmation"
         options={{
-          title: 'Email Confirmation',
+          title: t('layout.emailConfirmationTitle'),
           headerShown: false
         }}
       />

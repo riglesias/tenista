@@ -3,6 +3,7 @@
 import BottomButtons from '@/components/ui/BottomButtons';
 import ScreenHeader from '@/components/ui/ScreenHeader';
 import CountryFlag from '@/components/ui/CountryFlag';
+import { useAppToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { createOrUpdatePlayerProfile, getPlayerProfile } from '@/lib/actions/player.actions';
@@ -10,7 +11,7 @@ import { getThemeColors } from '@/lib/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -276,6 +277,7 @@ export default function EditFlag() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
+  const { showToast } = useAppToast();
   const { t } = useTranslation('profile');
   const { t: tErrors } = useTranslation('errors');
   const [loading, setLoading] = useState(false);
@@ -299,8 +301,7 @@ export default function EditFlag() {
         setSelectedCountryCode(data.nationality_code);
       }
     } catch (error) {
-      console.error('Error loading player flag:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editFlag.loadError'));
+      showToast(t('editFlag.loadError'), { type: 'error' });
     } finally {
       setInitialLoading(false);
     }
@@ -314,7 +315,7 @@ export default function EditFlag() {
     if (!user) return;
 
     if (!selectedCountryCode) {
-      Alert.alert(t('editFlag.requiredField'), t('editFlag.selectFlag'));
+      showToast(t('editFlag.selectFlag'), { type: 'error' });
       return;
     }
 
@@ -326,16 +327,13 @@ export default function EditFlag() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('editFlag.saveError'));
-        console.error('Flag save error:', error);
+        showToast(t('editFlag.saveError'), { type: 'error' });
       } else {
-        Alert.alert(tErrors('generic.success'), t('editFlag.saveSuccess'), [
-          { text: 'OK', onPress: () => router.back() }
-        ]);
+        showToast(t('editFlag.saveSuccess'), { type: 'success' });
+        router.back();
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Flag save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

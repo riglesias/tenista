@@ -2,7 +2,7 @@
 
 import { router, useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Alert, View } from 'react-native'
+import { View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
 import { DaySelector, FilterBottomSheet } from '@/components/community'
@@ -13,6 +13,7 @@ import PlayNowModal from '@/components/community/PlayNowModal'
 import CityRecentMatches from '@/components/community/CityRecentMatches'
 import { EmptyState } from '@/components/ui/ErrorMessage'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { useAppToast } from '@/components/ui/Toast'
 
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -49,7 +50,8 @@ export default function CommunityScreen() {
   const colors = getThemeColors(isDark)
   const { t } = useTranslation('community')
   const { t: tErrors } = useTranslation('errors')
-  
+  const { showToast } = useAppToast()
+
   // Data state
   const [allPlayers, setAllPlayers] = useState<Player[]>([])
   const [userProfile, setUserProfile] = useState<any>(null)
@@ -150,14 +152,14 @@ export default function CommunityScreen() {
         
       },
       {
-        onError: (error) => {
-          console.error('Error loading available players:', error)
+        onError: () => {
+          // silently handled
         }
       }
     )
 
     if (error && !isRefresh) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.loadPlayers'))
+      showToast(t('errors.loadPlayers'), { type: 'error' })
     }
   }
 
@@ -197,7 +199,7 @@ export default function CommunityScreen() {
       if (error) {
         // Revert optimistic update on error
         setIsAvailableToday(!newAvailability)
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.updateAvailability'))
+        showToast(t('errors.updateAvailability'), { type: 'error' })
       } else {
         // Silently refresh player list in background without triggering loading state
         if (user && userProfile?.city_id) {
@@ -213,8 +215,7 @@ export default function CommunityScreen() {
     } catch (error) {
       // Revert optimistic update on error
       setIsAvailableToday(!newAvailability)
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.unexpected'))
-      console.error('Availability toggle error:', error)
+      showToast(t('errors.unexpected'), { type: 'error' })
     } finally {
       setIsUpdatingAvailability(false)
     }

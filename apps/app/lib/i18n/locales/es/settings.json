@@ -58,6 +58,19 @@
     "confirmText": "Escribe ELIMINAR para confirmar",
     "placeholder": "Escribe ELIMINAR",
     "deleteButton": "Eliminar Cuenta",
-    "cancelButton": "Cancelar"
+    "cancelButton": "Cancelar",
+    "permanentWarning": "Esta acción eliminará permanentemente tu cuenta y todos los datos asociados, incluyendo:",
+    "dataProfile": "Tu perfil e información personal",
+    "dataRating": "Tu nivel de tenis e historial de partidos",
+    "dataLeagues": "Tus membresías y posiciones en ligas",
+    "dataTournaments": "Tus participaciones en torneos",
+    "dataPhotos": "Todas las fotos y documentos subidos",
+    "cannotBeUndone": "Esta acción no se puede deshacer.",
+    "confirmInstruction": "Para confirmar la eliminación de tu cuenta, escribe",
+    "confirmInstructionSuffix": "en el campo de abajo:",
+    "confirmPlaceholder": "Escribe DELETE para confirmar",
+    "mustTypeDelete": "Debes escribir \"DELETE\" exactamente para confirmar",
+    "deleting": "Eliminando...",
+    "confirm": "Confirmar"
   }
 }

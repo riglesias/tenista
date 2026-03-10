@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Alert } from 'react-native'
 import { router } from 'expo-router'
 import { getPlayerById, getPlayerProfile } from '@/lib/actions/player.actions'
 import { getPlayerLeagues } from '@/lib/actions/matches.actions'
 import { useErrorHandler } from '@/lib/utils/errors'
+import { useAppToast } from '@/components/ui/Toast'
 
 export interface PlayerData {
   id: string
@@ -27,6 +27,7 @@ export function useMatchData(opponentId?: string) {
   const [currentPlayer, setCurrentPlayer] = useState<PlayerData | null>(null)
   const [leagues, setLeagues] = useState<League[]>([])
   const { handleAsyncError } = useErrorHandler()
+  const { showToast } = useAppToast()
 
   useEffect(() => {
     if (opponentId) {
@@ -36,7 +37,7 @@ export function useMatchData(opponentId?: string) {
 
   const loadData = async () => {
     if (!opponentId) {
-      Alert.alert('Error', 'No opponent selected')
+      showToast('No opponent selected', { type: 'error' })
       router.back()
       return
     }
@@ -69,7 +70,7 @@ export function useMatchData(opponentId?: string) {
     )
 
     if (error) {
-      Alert.alert('Error', error.message)
+      showToast(error.message, { type: 'error' })
       router.back()
     } else {
       setLoading(false)

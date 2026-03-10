@@ -12,7 +12,7 @@ import { getThemeColors } from '@/lib/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -101,8 +101,7 @@ export default function EditLocation() {
         setCountries(sortedCountries);
       }
     } catch (error) {
-      console.error('Error loading location data:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editLocation.loadError'));
+      showToast(t('editLocation.loadError'), { type: 'error' });
     } finally {
       setInitialLoading(false);
     }
@@ -121,7 +120,7 @@ export default function EditLocation() {
     if (!user) return;
 
     if (!selectedCountry || !selectedCity) {
-      Alert.alert(t('editLocation.requiredFields'), t('editLocation.selectCountryAndCity'));
+      showToast(t('editLocation.selectCountryAndCity'), { type: 'error' });
       return;
     }
 
@@ -133,7 +132,7 @@ export default function EditLocation() {
         ?.cities.find(city => city.id === selectedCity);
 
       if (!selectedCityData) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('editLocation.invalidSelection'));
+        showToast(t('editLocation.invalidSelection'), { type: 'error' });
         setLoading(false);
         return;
       }
@@ -146,8 +145,7 @@ export default function EditLocation() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('editLocation.saveError'));
-        console.error('Location save error:', error);
+        showToast(t('editLocation.saveError'), { type: 'error' });
       } else {
         // Reload profile to get updated country data from database trigger
         const { data: updatedProfile } = await getPlayerProfile(user.id);
@@ -165,8 +163,7 @@ export default function EditLocation() {
         setTimeout(() => router.back(), 1000);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Location save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

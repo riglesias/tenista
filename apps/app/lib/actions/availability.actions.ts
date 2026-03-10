@@ -67,7 +67,6 @@ export async function getAvailablePlayersToday(
 
     return { data: availablePlayers, error: null };
   } catch (error) {
-    console.error('Error fetching available players:', error);
     return { data: null, error };
   }
 }
@@ -122,7 +121,6 @@ export async function getAvailablePlayersForDay(
 
     return { data: availablePlayers, error: null };
   } catch (error) {
-    console.error('Error fetching available players for day:', error);
     return { data: null, error };
   }
 }
@@ -199,7 +197,6 @@ export async function getAllAvailablePlayersInCity(
 
     return { data: availablePlayers, error: null };
   } catch (error) {
-    console.error('Error fetching all available players:', error);
     return { data: null, error };
   }
 } 

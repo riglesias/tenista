@@ -10,13 +10,14 @@ import { router } from 'expo-router'
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
 import {
     ActivityIndicator,
-    Alert,
     Image,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { HelpCircle, Play, Trophy } from 'lucide-react-native'
 import { useCreatePlayoffTournament, useStartPlayoffTournament, usePlayoffTournament } from '@/hooks/usePlayoffs'
 import StandingsTable from './StandingsTable'
@@ -47,7 +48,7 @@ interface LeagueInfoCardProps {
   tournamentStarted?: boolean // true if tournament exists AND status !== 'not_started'
 }
 
-const LeagueInfoCard = ({ selectedLeague, onShowRules, onShowTournamentRules, onStartTournament, isStartingTournament, tournamentStarted }: LeagueInfoCardProps) => {
+const LeagueInfoCard = React.memo(function LeagueInfoCard({ selectedLeague, onShowRules, onShowTournamentRules, onStartTournament, isStartingTournament, tournamentStarted }: LeagueInfoCardProps) {
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
   const { t, i18n } = useTranslation('league')
@@ -244,7 +245,7 @@ const LeagueInfoCard = ({ selectedLeague, onShowRules, onShowTournamentRules, on
 
     </View>
   )
-}
+})
 
 function CurrentLeagueComponent({
   selectedLeague,
@@ -257,6 +258,8 @@ function CurrentLeagueComponent({
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
   const { t } = useTranslation('league')
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
 
   // Determine competition type
   const isLadderLeague = selectedLeague.league.competition_type === 'ladder'
@@ -275,55 +278,51 @@ function CurrentLeagueComponent({
     // Check if tournament already exists but is in 'not_started' status (after reset)
     const existingNotStarted = tournament && tournament.status === 'not_started'
 
-    Alert.alert(
-      'Start Tournament',
-      `Are you sure you want to start the tournament with ${qualifyingCount} players? This action cannot be undone.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Start',
-          style: 'destructive',
-          onPress: () => {
-            if (existingNotStarted) {
-              // Tournament exists but was reset - just update status to in_progress
-              startTournamentMutation.mutate(
-                {
-                  tournamentId: tournament.id,
-                  leagueId: selectedLeague.league.id,
-                },
-                {
-                  onSuccess: () => {
-                    Alert.alert('Success', 'Tournament started successfully!')
-                    onRefresh()
-                  },
-                  onError: (error) => {
-                    Alert.alert('Error', `Failed to start tournament: ${error.message}`)
-                  },
-                }
-              )
-            } else {
-              // No tournament exists - create new one
-              createTournamentMutation.mutate(
-                {
-                  league_id: selectedLeague.league.id,
-                  qualifying_players_count: qualifyingCount,
-                },
-                {
-                  onSuccess: () => {
-                    Alert.alert('Success', 'Tournament started successfully!')
-                    onRefresh()
-                  },
-                  onError: (error) => {
-                    Alert.alert('Error', `Failed to start tournament: ${error.message}`)
-                  },
-                }
-              )
+    confirm({
+      title: 'Start Tournament',
+      message: `Are you sure you want to start the tournament with ${qualifyingCount} players? This action cannot be undone.`,
+      confirmText: 'Start',
+      cancelText: 'Cancel',
+      destructive: true,
+      onConfirm: () => {
+        if (existingNotStarted) {
+          // Tournament exists but was reset - just update status to in_progress
+          startTournamentMutation.mutate(
+            {
+              tournamentId: tournament.id,
+              leagueId: selectedLeague.league.id,
+            },
+            {
+              onSuccess: () => {
+                showToast('Tournament started successfully!', { type: 'success' })
+                onRefresh()
+              },
+              onError: (error) => {
+                showToast(`Failed to start tournament: ${error.message}`, { type: 'error' })
+              },
             }
-          },
-        },
-      ]
-    )
-  }, [selectedLeague.league.id, selectedLeague.total_players, tournament, createTournamentMutation, startTournamentMutation, onRefresh])
+          )
+        } else {
+          // No tournament exists - create new one
+          createTournamentMutation.mutate(
+            {
+              league_id: selectedLeague.league.id,
+              qualifying_players_count: qualifyingCount,
+            },
+            {
+              onSuccess: () => {
+                showToast('Tournament started successfully!', { type: 'success' })
+                onRefresh()
+              },
+              onError: (error) => {
+                showToast(`Failed to start tournament: ${error.message}`, { type: 'error' })
+              },
+            }
+          )
+        }
+      },
+    })
+  }, [selectedLeague.league.id, selectedLeague.total_players, tournament, createTournamentMutation, startTournamentMutation, onRefresh, confirm, showToast])
 
   // Determine initial tab based on competition type
   const getInitialTab = useCallback((): LeagueTab => {
@@ -357,9 +356,9 @@ function CurrentLeagueComponent({
     enabled: !isLadderLeague && !isPlayoffsOnlyLeague,
   })
 
-  const handlePlayerPress = (playerId: string) => {
+  const handlePlayerPress = useCallback((playerId: string) => {
     router.push(`/player-profile?playerId=${playerId}`)
-  }
+  }, [])
 
   // Determine which tabs to show
   const availableTabs = useMemo(() => {
@@ -535,8 +534,8 @@ export default function CurrentLeague(props: CurrentLeagueProps) {
   return (
     <AsyncErrorBoundary
       onRetry={props.onRefresh}
-      onError={(error) => {
-        console.error('CurrentLeague error:', error)
+      onError={() => {
+        // silently handled
       }}
     >
       <CurrentLeagueComponent {...props} />

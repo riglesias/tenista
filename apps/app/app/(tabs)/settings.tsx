@@ -1,9 +1,11 @@
 'use client'
 
 import AvatarPicker from '@/components/ui/AvatarPicker';
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import DeleteAccountModal from '@/components/ui/DeleteAccountModal';
 import LanguageSelectionSheet from '@/components/ui/LanguageSelectionSheet';
 import CountryFlag from '@/components/ui/CountryFlag';
+import { useAppToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useNotifications } from '@/contexts/NotificationContext';
@@ -16,7 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { router, useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
+import { Platform, ScrollView, Switch, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -41,6 +43,8 @@ export default function SettingsScreen() {
   const { language } = useLanguage();
   const { t } = useTranslation('settings');
   const { t: tCommon } = useTranslation('common');
+  const { showToast } = useAppToast();
+  const { confirm } = useConfirmDialog();
   const colors = getThemeColors(isDark);
   const insets = useSafeAreaInsets();
   const [playerProfile, setPlayerProfile] = useState<any>(null);
@@ -70,7 +74,6 @@ export default function SettingsScreen() {
       const { data, error } = await getPlayerProfile(user.id);
       
       if (error) {
-        console.error('Error loading player profile:', error);
         setProfileError(t('alerts.failedToLoadProfile'));
       } else {
         setPlayerProfile(data);
@@ -95,7 +98,6 @@ export default function SettingsScreen() {
         }
       }
     } catch (error) {
-      console.error('Error loading player profile:', error);
       setProfileError(t('alerts.failedToLoadProfile'));
     } finally {
       setLoading(false);
@@ -119,15 +121,13 @@ export default function SettingsScreen() {
       });
       
       if (updateError) {
-        Alert.alert(tCommon('labels.error') || 'Error', t('alerts.updateError'));
-        console.error('Profile update error:', updateError);
+        showToast(t('alerts.updateError'), { type: 'error' });
       } else {
         // Update local state
         setPlayerProfile((prev: any) => prev ? { ...prev, avatar_url: newAvatarUrl } : prev);
       }
     } catch (error) {
-      console.error('Avatar update error:', error);
-      Alert.alert(tCommon('labels.error') || 'Error', t('alerts.avatarError'));
+      showToast(t('alerts.avatarError'), { type: 'error' });
     }
   };
 
@@ -161,8 +161,7 @@ export default function SettingsScreen() {
         await disableNotifications();
       }
     } catch (error) {
-      console.error('Error toggling notifications:', error);
-      Alert.alert(tCommon('labels.error') || 'Error', t('alerts.notificationError'));
+      showToast(t('alerts.notificationError'), { type: 'error' });
       // Revert the local state on error
       setPlayNowNotificationsEnabled(!value);
       setPlayerProfile((prev: any) => prev ? { ...prev, play_now_notifications_enabled: !value } : prev);
@@ -195,8 +194,7 @@ export default function SettingsScreen() {
         await enableNotifications();
       }
     } catch (error) {
-      console.error('Error toggling match result notifications:', error);
-      Alert.alert(tCommon('labels.error') || 'Error', t('alerts.notificationError'));
+      showToast(t('alerts.notificationError'), { type: 'error' });
       // Revert the local state on error
       setMatchResultNotificationsEnabled(!value);
       setPlayerProfile((prev: any) => prev ? { ...prev, match_result_notifications_enabled: !value } : prev);
@@ -208,7 +206,7 @@ export default function SettingsScreen() {
   // Check if Play Now notifications are enabled in player profile
   useEffect(() => {
     if (playerProfile?.play_now_notifications_enabled && hasPermission) {
-      enableNotifications().catch(console.error);
+      enableNotifications().catch(() => { /* silently handled */ });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerProfile?.play_now_notifications_enabled, hasPermission]);
@@ -217,82 +215,40 @@ export default function SettingsScreen() {
     try {
       const { error } = await signOut();
       if (error) {
-        const errorMessage = t('alerts.logoutError');
-        if (Platform.OS === 'web') {
-          window.alert(errorMessage);
-        } else {
-          Alert.alert(tCommon('labels.error') || 'Error', errorMessage);
-        }
+        showToast(t('alerts.logoutError'), { type: 'error' });
       } else {
         router.replace('/(auth)/sign-in');
       }
     } catch (error) {
-      console.error('Logout error:', error);
-      const errorMessage = t('alerts.unexpectedError');
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage);
-      } else {
-        Alert.alert(tCommon('labels.error') || 'Error', errorMessage);
-      }
+      showToast(t('alerts.unexpectedError'), { type: 'error' });
     }
   };
 
   const confirmLogout = () => {
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm(t('alerts.logoutConfirmMessage'));
-      if (confirmed) {
-        handleLogout();
-      }
-    } else {
-      Alert.alert(
-        t('alerts.logoutConfirmTitle'),
-        t('alerts.logoutConfirmMessage'),
-        [
-          { text: tCommon('buttons.cancel'), style: 'cancel' },
-          { text: t('account.logout'), style: 'destructive', onPress: handleLogout },
-        ]
-      );
-    }
+    confirm({
+      title: t('alerts.logoutConfirmTitle'),
+      message: t('alerts.logoutConfirmMessage'),
+      confirmText: t('account.logout'),
+      cancelText: tCommon('buttons.cancel'),
+      destructive: true,
+      onConfirm: handleLogout,
+    });
   };
 
   const handleDeleteAccount = async () => {
     setDeletingAccount(true);
     try {
       const result = await deleteAccount();
-      
+
       if (result.success) {
-        // Show success message before signing out
-        if (Platform.OS === 'web') {
-          window.alert('Account successfully deleted. You will now be signed out.');
-        } else {
-          Alert.alert(
-            'Account Deleted', 
-            'Your account has been successfully deleted. You will now be signed out.',
-            [{ text: 'OK', onPress: () => router.replace('/(auth)/sign-in') }]
-          );
-        }
-        
-        // If on web, redirect immediately after alert
-        if (Platform.OS === 'web') {
-          router.replace('/(auth)/sign-in');
-        }
+        showToast(t('alerts.accountDeleted') || 'Account successfully deleted.', { type: 'success' });
+        router.replace('/(auth)/sign-in');
       } else {
-        // Show error
         const errorMessage = result.error || 'Failed to delete account';
-        if (Platform.OS === 'web') {
-          window.alert(errorMessage);
-        } else {
-          Alert.alert('Delete Account Error', errorMessage);
-        }
+        showToast(errorMessage, { type: 'error' });
       }
     } catch (error) {
-      console.error('Delete account error:', error);
-      const errorMessage = 'An unexpected error occurred while deleting your account.';
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage);
-      } else {
-        Alert.alert('Error', errorMessage);
-      }
+      showToast('An unexpected error occurred while deleting your account.', { type: 'error' });
     } finally {
       setDeletingAccount(false);
       setShowDeleteModal(false);

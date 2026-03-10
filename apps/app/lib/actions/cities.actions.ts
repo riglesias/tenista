@@ -15,7 +15,7 @@ export async function getCitiesByCountry(countryCode: string) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching cities:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -36,7 +36,7 @@ export async function getAllCountriesWithCities() {
     
     return { data: uniqueCountries, error: null }
   } catch (error) {
-    console.error('Error fetching countries with cities:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -52,7 +52,7 @@ export async function getCityById(cityId: string) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching city:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -68,7 +68,7 @@ export async function getAllCities() {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching all cities:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -83,18 +83,16 @@ export async function inferUserCountry(): Promise<string> {
     if (response.ok) {
       const data = await response.json()
       if (data.country_code) {
-        console.log('Inferred country from IP:', data.country_code)
         return data.country_code
       }
     }
   } catch (error) {
-    console.log('Failed to get country from IP:', error)
+    // silently handled
   }
   
   // Method 2: Use timezone as fallback
   try {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-    console.log('User timezone:', timezone)
     
     // Map common timezones to countries
     const timezoneToCountry: { [key: string]: string } = {
@@ -119,12 +117,11 @@ export async function inferUserCountry(): Promise<string> {
     // Check if timezone starts with any of our mapped values
     for (const [tz, country] of Object.entries(timezoneToCountry)) {
       if (timezone.includes(tz.split('/')[1])) {
-        console.log('Inferred country from timezone:', country)
         return country
       }
     }
   } catch (error) {
-    console.log('Failed to get country from timezone:', error)
+    // silently handled
   }
   
   // Default to US if we can't determine

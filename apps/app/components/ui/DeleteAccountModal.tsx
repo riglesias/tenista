@@ -5,14 +5,14 @@ import { getThemeColors } from '@/lib/utils/theme'
 import { AlertTriangle, X } from 'lucide-react-native'
 import React, { useState } from 'react'
 import {
-  Alert,
   Modal,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
+import { useAppToast } from '@/components/ui/Toast'
+import { useTranslation } from 'react-i18next'
 
 interface DeleteAccountModalProps {
   visible: boolean
@@ -31,6 +31,12 @@ export default function DeleteAccountModal({
   const [confirmationText, setConfirmationText] = useState('')
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
+  const { showToast } = useAppToast()
+  const { t } = useTranslation('settings')
+  const { t: tCommon } = useTranslation('common')
+
+  // The confirmation word is always "DELETE" regardless of language
+  const CONFIRM_WORD = 'DELETE'
 
   const handleClose = () => {
     setStep('warning')
@@ -43,12 +49,8 @@ export default function DeleteAccountModal({
   }
 
   const handleConfirmDeletion = async () => {
-    if (confirmationText !== 'DELETE') {
-      if (Platform.OS === 'web') {
-        window.alert('You must type "DELETE" exactly to confirm')
-      } else {
-        Alert.alert('Invalid Confirmation', 'You must type "DELETE" exactly to confirm')
-      }
+    if (confirmationText !== CONFIRM_WORD) {
+      showToast(t('deleteModal.mustTypeDelete'), { type: 'error' })
       return
     }
 
@@ -60,7 +62,7 @@ export default function DeleteAccountModal({
     }
   }
 
-  const isConfirmationValid = confirmationText === 'DELETE'
+  const isConfirmationValid = confirmationText === CONFIRM_WORD
 
   return (
     <Modal
@@ -102,7 +104,7 @@ export default function DeleteAccountModal({
                 fontWeight: 'bold',
                 color: colors.foreground,
               }}>
-                Delete Account
+                {t('deleteModal.title')}
               </Text>
             </View>
             <TouchableOpacity
@@ -124,16 +126,16 @@ export default function DeleteAccountModal({
                 marginBottom: 16,
                 lineHeight: 24,
               }}>
-                This action will permanently delete your account and all associated data, including:
+                {t('deleteModal.permanentWarning')}
               </Text>
 
               <View style={{ marginBottom: 20 }}>
                 {[
-                  'Your profile and personal information',
-                  'Your tennis rating and match history',
-                  'Your league memberships and standings',
-                  'Your tournament participations',
-                  'All uploaded photos and documents'
+                  t('deleteModal.dataProfile'),
+                  t('deleteModal.dataRating'),
+                  t('deleteModal.dataLeagues'),
+                  t('deleteModal.dataTournaments'),
+                  t('deleteModal.dataPhotos')
                 ].map((item, index) => (
                   <Text key={index} style={{
                     fontSize: 14,
@@ -153,7 +155,7 @@ export default function DeleteAccountModal({
                 marginBottom: 24,
                 textAlign: 'center',
               }}>
-                This action cannot be undone.
+                {t('deleteModal.cannotBeUndone')}
               </Text>
 
               <View style={{
@@ -176,7 +178,7 @@ export default function DeleteAccountModal({
                     fontSize: 16,
                     fontWeight: '600',
                   }}>
-                    Cancel
+                    {t('deleteModal.cancelButton')}
                   </Text>
                 </TouchableOpacity>
 
@@ -196,7 +198,7 @@ export default function DeleteAccountModal({
                     fontSize: 16,
                     fontWeight: '600',
                   }}>
-                    Continue
+                    {tCommon('buttons.continue')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -211,9 +213,9 @@ export default function DeleteAccountModal({
                 marginBottom: 20,
                 lineHeight: 24,
               }}>
-                To confirm account deletion, please type{' '}
-                <Text style={{ fontWeight: 'bold', color: '#ef4444' }}>DELETE</Text>
-                {' '}in the field below:
+                {t('deleteModal.confirmInstruction')}{' '}
+                <Text style={{ fontWeight: 'bold', color: '#ef4444' }}>{CONFIRM_WORD}</Text>{' '}
+                {t('deleteModal.confirmInstructionSuffix')}
               </Text>
 
               <TextInput
@@ -227,7 +229,7 @@ export default function DeleteAccountModal({
                   color: colors.foreground,
                   marginBottom: 24,
                 }}
-                placeholder="Type DELETE to confirm"
+                placeholder={t('deleteModal.confirmPlaceholder')}
                 placeholderTextColor={colors.mutedForeground}
                 value={confirmationText}
                 onChangeText={setConfirmationText}
@@ -256,7 +258,7 @@ export default function DeleteAccountModal({
                     fontSize: 16,
                     fontWeight: '600',
                   }}>
-                    Back
+                    {t('deleteModal.cancelButton')}
                   </Text>
                 </TouchableOpacity>
 
@@ -276,7 +278,7 @@ export default function DeleteAccountModal({
                     fontSize: 16,
                     fontWeight: '600',
                   }}>
-                    {loading ? 'Deleting...' : 'Confirm'}
+                    {loading ? t('deleteModal.deleting') : t('deleteModal.confirm')}
                   </Text>
                 </TouchableOpacity>
               </View>

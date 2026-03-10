@@ -2,6 +2,7 @@
 
 import MatchCard from '@/components/ui/MatchCard'
 import ReportMatchDialog from '@/components/ui/ReportMatchDialog'
+import { useAppToast } from '@/components/ui/Toast'
 import CompletedLeagueCard from '@/components/league/CompletedLeagueCard'
 import { useTheme } from '@/contexts/ThemeContext'
 import { reportMatchResult } from '@/lib/actions/matches.actions'
@@ -14,7 +15,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { router, useFocusEffect } from 'expo-router'
 import ResultsLoading from '@/components/results/ResultsLoading'
 import React, { useCallback, useRef, useState } from 'react'
-import { Alert, RefreshControl, ScrollView, Text, View } from 'react-native'
+import { RefreshControl, ScrollView, Text, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 
@@ -66,6 +67,7 @@ export default function ResultsScreen() {
   const insets = useSafeAreaInsets()
   const { t } = useTranslation('match')
   const { t: tErrors } = useTranslation('errors')
+  const { showToast } = useAppToast()
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [currentPlayerId, setCurrentPlayerId] = useState<string | null>(null)
@@ -78,7 +80,6 @@ export default function ResultsScreen() {
       // Get current player
       const { data: player } = await getPlayerProfile()
       if (!player) {
-        console.error('No player profile found')
         return
       }
 
@@ -94,7 +95,7 @@ export default function ResultsScreen() {
       setMatches(statsResult.recentMatches)
       setCompletedLeagues(completedResult.data || [])
     } catch (error) {
-      console.error('Error fetching player data:', error)
+      // silently handled
     } finally {
       setLoading(false)
       setRefreshing(false)
@@ -111,8 +112,10 @@ export default function ResultsScreen() {
   const [reportLoading, setReportLoading] = useState(false)
 
   const handleEditMatch = (matchId: string) => {
-    // TODO: Navigate to edit match screen or open edit modal
-    Alert.alert(t('alerts.editMatch'), t('alerts.editMatchMessage'))
+    router.push({
+      pathname: '/submit-result',
+      params: { editMatchId: matchId, editMode: 'true' }
+    })
   }
 
   const handleReportMatch = (matchId: string) => {
@@ -131,14 +134,13 @@ export default function ResultsScreen() {
         const message = error.message?.includes('already have a pending report')
           ? t('report.alreadyReported')
           : t('report.error')
-        Alert.alert(tErrors('generic.somethingWentWrong'), message)
+        showToast(message, { type: 'error' })
       } else {
-        Alert.alert(t('report.success'), '')
+        showToast(t('report.success'), { type: 'success' })
         setReportDialogVisible(false)
       }
     } catch (error) {
-      console.error('Error reporting match:', error)
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('report.error'))
+      showToast(t('report.error'), { type: 'error' })
     } finally {
       setReportLoading(false)
     }

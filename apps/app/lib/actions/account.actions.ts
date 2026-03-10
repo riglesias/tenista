@@ -13,8 +13,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
   const operationsLog: string[] = []
   
   try {
-    console.log('🗑️ Starting account deletion for user:', userId)
-
     // Check if user exists in players table using auth_user_id
     const { error: fetchError } = await supabase
       .from('players')
@@ -24,7 +22,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
 
     // Handle auth-only users (no player profile)
     if (fetchError?.code === 'PGRST116') {
-      console.log('⚠️ Auth-only user detected - no player data to clean up')
       operationsLog.push('Auth-only user detected')
       
       return { 
@@ -38,7 +35,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
 
     // Handle other database errors
     if (fetchError) {
-      console.error('Database error checking user:', fetchError)
       return { 
         success: false, 
         error: 'Failed to verify user profile',
@@ -48,7 +44,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
     }
 
     operationsLog.push('User profile verified - will be handled by Edge function')
-    console.log('✅ User profile verified - Edge function will handle unlinking and anonymization')
     
     return { 
       success: true, 
@@ -57,7 +52,6 @@ export async function deleteUserData(userId: string): Promise<DeletionResult> {
       message: 'User profile verified - ready for deletion'
     }
   } catch (error: any) {
-    console.error('Unexpected error during account deletion:', error)
     operationsLog.push(`Unexpected error: ${error.message}`)
     
     return { 

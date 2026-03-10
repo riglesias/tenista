@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Status enums
-export const PlayoffTournamentStatusEnum = z.enum(['not_started', 'in_progress', 'completed']);
+export const PlayoffTournamentStatusEnum = z.enum(['not_started', 'in_progress', 'completed', 'suspended']);
 export const PlayoffRoundStatusEnum = z.enum(['not_started', 'in_progress', 'completed']);
 export const PlayoffMatchStatusEnum = z.enum(['pending', 'completed', 'bye']);
 

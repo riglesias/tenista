@@ -15,7 +15,6 @@ import { ArrowLeft } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     Image,
     StyleSheet,
     Text,
@@ -25,6 +24,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 import { supabase } from '@/lib/supabase';
 
 type Court = {
@@ -56,6 +56,7 @@ export default function HomecourtOnboarding() {
   const { t: tProfile } = useTranslation('profile');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -116,7 +117,7 @@ export default function HomecourtOnboarding() {
         }
       }
     } catch (error) {
-      console.error('Error loading homecourt data:', error);
+      // silently handled
     } finally {
       setLoading(false);
     }
@@ -156,9 +157,9 @@ export default function HomecourtOnboarding() {
 
       if (error) {
         if (errorType === 'invalid_code') {
-          Alert.alert(tErrors('generic.somethingWentWrong'), tProfile('editClub.invalidCode'));
+          showToast(tProfile('editClub.invalidCode'), { type: 'error' });
         } else {
-          Alert.alert(tErrors('generic.somethingWentWrong'), tProfile('editClub.joinError'));
+          showToast(tProfile('editClub.joinError'), { type: 'error' });
         }
         return;
       }
@@ -170,8 +171,7 @@ export default function HomecourtOnboarding() {
         setJoinCode('');
       }
     } catch (error) {
-      console.error('Error verifying club code:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), tProfile('editClub.joinError'));
+      showToast(tProfile('editClub.joinError'), { type: 'error' });
     } finally {
       setVerifying(false);
     }
@@ -182,7 +182,7 @@ export default function HomecourtOnboarding() {
 
     // If there's a pending org that needs verification, block
     if (pendingOrg) {
-      Alert.alert(t('homecourt.title'), tProfile('editHomecourt.verifyFirst'));
+      showToast(tProfile('editHomecourt.verifyFirst'), { type: 'error' });
       return;
     }
 
@@ -199,16 +199,14 @@ export default function HomecourtOnboarding() {
         });
 
         if (error) {
-          Alert.alert(tErrors('generic.somethingWentWrong'), t('location.saveError'));
-          console.error('Homecourt save error:', error);
+          showToast(t('location.saveError'), { type: 'error' });
           return;
         }
       }
 
       router.push('/onboarding/contact' as any);
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Homecourt save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setSaving(false);
     }

@@ -1,12 +1,12 @@
 'use client'
 
+import { useAppToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { router, useFocusEffect } from 'expo-router'
 import React, { useCallback, useState } from 'react'
 import {
-    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -27,6 +27,7 @@ export default function EmailSignIn() {
   const { t } = useTranslation('auth')
   const { t: tCommon } = useTranslation('common')
   const { t: tErrors } = useTranslation('errors')
+  const { showToast } = useAppToast()
 
   // Reset loading state when component is focused
   useFocusEffect(
@@ -54,11 +55,7 @@ export default function EmailSignIn() {
   const handleSignIn = async () => {
     const validationError = validateForm()
     if (validationError) {
-      if (Platform.OS === 'web') {
-        window.alert(validationError)
-      } else {
-        Alert.alert(t('alerts.error'), validationError)
-      }
+      showToast(validationError, { type: 'error' })
       return
     }
 
@@ -85,22 +82,14 @@ export default function EmailSignIn() {
           errorMessage = error.message
         }
 
-        if (Platform.OS === 'web') {
-          window.alert(errorMessage)
-        } else {
-          Alert.alert(t('alerts.error'), errorMessage)
-        }
+        showToast(errorMessage, { type: 'error' })
       } else {
         // The AuthGuard will handle the redirect automatically
       }
     } catch {
       const errorMessage = tErrors('generic.somethingWentWrong')
 
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage)
-      } else {
-        Alert.alert(t('alerts.error'), errorMessage)
-      }
+      showToast(errorMessage, { type: 'error' })
     } finally {
       setLoading(false)
     }

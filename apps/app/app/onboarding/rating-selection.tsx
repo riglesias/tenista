@@ -10,7 +10,6 @@ import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
-  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,6 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 
 export default function RatingSelection() {
   const { user } = useAuth();
@@ -27,6 +27,7 @@ export default function RatingSelection() {
   const { t } = useTranslation('onboarding');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [selectedRating, setSelectedRating] = useState(2.0);
   const [loading, setLoading] = useState(false);
@@ -68,14 +69,12 @@ export default function RatingSelection() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('rating.saveError'));
-        console.error('Rating save error:', error);
+        showToast(t('rating.saveError'), { type: 'error' });
       } else {
         router.push('/onboarding/availability' as any);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Rating save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

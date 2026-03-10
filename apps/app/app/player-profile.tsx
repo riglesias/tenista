@@ -7,6 +7,8 @@ import ScreenHeader from '@/components/ui/ScreenHeader'
 import RatingBadge from '@/components/ui/RatingBadge'
 import CountryFlag from '@/components/ui/CountryFlag'
 import ChallengeConfirmationSheet from '@/components/ladder/ChallengeConfirmationSheet'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getCourtById } from '@/lib/actions/courts.actions'
 import { getPlayerStats, MatchData, PlayerStatsData } from '@/lib/actions/player-stats.actions'
@@ -25,7 +27,6 @@ import { router, Stack, useLocalSearchParams, useFocusEffect } from 'expo-router
 import React, { useCallback, useEffect, useState } from 'react'
 import {
   ActivityIndicator,
-  Alert,
   Linking,
   RefreshControl,
   ScrollView,
@@ -113,6 +114,8 @@ export default function PlayerProfile() {
   const isFromLadder = fromLadder === 'true' && !!leagueId
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
   const { t } = useTranslation('profile')
   const { t: tErrors } = useTranslation('errors')
   const [player, setPlayer] = useState<any>(null)
@@ -212,7 +215,6 @@ export default function PlayerProfile() {
         setLadderConfig(DEFAULT_LADDER_CONFIG)
       }
     } catch (error) {
-      console.error('Error loading ladder config:', error)
       setLadderConfig(DEFAULT_LADDER_CONFIG)
     }
   }
@@ -234,7 +236,7 @@ export default function PlayerProfile() {
     try {
       const { data, error } = await getPlayerById(playerId)
       if (error) {
-        console.error('Error loading player profile:', error)
+        // silently handled
       } else {
         setPlayer(data)
         
@@ -256,7 +258,7 @@ export default function PlayerProfile() {
         setRecentMatches(recentMatches)
       }
     } catch (error) {
-      console.error('Error loading player profile:', error)
+      // silently handled
     } finally {
       setLoading(false)
     }
@@ -267,7 +269,7 @@ export default function PlayerProfile() {
       const { data } = await getPlayerProfile()
       setCurrentUser(data)
     } catch (error) {
-      console.error('Error loading current user:', error)
+      // silently handled
     }
   }
 
@@ -284,11 +286,7 @@ export default function PlayerProfile() {
 
   const handleSendMessage = async () => {
     if (!player?.phone_number) {
-      Alert.alert(
-        t('playerProfile.noPhoneTitle'),
-        t('playerProfile.noPhoneMessage'),
-        [{ text: 'OK' }]
-      )
+      showToast(t('playerProfile.noPhoneMessage'), { type: 'info' })
       return
     }
 
@@ -311,11 +309,7 @@ export default function PlayerProfile() {
     )
 
     if (!formattedPhone) {
-      Alert.alert(
-        tErrors('generic.error'),
-        t('playerProfile.invalidPhoneNumber'),
-        [{ text: 'OK' }]
-      )
+      showToast(t('playerProfile.invalidPhoneNumber'), { type: 'error' })
       return
     }
 
@@ -328,18 +322,17 @@ export default function PlayerProfile() {
         await Linking.openURL(whatsappUrl)
       } else {
         // WhatsApp not installed - offer SMS fallback
-        Alert.alert(
-          t('playerProfile.whatsappNotInstalled'),
-          t('playerProfile.whatsappFallbackMessage'),
-          [
-            { text: t('playerProfile.cancel'), style: 'cancel' },
-            { text: t('playerProfile.useSms'), onPress: () => sendViaSms(senderName) },
-          ]
-        )
+        confirm({
+          title: t('playerProfile.whatsappNotInstalled'),
+          message: t('playerProfile.whatsappFallbackMessage'),
+          cancelText: t('playerProfile.cancel'),
+          confirmText: t('playerProfile.useSms'),
+          destructive: false,
+          onConfirm: () => sendViaSms(senderName),
+        })
       }
     } catch (error) {
-      console.error('Error opening WhatsApp:', error)
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('playerProfile.whatsappError'))
+      showToast(t('playerProfile.whatsappError'), { type: 'error' })
     }
   }
 
@@ -355,11 +348,10 @@ export default function PlayerProfile() {
       if (supported) {
         await Linking.openURL(smsUrl)
       } else {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('playerProfile.smsNotSupported'))
+        showToast(t('playerProfile.smsNotSupported'), { type: 'error' })
       }
     } catch (error) {
-      console.error('Error opening SMS:', error)
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('playerProfile.smsError'))
+      showToast(t('playerProfile.smsError'), { type: 'error' })
     }
   }
 
@@ -382,17 +374,11 @@ export default function PlayerProfile() {
         challengedPosition: targetPlayerPosition,
       })
       setShowChallengeSheet(false)
-      Alert.alert(
-        t('playerProfile.challengeSent'),
-        t('playerProfile.challengeSentMessage'),
-        [{ text: 'OK', onPress: () => router.back() }]
-      )
+      showToast(t('playerProfile.challengeSentMessage'), { type: 'success' })
+      router.back()
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : tErrors('generic.somethingWentWrong')
-      Alert.alert(
-        tErrors('generic.error'),
-        getChallengeReasonTranslation(errorMessage, t)
-      )
+      showToast(getChallengeReasonTranslation(errorMessage, t), { type: 'error' })
     }
   }
 

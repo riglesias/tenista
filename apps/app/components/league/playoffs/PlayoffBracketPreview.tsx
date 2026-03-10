@@ -3,7 +3,7 @@
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { Eye, Trophy } from 'lucide-react-native'
-import React from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import CountryFlag from '@/components/ui/CountryFlag'
 
@@ -100,26 +100,32 @@ export default function PlayoffBracketPreview({
 
   const isActiveTournament = !!tournamentData && tournamentData.status !== 'not_started'
 
-  const getPlayerName = (player: any) => {
-    return `${player.firstName || player.first_name || ''} ${player.lastName || player.last_name || ''}`.trim()
-  }
-
-  const formatPlayerName = (player: any) => {
+  const formatPlayerName = useCallback((player: any) => {
     const firstName = player.firstName || player.first_name || ''
     const lastName = player.lastName || player.last_name || ''
     if (firstName && lastName) {
       return `${firstName} ${lastName.charAt(0)}.`
     }
     return `${firstName} ${lastName}`.trim()
-  }
+  }, [])
+
+  // Build a participant lookup map for O(1) access instead of O(n) find
+  const participantMap = useMemo(() => {
+    if (!tournamentData?.participants) return new Map<string, TournamentParticipant>()
+    const map = new Map<string, TournamentParticipant>()
+    for (const p of tournamentData.participants) {
+      map.set(p.player_id, p)
+    }
+    return map
+  }, [tournamentData?.participants])
 
   // Get participant data by player ID (for active tournaments)
-  const getParticipantByPlayerId = (playerId: string): TournamentParticipant | undefined => {
-    return tournamentData?.participants.find(p => p.player_id === playerId)
-  }
+  const getParticipantByPlayerId = useCallback((playerId: string): TournamentParticipant | undefined => {
+    return participantMap.get(playerId)
+  }, [participantMap])
 
   // Format scores for display
-  const formatScores = (match: TournamentMatch): string => {
+  const formatScores = useCallback((match: TournamentMatch): string => {
     if (match.result_data?.score) {
       return match.result_data.score
     }
@@ -129,10 +135,10 @@ export default function PlayoffBracketPreview({
         .join(', ')
     }
     return ''
-  }
+  }, [])
 
   // Find champion from completed tournament
-  const findChampion = (): { player: any; seedPosition: number } | null => {
+  const champion = useMemo((): { player: any; seedPosition: number } | null => {
     if (!tournamentData || tournamentData.status !== 'completed') return null
 
     const lastRound = tournamentData.rounds[tournamentData.rounds.length - 1]
@@ -141,12 +147,12 @@ export default function PlayoffBracketPreview({
     const finalMatch = lastRound.matches[0]
     if (!finalMatch || !finalMatch.winner_id) return null
 
-    const participant = getParticipantByPlayerId(finalMatch.winner_id)
+    const participant = participantMap.get(finalMatch.winner_id)
     return {
       player: finalMatch.winner,
       seedPosition: participant?.seed_position || 1
     }
-  }
+  }, [tournamentData, participantMap])
 
   const generateBracketPreview = () => {
     // Sort players by seed position to ensure correct bracket matchups
@@ -612,7 +618,6 @@ export default function PlayoffBracketPreview({
 
   // Render champion display for completed tournaments
   const renderChampionDisplay = () => {
-    const champion = findChampion()
     if (!champion) return null
 
     return (
@@ -659,6 +664,14 @@ export default function PlayoffBracketPreview({
     )
   }
 
+  // Use tournament data for active tournaments, otherwise generate preview
+  const bracketRounds = useMemo(() => {
+    if (qualifyingData.qualifiedPlayers.length === 0) return []
+    return isActiveTournament
+      ? convertTournamentRoundsToBracket()
+      : generateBracketPreview()
+  }, [isActiveTournament, tournamentData, qualifyingData.qualifiedPlayers, qualifyingCount, participantMap])
+
   if (qualifyingData.qualifiedPlayers.length === 0) {
     return (
       <View style={{ paddingHorizontal: 24, paddingBottom: 16 }}>
@@ -691,11 +704,6 @@ export default function PlayoffBracketPreview({
       </View>
     )
   }
-
-  // Use tournament data for active tournaments, otherwise generate preview
-  const bracketRounds = isActiveTournament
-    ? convertTournamentRoundsToBracket()
-    : generateBracketPreview()
 
   return (
     <View style={{ paddingHorizontal: 24, paddingBottom: 16 }}>

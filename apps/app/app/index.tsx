@@ -40,7 +40,6 @@ export default function Index() {
           setRedirectPath('/(tabs)/community');
         }
       } catch (error) {
-        console.error('Error checking onboarding:', error);
         setRedirectPath('/onboarding/profile');
       }
       

@@ -2,6 +2,7 @@
 
 import BottomButtons from '@/components/ui/BottomButtons';
 import ScreenHeader from '@/components/ui/ScreenHeader';
+import { useAppToast } from '@/components/ui/Toast';
 import {
   BROWSABLE_RATING_VALUES,
   formatRating,
@@ -20,7 +21,7 @@ import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import { ArrowDown } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -28,6 +29,7 @@ export default function EditRating() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
+  const { showToast } = useAppToast();
   const { t } = useTranslation('profile');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
@@ -60,8 +62,7 @@ export default function EditRating() {
       setCanSubmit(eligible);
       setLastRequestDate(lastDate);
     } catch (error) {
-      console.error('Error loading player data:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editRating.loadError'));
+      showToast(t('editRating.loadError'), { type: 'error' });
     } finally {
       setInitialLoading(false);
     }
@@ -79,12 +80,12 @@ export default function EditRating() {
     if (!user || !playerProfile) return;
 
     if (requestedRating === currentRating) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editRating.sameRatingError'));
+      showToast(t('editRating.sameRatingError'), { type: 'error' });
       return;
     }
 
     if (!reason.trim()) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editRating.noReason'));
+      showToast(t('editRating.noReason'), { type: 'error' });
       return;
     }
 
@@ -98,7 +99,7 @@ export default function EditRating() {
       );
 
       if (!success) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), error || tErrors('generic.tryAgain'));
+        showToast(error || tErrors('generic.tryAgain'), { type: 'error' });
         return;
       }
 
@@ -111,21 +112,13 @@ export default function EditRating() {
       );
 
       if (emailResult.success) {
-        Alert.alert(
-          t('editRating.requestSubmitted'),
-          t('editRating.requestSuccess'),
-          [{ text: 'OK', onPress: () => router.back() }]
-        );
+        showToast(t('editRating.requestSuccess'), { type: 'success' });
       } else {
-        Alert.alert(
-          t('editRating.requestSubmitted'),
-          t('editRating.requestSuccessEmailError'),
-          [{ text: 'OK', onPress: () => router.back() }]
-        );
+        showToast(t('editRating.requestSuccessEmailError'), { type: 'success' });
       }
+      router.back();
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Rating request submission error:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

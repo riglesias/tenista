@@ -31,7 +31,7 @@ export async function getPlayerClub(
       error: null,
     }
   } catch (error: any) {
-    console.error('Error getting player club:', error)
+    // silently handled
     return { data: null, error: error.message || 'Failed to get player club' }
   }
 }
@@ -56,7 +56,7 @@ export async function getOrganizationByCourtId(
 
     return { data, error: null }
   } catch (error: any) {
-    console.error('Error getting organization by court:', error)
+    // silently handled
     return { data: null, error: error.message || 'Failed to get organization' }
   }
 }
@@ -127,7 +127,7 @@ export async function joinClub(
       error: null,
     }
   } catch (error: any) {
-    console.error('Error joining club:', error)
+    // silently handled
     return { data: null, error: error.message || 'Failed to join club', errorType: 'unknown' }
   }
 }
@@ -164,7 +164,7 @@ export async function getAllClubs(): Promise<{
       error: null,
     }
   } catch (error: any) {
-    console.error('Error getting all clubs:', error)
+    // silently handled
     return { data: [], error: error.message || 'Failed to get clubs' }
   }
 }
@@ -188,7 +188,7 @@ export async function leaveClub(
 
     return { error: null }
   } catch (error: any) {
-    console.error('Error leaving club:', error)
+    // silently handled
     return { error: error.message || 'Failed to leave club' }
   }
 }

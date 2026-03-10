@@ -9,9 +9,10 @@ import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 
 const DAYS_OF_WEEK: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
@@ -25,6 +26,7 @@ export default function Availability() {
   const { t } = useTranslation('onboarding');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [loading, setLoading] = React.useState(false);
   const [availability, setAvailability] = React.useState<AvailabilityData>({});
@@ -70,25 +72,19 @@ export default function Availability() {
       });
 
       if (error) {
-        console.error('❌ Availability save error:', error);
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('availability.saveError'));
+        showToast(t('availability.saveError'), { type: 'error' });
       } else {
-        console.log('✅ Onboarding completed successfully! User availability saved.');
-        console.log('📊 Availability data:', cleanedAvailability);
-        
         // Refresh user context to trigger re-check in AuthGuard
         refreshUser();
-        
+
         // Add a small delay to ensure database update is propagated
         setTimeout(() => {
-          console.log('🚀 Navigating to main app...');
           // Navigate to main app
           router.replace('/(tabs)/community');
         }, 500);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Availability save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

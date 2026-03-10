@@ -7,7 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import CachedImage from '@/components/ui/CachedImage';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { useAppToast } from '@/components/ui/Toast';
 
 interface AvatarPickerProps {
   avatarUrl: string | null;
@@ -63,6 +64,7 @@ const AvatarPicker = React.memo(({
 }: AvatarPickerProps) => {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
+  const { showToast } = useAppToast();
   const [uploading, setUploading] = useState(false);
 
   const handleImagePick = useCallback(async () => {
@@ -74,15 +76,15 @@ const AvatarPicker = React.memo(({
       
       // Check if ImagePicker is available
       if (!ImagePicker || !ImagePicker.requestMediaLibraryPermissionsAsync) {
-        Alert.alert('Error', 'Image picker is not available on this platform.');
+        showToast('Image picker is not available on this platform.', { type: 'error' });
         setUploading(false);
         return;
       }
-      
+
       const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
+
       if (permissionResult.granted === false) {
-        Alert.alert('Permission Required', 'Please allow access to your photo library to upload a profile picture.');
+        showToast('Please allow access to your photo library to upload a profile picture.', { type: 'info' });
         setUploading(false);
         return;
       }
@@ -109,7 +111,7 @@ const AvatarPicker = React.memo(({
 
         // Validate the asset has a URI
         if (!asset.uri) {
-          Alert.alert('Error', 'Selected image is invalid. Please try another image.');
+          showToast('Selected image is invalid. Please try another image.', { type: 'error' });
           setUploading(false);
           return;
         }
@@ -117,10 +119,7 @@ const AvatarPicker = React.memo(({
         // Validate file size (5MB limit)
         const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
         if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
-          Alert.alert(
-            'Image Too Large',
-            'Please select an image smaller than 5MB.'
-          );
+          showToast('Please select an image smaller than 5MB.', { type: 'error' });
           setUploading(false);
           return;
         }
@@ -129,24 +128,22 @@ const AvatarPicker = React.memo(({
         const { url, error } = await uploadAvatar(userId, asset.uri);
         
         if (error) {
-          Alert.alert('Upload Error', 'Failed to upload profile picture. Please try again.');
-          console.error('Avatar upload error:', error);
+          showToast('Failed to upload profile picture. Please try again.', { type: 'error' });
         } else if (url) {
           onAvatarChange(url);
         } else {
-          Alert.alert('Error', 'Upload completed but no URL was returned. Please try again.');
+          showToast('Upload completed but no URL was returned. Please try again.', { type: 'error' });
         }
       }
       
       // Always reset uploading state when done
       setUploading(false);
     } catch (error) {
-      console.error('Image picker error:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-      Alert.alert('Error', `${errorMessage}. Please try again.`);
+      showToast(`${errorMessage}. Please try again.`, { type: 'error' });
       setUploading(false);
     }
-  }, [disabled, userId, uploading, onAvatarChange, size]);
+  }, [disabled, userId, uploading, onAvatarChange, size, showToast]);
 
   const radius = size / 2;
   const editButtonSize = Math.max(24, size * 0.25);

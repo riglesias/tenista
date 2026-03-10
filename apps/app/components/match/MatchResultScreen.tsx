@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import {
   View,
   Text,
@@ -8,7 +8,6 @@ import {
   Platform,
   AccessibilityInfo,
   Dimensions,
-  Alert,
   ScrollView,
   NativeSyntheticEvent,
   NativeScrollEvent,
@@ -32,6 +31,7 @@ import {
   shareToInstagramStory,
 } from '@/lib/utils/share'
 import ShareableMatchCard from './ShareableMatchCard'
+import { useAppToast } from '@/components/ui/Toast'
 
 type CourtSurface = 'hard' | 'clay' | 'grass'
 
@@ -81,6 +81,7 @@ export default function MatchResultScreen({
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
   const { t } = useTranslation('match')
+  const { showToast } = useAppToast()
 
   const [reduceMotion, setReduceMotion] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(DEFAULT_INDEX)
@@ -102,7 +103,10 @@ export default function MatchResultScreen({
   const horizontalPadding = (SCREEN_WIDTH - CARD_WIDTH) / 2
 
   // Calculate snap offsets for each card to be centered
-  const snapOffsets = COURT_SURFACES.map((_, index) => index * (CARD_WIDTH + CARD_GAP))
+  const snapOffsets = useMemo(
+    () => COURT_SURFACES.map((_, index) => index * (CARD_WIDTH + CARD_GAP)),
+    []
+  )
 
   // Check motion preferences
   useEffect(() => {
@@ -151,7 +155,6 @@ export default function MatchResultScreen({
     try {
       const cardRef = cardRefs.current[selectedIndex]
       if (!cardRef) {
-        console.error('Card ref not available for index:', selectedIndex)
         return null
       }
 
@@ -163,7 +166,6 @@ export default function MatchResultScreen({
       })
       return uri
     } catch (error) {
-      console.error('Error capturing card:', error)
       return null
     }
   }, [selectedIndex])
@@ -174,7 +176,7 @@ export default function MatchResultScreen({
     try {
       const uri = await captureCard()
       if (!uri) {
-        Alert.alert('Error', 'Failed to capture image. Please try again.')
+        showToast('Failed to capture image. Please try again.', { type: 'error' })
         return
       }
 
@@ -183,12 +185,11 @@ export default function MatchResultScreen({
         await shareImage(uri)
       }
     } catch (error) {
-      console.error('Error sharing to Instagram:', error)
-      Alert.alert('Error', 'Failed to share to Instagram. Please try again.')
+      showToast('Failed to share to Instagram. Please try again.', { type: 'error' })
     } finally {
       setIsSharing(false)
     }
-  }, [captureCard])
+  }, [captureCard, showToast])
 
   // Handle save to device
   const handleSave = useCallback(async () => {
@@ -196,23 +197,22 @@ export default function MatchResultScreen({
     try {
       const uri = await captureCard()
       if (!uri) {
-        Alert.alert('Error', 'Failed to capture image. Please try again.')
+        showToast('Failed to capture image. Please try again.', { type: 'error' })
         return
       }
 
       const result = await saveImageToLibrary(uri)
       if (result.success) {
-        Alert.alert('Saved', 'Image saved to your photo library!')
+        showToast('Image saved to your photo library!', { type: 'success' })
       } else {
-        Alert.alert('Error', result.error || 'Failed to save image.')
+        showToast(result.error || 'Failed to save image.', { type: 'error' })
       }
     } catch (error) {
-      console.error('Error saving:', error)
-      Alert.alert('Error', 'Failed to save image. Please try again.')
+      showToast('Failed to save image. Please try again.', { type: 'error' })
     } finally {
       setIsSaving(false)
     }
-  }, [captureCard])
+  }, [captureCard, showToast])
 
   // Handle generic share
   const handleShare = useCallback(async () => {
@@ -220,18 +220,17 @@ export default function MatchResultScreen({
     try {
       const uri = await captureCard()
       if (!uri) {
-        Alert.alert('Error', 'Failed to capture image. Please try again.')
+        showToast('Failed to capture image. Please try again.', { type: 'error' })
         return
       }
 
       await shareImage(uri)
     } catch (error) {
-      console.error('Error sharing:', error)
-      Alert.alert('Error', 'Failed to share image. Please try again.')
+      showToast('Failed to share image. Please try again.', { type: 'error' })
     } finally {
       setIsSharing(false)
     }
-  }, [captureCard])
+  }, [captureCard, showToast])
 
   // Animated styles
   const cardAnimatedStyle = useAnimatedStyle(() => ({
@@ -377,7 +376,7 @@ export default function MatchResultScreen({
               >
                 <Download size={20} color={colors.foreground} />
                 <Text style={[styles.secondaryButtonText, { color: colors.foreground }]}>
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? t('celebration.saving') : t('celebration.save')}
                 </Text>
               </TouchableOpacity>
 
@@ -391,7 +390,7 @@ export default function MatchResultScreen({
               >
                 <Share2 size={20} color={colors.foreground} />
                 <Text style={[styles.secondaryButtonText, { color: colors.foreground }]}>
-                  Share
+                  {t('celebration.shareResult')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -403,7 +402,7 @@ export default function MatchResultScreen({
 }
 
 // Simple Instagram icon component (white)
-function InstagramIcon() {
+const InstagramIcon = React.memo(function InstagramIcon() {
   return (
     <View style={styles.instagramIcon}>
       <View style={styles.instagramIconOuter} />
@@ -411,7 +410,7 @@ function InstagramIcon() {
       <View style={styles.instagramIconDot} />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

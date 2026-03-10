@@ -4,13 +4,14 @@ import AvatarPicker from '@/components/ui/AvatarPicker';
 import BottomButtons from '@/components/ui/BottomButtons';
 import { RadioButton } from '@/components/ui/RadioButton';
 import ScreenHeader from '@/components/ui/ScreenHeader';
+import { useAppToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { createOrUpdatePlayerProfile, getPlayerProfile } from '@/lib/actions/player.actions';
 import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, Alert, Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +19,7 @@ export default function EditProfile() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
+  const { showToast } = useAppToast();
   const { t } = useTranslation('profile');
   const { t: tErrors } = useTranslation('errors');
   const [loading, setLoading] = React.useState(false);
@@ -48,8 +50,7 @@ export default function EditProfile() {
         setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
-      console.error('Error loading player profile:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('edit.saveError'));
+      showToast(t('edit.saveError'), { type: 'error' });
     } finally {
       setInitialLoading(false);
     }
@@ -63,7 +64,7 @@ export default function EditProfile() {
     if (!user) return;
 
     if (!firstName || !lastName || !gender) {
-      Alert.alert(t('edit.requiredFields'), t('edit.fillAllFields'));
+      showToast(t('edit.fillAllFields'), { type: 'error' });
       return;
     }
 
@@ -77,16 +78,13 @@ export default function EditProfile() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('edit.saveError'));
-        console.error('Profile save error:', error);
+        showToast(t('edit.saveError'), { type: 'error' });
       } else {
-        Alert.alert(tErrors('generic.success'), t('edit.saveSuccess'), [
-          { text: 'OK', onPress: () => router.back() }
-        ]);
+        showToast(t('edit.saveSuccess'), { type: 'success' });
+        router.back();
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Profile save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -214,7 +212,7 @@ export default function EditProfile() {
               onPress={(value) => setGender(value as 'female')}
             />
           </View>
-          <TouchableOpacity onPress={() => Alert.alert(t('edit.genderInfoTitle'), t('edit.genderInfoMessage'))}>
+          <TouchableOpacity onPress={() => showToast(t('edit.genderInfoMessage'), { type: 'info' })}>
             <Text className={`text-sm mt-1 underline ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {t('edit.whyGender')}
             </Text>

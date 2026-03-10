@@ -104,7 +104,7 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
         }
       }
     } catch (error) {
-      console.error('Error fetching league data:', error)
+      // silently handled
     }
 
     const stats: PlayerStatsData = {
@@ -166,7 +166,6 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
       recentMatches,
     }
   } catch (error) {
-    console.error('Error fetching player stats:', error)
     return {
       stats: {
         matchesPlayed: 0,

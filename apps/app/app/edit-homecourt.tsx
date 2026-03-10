@@ -5,6 +5,7 @@ import CourtSelectionSheet from '@/components/ui/CourtSelectionSheet';
 import SelectionBottomSheet, { SelectionOption } from '@/components/ui/SelectionBottomSheet';
 import ScreenHeader from '@/components/ui/ScreenHeader';
 import { useAppToast } from '@/components/ui/Toast';
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getAllCities } from '@/lib/actions/cities.actions';
@@ -16,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Building2 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Alert, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { PlayerOrganization } from '@/lib/validation/organization.validation';
@@ -54,6 +55,7 @@ export default function EditHomecourt() {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
   const { showToast } = useAppToast();
+  const { confirm } = useConfirmDialog();
   const { t } = useTranslation('profile');
   const { t: tErrors } = useTranslation('errors');
   const [loading, setLoading] = React.useState(false);
@@ -88,8 +90,7 @@ export default function EditHomecourt() {
       const { data: profile, error } = await getPlayerProfile(user.id);
 
       if (error) {
-        console.error('Error loading player profile:', error);
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('editHomecourt.loadError'));
+        showToast(t('editHomecourt.loadError'), { type: 'error' });
         return;
       }
 
@@ -130,8 +131,7 @@ export default function EditHomecourt() {
         }
       }
     } catch (error) {
-      console.error('Error loading homecourt data:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editHomecourt.loadError'));
+      showToast(t('editHomecourt.loadError'), { type: 'error' });
     } finally {
       setInitialLoading(false);
     }
@@ -145,17 +145,14 @@ export default function EditHomecourt() {
     if (court.id === 'other' || court.id === 'none') {
       // If player was in a club, warn about leaving
       if (currentClub) {
-        Alert.alert(
-          t('editHomecourt.leaveClubTitle'),
-          t('editHomecourt.leaveClubMessage', { name: currentClub.organization_name }),
-          [
-            { text: t('editHomecourt.cancel'), style: 'cancel' },
-            {
-              text: t('editHomecourt.continue'),
-              onPress: () => setSelectedCourt(court.id),
-            },
-          ]
-        );
+        confirm({
+          title: t('editHomecourt.leaveClubTitle'),
+          message: t('editHomecourt.leaveClubMessage', { name: currentClub.organization_name }),
+          cancelText: t('editHomecourt.cancel'),
+          confirmText: t('editHomecourt.continue'),
+          destructive: false,
+          onConfirm: () => setSelectedCourt(court.id),
+        });
         return;
       }
       setSelectedCourt(court.id);
@@ -175,20 +172,17 @@ export default function EditHomecourt() {
 
       // If switching from another club, warn first
       if (currentClub && currentClub.organization_id !== linkedOrg.id) {
-        Alert.alert(
-          t('editHomecourt.switchClubTitle'),
-          t('editHomecourt.switchClubMessage', { oldClub: currentClub.organization_name, newClub: linkedOrg.name }),
-          [
-            { text: t('editHomecourt.cancel'), style: 'cancel' },
-            {
-              text: t('editHomecourt.continue'),
-              onPress: () => {
-                setPendingOrg(linkedOrg);
-                setSelectedCourt(court.id);
-              },
-            },
-          ]
-        );
+        confirm({
+          title: t('editHomecourt.switchClubTitle'),
+          message: t('editHomecourt.switchClubMessage', { oldClub: currentClub.organization_name, newClub: linkedOrg.name }),
+          cancelText: t('editHomecourt.cancel'),
+          confirmText: t('editHomecourt.continue'),
+          destructive: false,
+          onConfirm: () => {
+            setPendingOrg(linkedOrg);
+            setSelectedCourt(court.id);
+          },
+        });
         return;
       }
 
@@ -198,17 +192,14 @@ export default function EditHomecourt() {
     } else {
       // Public court with no linked org
       if (currentClub) {
-        Alert.alert(
-          t('editHomecourt.leaveClubTitle'),
-          t('editHomecourt.leaveClubMessage', { name: currentClub.organization_name }),
-          [
-            { text: t('editHomecourt.cancel'), style: 'cancel' },
-            {
-              text: t('editHomecourt.continue'),
-              onPress: () => setSelectedCourt(court.id),
-            },
-          ]
-        );
+        confirm({
+          title: t('editHomecourt.leaveClubTitle'),
+          message: t('editHomecourt.leaveClubMessage', { name: currentClub.organization_name }),
+          cancelText: t('editHomecourt.cancel'),
+          confirmText: t('editHomecourt.continue'),
+          destructive: false,
+          onConfirm: () => setSelectedCourt(court.id),
+        });
         return;
       }
       setSelectedCourt(court.id);
@@ -244,7 +235,7 @@ export default function EditHomecourt() {
         setCourtOrgs(orgsResult.data.map((o: any) => ({ court_id: o.court_id, org_name: o.name })));
       }
     } catch (error) {
-      console.error('Error loading courts for new city:', error);
+      // silently handled
     }
   };
 
@@ -274,7 +265,6 @@ export default function EditHomecourt() {
         setTimeout(() => router.back(), 1000);
       }
     } catch (error) {
-      console.error('Error verifying club code:', error);
       showToast(t('editClub.joinError'), { type: 'error' });
     } finally {
       setVerifying(false);
@@ -321,16 +311,14 @@ export default function EditHomecourt() {
       const { error } = await createOrUpdatePlayerProfile(user.id, profileUpdate);
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('editHomecourt.saveError'));
-        console.error('Homecourt save error:', error);
+        showToast(t('editHomecourt.saveError'), { type: 'error' });
       } else {
         setCurrentHomecourtId(selectedCourt);
         showToast(t('editHomecourt.saveSuccess'), { type: 'success' });
         setTimeout(() => router.back(), 1000);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Homecourt save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -339,37 +327,32 @@ export default function EditHomecourt() {
   const handleLeaveClub = () => {
     if (!currentClub || !playerId) return;
 
-    Alert.alert(
-      t('editClub.leaveConfirmTitle'),
-      t('editHomecourt.leaveClubClearsHomecourt', { name: currentClub.organization_name }),
-      [
-        { text: t('editHomecourt.cancel'), style: 'cancel' },
-        {
-          text: t('editClub.leaveClub'),
-          style: 'destructive',
-          onPress: async () => {
-            setLoading(true);
-            try {
-              const { error } = await leaveClub(playerId);
-              if (error) {
-                showToast(t('editClub.leaveError'), { type: 'error' });
-                return;
-              }
-              const clubName = currentClub.organization_name;
-              setCurrentClub(null);
-              setSelectedCourt(null);
-              setCurrentHomecourtId(null);
-              showToast(t('editClub.leaveSuccess', { name: clubName }), { type: 'success' });
-            } catch (error) {
-              console.error('Error leaving club:', error);
-              showToast(t('editClub.leaveError'), { type: 'error' });
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-      ]
-    );
+    confirm({
+      title: t('editClub.leaveConfirmTitle'),
+      message: t('editHomecourt.leaveClubClearsHomecourt', { name: currentClub.organization_name }),
+      cancelText: t('editHomecourt.cancel'),
+      confirmText: t('editClub.leaveClub'),
+      destructive: true,
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          const { error } = await leaveClub(playerId);
+          if (error) {
+            showToast(t('editClub.leaveError'), { type: 'error' });
+            return;
+          }
+          const clubName = currentClub.organization_name;
+          setCurrentClub(null);
+          setSelectedCourt(null);
+          setCurrentHomecourtId(null);
+          showToast(t('editClub.leaveSuccess', { name: clubName }), { type: 'success' });
+        } catch (error) {
+          showToast(t('editClub.leaveError'), { type: 'error' });
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
 
   const handleCancel = () => {

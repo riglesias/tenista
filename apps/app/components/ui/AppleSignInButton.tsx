@@ -5,13 +5,15 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Alert, Platform, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { useAppToast } from '@/components/ui/Toast'
 
 export default function AppleSignInButton({ disabled = false, onError }: { disabled?: boolean, onError?: (error: string) => void }) {
   const { signInWithApple } = useAuth()
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
+  const { showToast } = useAppToast()
   const [isAppleSignInAvailable, setIsAppleSignInAvailable] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -22,7 +24,6 @@ export default function AppleSignInButton({ disabled = false, onError }: { disab
           const isAvailable = await AppleAuthentication.isAvailableAsync()
           setIsAppleSignInAvailable(isAvailable)
         } catch (error) {
-          console.log('Apple Sign-In not available:', error)
           setIsAppleSignInAvailable(false)
         }
       }
@@ -35,11 +36,7 @@ export default function AppleSignInButton({ disabled = false, onError }: { disab
     if (onError) {
       onError(errorMessage)
     } else {
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage)
-      } else {
-        Alert.alert('Apple Sign In Error', errorMessage)
-      }
+      showToast(errorMessage, { type: 'error' })
     }
   }
 
@@ -54,7 +51,6 @@ export default function AppleSignInButton({ disabled = false, onError }: { disab
 
     try {
       setIsLoading(true)
-      console.log('🍎 Starting Apple Sign-In...')
       const credential = await AppleAuthentication.signInAsync({
         requestedScopes: [
           AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
@@ -62,33 +58,19 @@ export default function AppleSignInButton({ disabled = false, onError }: { disab
         ],
       })
 
-      console.log('🍎 Apple credential received:', {
-        user: credential.user,
-        email: credential.email,
-        fullName: credential.fullName,
-        hasIdentityToken: !!credential.identityToken,
-        hasAuthorizationCode: !!credential.authorizationCode,
-        identityTokenLength: credential.identityToken?.length,
-        authorizationCodeLength: credential.authorizationCode?.length,
-      })
-
       if (credential.identityToken) {
-        console.log('🍎 Got Apple ID token, signing in with Supabase...')
         const { error } = await signInWithApple(credential.identityToken, credential.user, {
           fullName: credential.fullName,
           email: credential.email,
         })
         
         if (error) {
-          console.error('🍎 Supabase sign-in error:', error)
           setIsLoading(false)
           handleError(error.message || 'Failed to sign in with Supabase')
         } else {
-          console.log('🍎 Successfully signed in with Supabase')
           // Keep loading state - AuthContext will handle navigation
         }
       } else {
-        console.error('🍎 No identity token received from Apple')
         setIsLoading(false)
         handleError('Failed to get identity token from Apple.')
       }
@@ -96,15 +78,7 @@ export default function AppleSignInButton({ disabled = false, onError }: { disab
       setIsLoading(false)
       if (error.code === 'ERR_REQUEST_CANCELED') {
         // User canceled the sign-in, don't show error
-        console.log('🍎 User canceled Apple sign-in')
       } else {
-        console.error('🍎 Apple sign-in error:', {
-          code: error.code,
-          message: error.message,
-          domain: error.domain,
-          userInfo: error.userInfo,
-          stack: error.stack,
-        })
         handleError(`Apple Sign-In failed: ${error.message || 'Unknown error'} (Code: ${error.code || 'N/A'})`)
       }
     }

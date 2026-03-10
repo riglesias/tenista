@@ -12,6 +12,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AuthGuard from '@/components/AuthGuard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastContainer } from '@/components/ui/Toast';
+import { ConfirmDialogContainer } from '@/components/ui/ConfirmDialog';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
@@ -82,6 +83,7 @@ function AppContent() {
       </Stack>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <ToastContainer />
+      <ConfirmDialogContainer />
     </NavigationThemeProvider>
   );
 }
@@ -94,11 +96,13 @@ function RootLayout() {
   });
 
   // Debug logging
-  console.log('[RootLayout] Starting app with env:', {
-    NODE_ENV: process.env.NODE_ENV,
-    hasSupabaseUrl: !!process.env.EXPO_PUBLIC_SUPABASE_URL,
-    hasSupabaseKey: !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-  });
+  if (__DEV__) {
+    console.log('[RootLayout] Starting app with env:', {
+      NODE_ENV: process.env.NODE_ENV,
+      hasSupabaseUrl: !!process.env.EXPO_PUBLIC_SUPABASE_URL,
+      hasSupabaseKey: !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+    });
+  }
 
   if (!loaded) {
     return null;
@@ -123,23 +127,23 @@ function ThemedApp() {
     <GluestackUIProvider mode={colorScheme}>
       <LanguageProvider>
         <ErrorBoundary
-          onError={(error) => {
-            console.error('Global error boundary caught:', error);
+          onError={() => {
+            // silently handled
           }}
           resetOnPropsChange={false}
         >
           <AuthProvider>
             <ErrorBoundary
-              onError={(error) => {
-                console.error('Auth error boundary caught:', error);
+              onError={() => {
+                // silently handled
               }}
               resetKeys={[colorScheme]}
             >
               <NotificationProvider>
                 <AuthGuard>
                   <ErrorBoundary
-                    onError={(error) => {
-                      console.error('App content error boundary caught:', error);
+                    onError={() => {
+                      // silently handled
                     }}
                     resetKeys={[colorScheme]}
                   >

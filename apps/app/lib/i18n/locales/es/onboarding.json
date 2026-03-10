@@ -3,7 +3,8 @@
     "step": "Paso {{current}} de {{total}}",
     "skip": "Omitir",
     "continue": "Continuar",
-    "finish": "Finalizar"
+    "finish": "Finalizar",
+    "saving": "Guardando..."
   },
   "profile": {
     "title": "Configuremos tu perfil",
@@ -74,7 +75,8 @@
     "tapToSelect": "Toca para seleccionar tu país",
     "requiredField": "Campo Requerido",
     "selectCountryMessage": "Por favor selecciona tu bandera de país.",
-    "saveError": "Error al guardar país. Por favor intenta de nuevo."
+    "saveError": "Error al guardar país. Por favor intenta de nuevo.",
+    "yourName": "Tu Nombre"
   },
   "rating": {
     "title": "Selección de Nivel",

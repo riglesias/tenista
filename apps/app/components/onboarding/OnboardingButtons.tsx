@@ -5,6 +5,7 @@ import { ActivityIndicator, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getThemeColors } from '@/lib/utils/theme';
 import { createOnboardingStyles } from './onboarding-styles';
+import { useTranslation } from 'react-i18next';
 
 interface OnboardingButtonsProps {
   onContinue?: () => void;
@@ -17,7 +18,7 @@ interface OnboardingButtonsProps {
 
 export function OnboardingButtons({
   onContinue,
-  continueText = 'Continue',
+  continueText,
   loading = false,
   continueDisabled = false,
   continueStyle = 'primary',
@@ -26,6 +27,8 @@ export function OnboardingButtons({
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
   const onboardingStyles = createOnboardingStyles(isDark);
+  const { t } = useTranslation('onboarding');
+  const displayText = continueText || t('common.continue');
   
   const continueButtonStyle = [
     onboardingStyles.continueButton,
@@ -53,10 +56,10 @@ export function OnboardingButtons({
               color={continueStyle === 'success' ? (colors.successForeground || '#fff') : colors.primaryForeground} 
               style={{ marginRight: 8 }}
             />
-            <Text style={continueTextStyle}>Saving...</Text>
+            <Text style={continueTextStyle}>{t('common.saving')}</Text>
           </View>
         ) : (
-          <Text style={continueTextStyle}>{continueText}</Text>
+          <Text style={continueTextStyle}>{displayText}</Text>
         )}
       </TouchableOpacity>
     </View>

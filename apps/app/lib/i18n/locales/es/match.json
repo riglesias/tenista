@@ -53,6 +53,12 @@
     "resultUpdated": "Resultado actualizado exitosamente",
     "editTitle": "Editar Resultado",
     "editingResult": "Editando Resultado",
+    "ladderCompetition": "Competición de Escalera",
+    "playoffTournament": "Torneo de Playoff",
+    "ladderChallengeMatch": "Partido de Desafío de Escalera",
+    "matchFormat": "Formato: {{format}}",
+    "bestOfSets": "Al mejor de {{count}} Set",
+    "bestOfSets_plural": "Al mejor de {{count}} Sets",
     "editWarning": "Cambiar el ganador puede actualizar las posiciones de la escalerilla",
     "validation": {
       "selectCompetition": "Por favor selecciona una competición para partidos competitivos",
@@ -143,6 +149,8 @@
     "done": "Listo",
     "victoryTitle": "¡Victoria!",
     "defeatTitle": "La próxima será.",
-    "shareDescription": "Comparte con tus amigos"
+    "shareDescription": "Comparte con tus amigos",
+    "saving": "Guardando...",
+    "save": "Guardar"
   }
 }

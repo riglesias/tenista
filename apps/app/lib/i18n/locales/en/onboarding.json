@@ -3,7 +3,8 @@
     "step": "Step {{current}} of {{total}}",
     "skip": "Skip",
     "continue": "Continue",
-    "finish": "Finish"
+    "finish": "Finish",
+    "saving": "Saving..."
   },
   "profile": {
     "title": "Let's set up your profile",
@@ -74,7 +75,8 @@
     "tapToSelect": "Tap to select your country",
     "requiredField": "Required Field",
     "selectCountryMessage": "Please select your country flag.",
-    "saveError": "Failed to save country. Please try again."
+    "saveError": "Failed to save country. Please try again.",
+    "yourName": "Your Name"
   },
   "rating": {
     "title": "Rating Selection",

@@ -52,8 +52,6 @@ export function useLadderRealtimeSubscription(
           filter: `league_id=eq.${leagueId}`,
         },
         (payload) => {
-          console.log('[Realtime] ladder_challenges change:', payload.eventType, payload.new)
-
           const newRecord = payload.new as LadderChallengePayload | undefined
           const oldRecord = payload.old as LadderChallengePayload | undefined
 
@@ -102,8 +100,6 @@ export function useLadderRealtimeSubscription(
           filter: `league_id=eq.${leagueId}`,
         },
         (payload) => {
-          console.log('[Realtime] ladder_rankings change:', payload.eventType, payload.new)
-
           // Invalidate rankings query
           queryClient.invalidateQueries({ queryKey: ['ladder-rankings', leagueId] })
 
@@ -132,15 +128,12 @@ export function useLadderRealtimeSubscription(
           })
         }
       )
-      .subscribe((status) => {
-        console.log('[Realtime] Subscription status:', status)
-      })
+      .subscribe()
 
     channelRef.current = channel
 
     // Cleanup on unmount or when dependencies change
     return () => {
-      console.log('[Realtime] Unsubscribing from channel:', channelName)
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null
@@ -176,8 +169,6 @@ export function usePlayerChallengesRealtimeSubscription(playerId: string | null)
           filter: `challenged_player_id=eq.${playerId}`,
         },
         (payload) => {
-          console.log('[Realtime] Incoming challenge change for player:', payload.eventType)
-
           // Invalidate pending challenges query
           queryClient.invalidateQueries({ queryKey: ['pending-challenges', playerId] })
 
@@ -202,8 +193,6 @@ export function usePlayerChallengesRealtimeSubscription(playerId: string | null)
           filter: `challenger_player_id=eq.${playerId}`,
         },
         (payload) => {
-          console.log('[Realtime] Outgoing challenge change for player:', payload.eventType)
-
           // Invalidate pending challenges query
           queryClient.invalidateQueries({ queryKey: ['pending-challenges', playerId] })
 
@@ -219,14 +208,11 @@ export function usePlayerChallengesRealtimeSubscription(playerId: string | null)
           }
         }
       )
-      .subscribe((status) => {
-        console.log('[Realtime] Player challenges subscription status:', status)
-      })
+      .subscribe()
 
     channelRef.current = channel
 
     return () => {
-      console.log('[Realtime] Unsubscribing from player challenges channel')
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null

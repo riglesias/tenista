@@ -1,7 +1,7 @@
 'use client'
 
-import React, { useState, useCallback } from 'react'
-import { ActivityIndicator, Text, View, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native'
+import React, { useState, useCallback, useMemo } from 'react'
+import { ActivityIndicator, Text, View, TouchableOpacity, ScrollView, Linking } from 'react-native'
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -37,6 +37,8 @@ import ReportResultDialog from './ReportResultDialog'
 import DoublesTeamPrompt from '../doubles/DoublesTeamPrompt'
 import ChallengeCard from './ChallengeCard'
 import { Swords } from 'lucide-react-native'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 type LadderSubTab = 'ranking' | 'challenges'
 
@@ -96,6 +98,8 @@ export default function LadderTab({
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
   const { t } = useTranslation('league')
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
   const leagueId = selectedLeague.league.id
   const isDoublesLeague = selectedLeague.league.participant_type === 'doubles'
   const ladderConfig: LadderConfig = selectedLeague.league.ladder_config || DEFAULT_LADDER_CONFIG
@@ -134,22 +138,27 @@ export default function LadderTab({
   const refreshLadderData = useRefreshLadderData()
 
   // Filter pending challenges to only show ones for this league
-  const leaguePendingChallenges = pendingChallenges.filter(
-    (c) => c.league_id === leagueId && c.status === 'pending'
+  const leaguePendingChallenges = useMemo(
+    () => pendingChallenges.filter((c) => c.league_id === leagueId && c.status === 'pending'),
+    [pendingChallenges, leagueId]
   )
 
   // Get outgoing challenge for this league
-  const outgoingChallenge = activeChallenge?.challenger_player_id === currentPlayerId
-    ? activeChallenge
-    : null
+  const outgoingChallenge = useMemo(
+    () => activeChallenge?.challenger_player_id === currentPlayerId ? activeChallenge : null,
+    [activeChallenge, currentPlayerId]
+  )
 
   // Get accepted incoming challenge (challenged player accepted, needs to record match)
-  const acceptedIncomingChallenge =
-    activeChallenge?.challenged_player_id === currentPlayerId &&
-    activeChallenge?.status === 'accepted' &&
-    activeChallenge?.league_id === leagueId
-      ? activeChallenge
-      : null
+  const acceptedIncomingChallenge = useMemo(
+    () =>
+      activeChallenge?.challenged_player_id === currentPlayerId &&
+      activeChallenge?.status === 'accepted' &&
+      activeChallenge?.league_id === leagueId
+        ? activeChallenge
+        : null,
+    [activeChallenge, currentPlayerId, leagueId]
+  )
 
   // Check if player has an active challenge (incoming or outgoing)
   const hasActiveChallenge = activeChallenge !== null
@@ -174,83 +183,72 @@ export default function LadderTab({
       })
       setShowChallengeSheet(false)
       setSelectedOpponent(null)
-      Alert.alert(t('alerts.challengeSent'), t('alerts.challengeSentMessage'))
+      showToast(t('alerts.challengeSentMessage'), { type: 'success' })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : t('alerts.failedToSendChallenge')
-      Alert.alert(t('alerts.error'), getChallengeErrorTranslation(errorMessage, t))
+      showToast(getChallengeErrorTranslation(errorMessage, t), { type: 'error' })
     }
-  }, [selectedOpponent, leagueId, createChallengeMutation, t])
+  }, [selectedOpponent, leagueId, createChallengeMutation, t, showToast])
 
   // Accept challenge
   const handleAcceptChallenge = useCallback(async (challengeId: string) => {
-    Alert.alert(
-      t('alerts.acceptChallenge'),
-      t('alerts.confirmAcceptChallenge'),
-      [
-        { text: t('alerts.cancel'), style: 'cancel' },
-        {
-          text: t('alerts.accept'),
-          onPress: async () => {
-            try {
-              await acceptChallengeMutation.mutateAsync({ challengeId, leagueId })
-              Alert.alert(t('alerts.challengeAccepted'), t('alerts.challengeAcceptedMessage'))
-            } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : t('alerts.failedToAcceptChallenge')
-              Alert.alert(t('alerts.error'), getChallengeErrorTranslation(errorMessage, t))
-            }
-          },
-        },
-      ]
-    )
-  }, [leagueId, acceptChallengeMutation, t])
+    confirm({
+      title: t('alerts.acceptChallenge'),
+      message: t('alerts.confirmAcceptChallenge'),
+      confirmText: t('alerts.accept'),
+      cancelText: t('alerts.cancel'),
+      destructive: false,
+      onConfirm: async () => {
+        try {
+          await acceptChallengeMutation.mutateAsync({ challengeId, leagueId })
+          showToast(t('alerts.challengeAcceptedMessage'), { type: 'success' })
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : t('alerts.failedToAcceptChallenge')
+          showToast(getChallengeErrorTranslation(errorMessage, t), { type: 'error' })
+        }
+      },
+    })
+  }, [leagueId, acceptChallengeMutation, t, confirm, showToast])
 
   // Decline challenge
   const handleDeclineChallenge = useCallback(async (challengeId: string) => {
-    Alert.alert(
-      t('alerts.declineChallenge'),
-      t('alerts.confirmDeclineChallenge'),
-      [
-        { text: t('alerts.cancel'), style: 'cancel' },
-        {
-          text: t('alerts.decline'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await declineChallengeMutation.mutateAsync({ challengeId, leagueId })
-              Alert.alert(t('alerts.challengeDeclined'), t('alerts.challengeDeclinedMessage'))
-            } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : t('alerts.failedToDeclineChallenge')
-              Alert.alert(t('alerts.error'), getChallengeErrorTranslation(errorMessage, t))
-            }
-          },
-        },
-      ]
-    )
-  }, [leagueId, declineChallengeMutation, t])
+    confirm({
+      title: t('alerts.declineChallenge'),
+      message: t('alerts.confirmDeclineChallenge'),
+      confirmText: t('alerts.decline'),
+      cancelText: t('alerts.cancel'),
+      destructive: true,
+      onConfirm: async () => {
+        try {
+          await declineChallengeMutation.mutateAsync({ challengeId, leagueId })
+          showToast(t('alerts.challengeDeclinedMessage'), { type: 'success' })
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : t('alerts.failedToDeclineChallenge')
+          showToast(getChallengeErrorTranslation(errorMessage, t), { type: 'error' })
+        }
+      },
+    })
+  }, [leagueId, declineChallengeMutation, t, confirm, showToast])
 
   // Cancel challenge (only for outgoing pending challenges)
   const handleCancelChallenge = useCallback(async (challengeId: string) => {
-    Alert.alert(
-      t('alerts.cancelChallenge'),
-      t('alerts.confirmCancelChallenge'),
-      [
-        { text: t('alerts.no'), style: 'cancel' },
-        {
-          text: t('alerts.yes'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await cancelChallengeMutation.mutateAsync({ challengeId, leagueId })
-              Alert.alert(t('alerts.challengeCancelled'), t('alerts.challengeCancelledMessage'))
-            } catch (error) {
-              const errorMessage = error instanceof Error ? error.message : t('alerts.failedToCancelChallenge')
-              Alert.alert(t('alerts.error'), getChallengeErrorTranslation(errorMessage, t))
-            }
-          },
-        },
-      ]
-    )
-  }, [leagueId, cancelChallengeMutation, t])
+    confirm({
+      title: t('alerts.cancelChallenge'),
+      message: t('alerts.confirmCancelChallenge'),
+      confirmText: t('alerts.yes'),
+      cancelText: t('alerts.no'),
+      destructive: true,
+      onConfirm: async () => {
+        try {
+          await cancelChallengeMutation.mutateAsync({ challengeId, leagueId })
+          showToast(t('alerts.challengeCancelledMessage'), { type: 'success' })
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : t('alerts.failedToCancelChallenge')
+          showToast(getChallengeErrorTranslation(errorMessage, t), { type: 'error' })
+        }
+      },
+    })
+  }, [leagueId, cancelChallengeMutation, t, confirm, showToast])
 
   // Record match (navigate to match recording screen)
   const handleRecordMatch = useCallback((challengeId: string) => {
@@ -284,15 +282,12 @@ export default function LadderTab({
     try {
       const { data: player, error } = await getPlayerById(playerId)
       if (error || !player) {
-        Alert.alert(t('errors.loadError'), t('errors.loadErrorMessage'))
+        showToast(t('errors.loadErrorMessage'), { type: 'error' })
         return
       }
 
       if (!player.phone_number) {
-        Alert.alert(
-          t('errors.loadError'),
-          'This player has not added their phone number.'
-        )
+        showToast('This player has not added their phone number.', { type: 'error' })
         return
       }
 
@@ -321,13 +316,12 @@ export default function LadderTab({
       if (supported) {
         await Linking.openURL(smsUrl)
       } else {
-        Alert.alert(t('errors.loadError'), 'Unable to open messaging app.')
+        showToast('Unable to open messaging app.', { type: 'error' })
       }
     } catch (error) {
-      console.error('Error messaging player:', error)
-      Alert.alert(t('errors.loadError'), t('errors.loadErrorMessage'))
+      showToast(t('errors.loadErrorMessage'), { type: 'error' })
     }
-  }, [t])
+  }, [t, showToast])
 
   // Handle edit result (navigate to submit-result in edit mode)
   const handleEditResult = useCallback((challengeId: string, playerMatchId: string) => {
@@ -349,15 +343,18 @@ export default function LadderTab({
       await reportMatchMutation.mutateAsync({ playerMatchId: reportMatchId, reason })
       setShowReportDialog(false)
       setReportMatchId(null)
-      Alert.alert(t('detail.reportSubmitted'))
+      showToast(t('detail.reportSubmitted'), { type: 'success' })
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to submit report'
-      Alert.alert(t('alerts.error'), errorMessage)
+      showToast(errorMessage, { type: 'error' })
     }
-  }, [reportMatchId, reportMatchMutation, t])
+  }, [reportMatchId, reportMatchMutation, t, showToast])
 
   // Filter completed challenges for "Recent" section
-  const recentCompletedChallenges = challengeHistory.filter(c => c.status === 'completed')
+  const recentCompletedChallenges = useMemo(
+    () => challengeHistory.filter(c => c.status === 'completed'),
+    [challengeHistory]
+  )
 
   // Loading state
   if (loadingRankings || (isDoublesLeague && loadingTeam)) {

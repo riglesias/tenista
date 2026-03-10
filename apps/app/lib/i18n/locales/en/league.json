@@ -173,7 +173,9 @@
   "standings": {
     "rank": "Rank",
     "player": "Player",
+    "playerHeader": "PLAYER",
     "points": "Points",
+    "ptsHeader": "PTS",
     "wins": "W",
     "losses": "L",
     "played": "Played",

@@ -138,14 +138,6 @@ function getUserFriendlyMessage(message: string): string {
 
 // Centralized error logging
 export function logError(error: AppError, context?: string) {
-  // Console logging for development
-  console.error(`[${error.code}] ${error.message}`, {
-    timestamp: error.timestamp,
-    context,
-    details: error.details,
-    originalError: error.originalError,
-  })
-
   // Sentry logging for production
   if (error.code !== 'COMPONENT_ERROR') {
     Sentry.captureException(error.originalError || new Error(error.message), {

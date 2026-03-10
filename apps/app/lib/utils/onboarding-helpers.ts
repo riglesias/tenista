@@ -1,13 +1,11 @@
 import { createOrUpdatePlayerProfile } from '@/lib/actions/player.actions';
-import { Alert } from 'react-native';
 
 /**
  * Common error handler for onboarding screens
  */
-export function handleOnboardingError(error: any, context: string) {
-  console.error(`${context} error:`, error);
-  Alert.alert('Error', `Failed to ${context}. Please try again.`);
-}
+export const handleOnboardingError = (context: string, showToast: (msg: string, opts?: { type?: string }) => void) => {
+  showToast(`Failed to ${context}. Please try again.`, { type: 'error' });
+};
 
 /**
  * Save profile data and handle errors
@@ -15,20 +13,20 @@ export function handleOnboardingError(error: any, context: string) {
 export async function saveProfileData(
   userId: string,
   data: any,
-  context: string
+  context: string,
+  showToast: (msg: string, opts?: { type?: string }) => void
 ): Promise<{ success: boolean }> {
   try {
     const { error } = await createOrUpdatePlayerProfile(userId, data);
-    
+
     if (error) {
-      handleOnboardingError(error, context);
+      handleOnboardingError(context, showToast);
       return { success: false };
     }
-    
+
     return { success: true };
   } catch (error) {
-    Alert.alert('Error', 'An unexpected error occurred. Please try again.');
-    console.error(`${context} exception:`, error);
+    showToast('An unexpected error occurred. Please try again.', { type: 'error' });
     return { success: false };
   }
 }

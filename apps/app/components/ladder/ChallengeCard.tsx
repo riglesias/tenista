@@ -20,7 +20,7 @@ interface ChallengeCardProps {
   onReportResult?: () => void
 }
 
-export default function ChallengeCard({
+function ChallengeCard({
   challenge,
   currentPlayerId,
   onAccept,
@@ -507,3 +507,5 @@ export default function ChallengeCard({
     </View>
   )
 }
+
+export default React.memo(ChallengeCard)

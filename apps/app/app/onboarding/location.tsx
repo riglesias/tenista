@@ -13,7 +13,6 @@ import { ArrowLeft } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
     ActivityIndicator,
-    Alert,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -21,6 +20,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 
 interface City {
   id: string;
@@ -45,6 +45,7 @@ export default function LocationOnboarding() {
   const { t } = useTranslation('onboarding');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -96,7 +97,7 @@ export default function LocationOnboarding() {
         }
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      // silently handled
     } finally {
       setLoading(false);
     }
@@ -109,7 +110,7 @@ export default function LocationOnboarding() {
         setCities(data);
       }
     } catch (error) {
-      console.error('Error loading cities:', error);
+      // silently handled
     }
   };
 
@@ -129,7 +130,7 @@ export default function LocationOnboarding() {
 
   const handleContinue = async () => {
     if (!user || !selectedCity) {
-      Alert.alert(t('location.selectionRequired'), t('location.selectCityMessage'));
+      showToast(t('location.selectCityMessage'), { type: 'error' });
       return;
     }
 
@@ -142,14 +143,12 @@ export default function LocationOnboarding() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('location.saveError'));
-        console.error('Location save error:', error);
+        showToast(t('location.saveError'), { type: 'error' });
       } else {
         router.push('/onboarding/homecourt' as any);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Location save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setSaving(false);
     }

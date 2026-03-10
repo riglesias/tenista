@@ -2,6 +2,7 @@
 
 import BottomButtons from '@/components/ui/BottomButtons';
 import ScreenHeader from '@/components/ui/ScreenHeader';
+import { useAppToast } from '@/components/ui/Toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { createOrUpdatePlayerProfile, getPlayerProfile } from '@/lib/actions/player.actions';
@@ -9,7 +10,7 @@ import { AvailabilityData, DayOfWeek, TimeSlot } from '@/lib/database.types';
 import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +22,7 @@ export default function EditAvailability() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
+  const { showToast } = useAppToast();
   const { t } = useTranslation('profile');
   const { t: tErrors } = useTranslation('errors');
   const [loading, setLoading] = React.useState(false);
@@ -41,8 +43,7 @@ export default function EditAvailability() {
         setAvailability(data.availability);
       }
     } catch (error) {
-      console.error('Error loading player availability:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), t('editAvailability.loadError'));
+      showToast(t('editAvailability.loadError'), { type: 'error' });
     } finally {
       setInitialLoading(false);
     }
@@ -84,16 +85,13 @@ export default function EditAvailability() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), t('editAvailability.saveError'));
-        console.error('Availability save error:', error);
+        showToast(t('editAvailability.saveError'), { type: 'error' });
       } else {
-        Alert.alert(tErrors('generic.success'), t('editAvailability.saveSuccess'), [
-          { text: 'OK', onPress: () => router.back() }
-        ]);
+        showToast(t('editAvailability.saveSuccess'), { type: 'success' });
+        router.back();
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Availability save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }

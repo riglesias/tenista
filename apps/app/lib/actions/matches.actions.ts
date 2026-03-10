@@ -130,11 +130,9 @@ export async function submitMatchResult(data: SubmitMatchData, submittedBy: stri
       )
 
       if (notificationError) {
-        console.error('Failed to send match result notification:', notificationError)
         // Don't fail the match submission if notification fails
       }
     } catch (notifError) {
-      console.error('Error sending match notification:', notifError)
       // Don't fail the match submission if notification fails
     }
 
@@ -146,7 +144,7 @@ export async function submitMatchResult(data: SubmitMatchData, submittedBy: stri
       error: null 
     }
   } catch (error) {
-    console.error('Error submitting match result:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -183,7 +181,7 @@ export async function getPlayerMatches(playerId: string) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching player matches:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -266,7 +264,7 @@ export async function getRecentMatchesInCity(cityId: string, limit: number = 3) 
     
     return { data: transformedData, error: null }
   } catch (error) {
-    console.error('Error fetching recent city matches:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -291,7 +289,7 @@ export async function getPlayerLeagues(playerId: string) {
     if (error) throw error
     return { data: data?.map(item => item.league).filter(Boolean) || [], error: null }
   } catch (error) {
-    console.error('Error fetching player leagues:', error)
+    // silently handled
     return { data: [], error }
   }
 }

@@ -50,18 +50,14 @@ export function useAvailabilityRealtime(
           // Skip own user's changes (already handled optimistically)
           if (currentUserId && newRecord.auth_user_id === currentUserId) return
 
-          console.log('[Realtime] Availability change detected:', newRecord.id, newRecord.available_today)
           onAvailabilityChange()
         }
       )
-      .subscribe((status) => {
-        console.log('[Realtime] Availability subscription status:', status)
-      })
+      .subscribe()
 
     channelRef.current = channel
 
     return () => {
-      console.log('[Realtime] Unsubscribing from availability channel:', channelName)
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
         channelRef.current = null

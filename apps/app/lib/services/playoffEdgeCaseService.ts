@@ -585,7 +585,6 @@ export class PlayoffEdgeCaseService {
     eventData: any
   ): Promise<void> {
     // This could be implemented with a tournament_events table
-    // For now, we'll just log to console
-    console.log(`Tournament ${tournamentId} - ${eventType}:`, eventData)
+    // For now, event logging is a no-op
   }
 }

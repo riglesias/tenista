@@ -8,7 +8,6 @@ import {
   TextInput,
   ActivityIndicator,
   ScrollView,
-  Alert,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native'
@@ -18,6 +17,7 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import PartnerSelectionList from './PartnerSelectionList'
 import { useCreateDoublesTeam } from '@/hooks/useDoublesTeam'
 import { Users } from 'lucide-react-native'
+import { useAppToast } from '@/components/ui/Toast'
 
 interface DoublesTeamFormSheetProps {
   visible: boolean
@@ -36,6 +36,7 @@ export default function DoublesTeamFormSheet({
 }: DoublesTeamFormSheetProps) {
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
+  const { showToast } = useAppToast()
 
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null)
   const [teamName, setTeamName] = useState('')
@@ -44,7 +45,7 @@ export default function DoublesTeamFormSheet({
 
   const handleCreateTeam = useCallback(async () => {
     if (!selectedPartnerId) {
-      Alert.alert('Select Partner', 'Please select a partner to form a team.')
+      showToast('Please select a partner to form a team.', { type: 'error' })
       return
     }
 
@@ -62,11 +63,11 @@ export default function DoublesTeamFormSheet({
       onClose()
       onTeamCreated?.()
 
-      Alert.alert('Team Created', 'Your doubles team has been created successfully!')
+      showToast('Your doubles team has been created successfully!', { type: 'success' })
     } catch (error) {
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to create team')
+      showToast(error instanceof Error ? error.message : 'Failed to create team', { type: 'error' })
     }
-  }, [selectedPartnerId, teamName, leagueId, currentPlayerId, createTeamMutation, onClose, onTeamCreated])
+  }, [selectedPartnerId, teamName, leagueId, currentPlayerId, createTeamMutation, onClose, onTeamCreated, showToast])
 
   const handleClose = useCallback(() => {
     setSelectedPartnerId(null)

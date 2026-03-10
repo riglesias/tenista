@@ -461,8 +461,7 @@ export class PlayoffMatchIntegrationService {
         .delete()
         .eq('id', playerMatchId)
     } catch (error) {
-      // Log error but don't throw - this is cleanup
-      console.error('Failed to rollback player match:', error)
+      // silently handled - this is cleanup
     }
   }
 

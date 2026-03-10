@@ -62,8 +62,8 @@ export default function ErrorBoundaryTest() {
   return (
     <ErrorBoundary
       key={key}
-      onError={(error) => {
-        console.log('Error boundary test caught error:', error)
+      onError={() => {
+        // silently handled in test
       }}
       fallback={({ error, retry }) => (
         <View style={{ padding: 20 }}>

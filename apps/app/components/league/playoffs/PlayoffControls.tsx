@@ -1,7 +1,9 @@
 'use client'
 
 import React from 'react'
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import {
@@ -10,7 +12,12 @@ import {
   Trophy,
   RefreshCw
 } from 'lucide-react-native'
-import { useStartPlayoffTournament } from '@/hooks/usePlayoffs'
+import {
+  useStartPlayoffTournament,
+  useSuspendPlayoffTournament,
+  useResumePlayoffTournament,
+  useAdvancePlayoffRound
+} from '@/hooks/usePlayoffs'
 
 interface PlayoffControlsProps {
   tournament: {
@@ -34,6 +41,11 @@ export default function PlayoffControls({
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
   const startMutation = useStartPlayoffTournament()
+  const suspendMutation = useSuspendPlayoffTournament()
+  const resumeMutation = useResumePlayoffTournament()
+  const advanceMutation = useAdvancePlayoffRound()
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
 
   const getStatusText = () => {
     switch (tournament.status) {
@@ -70,85 +82,96 @@ export default function PlayoffControls({
   }
 
   const handleStartTournament = () => {
-    Alert.alert(
-      'Start Tournament',
-      'Are you sure you want to start the tournament? This will begin the first round of matches.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Start',
-          style: 'default',
-          onPress: () => {
-            startMutation.mutate(
-              { tournamentId: tournament.id, leagueId },
-              {
-                onSuccess: () => onRefresh(),
-                onError: (error) => {
-                  Alert.alert('Error', `Failed to start tournament: ${error.message}`)
-                },
-              }
-            )
+    confirm({
+      title: 'Start Tournament',
+      message: 'Are you sure you want to start the tournament? This will begin the first round of matches.',
+      confirmText: 'Start',
+      cancelText: 'Cancel',
+      destructive: false,
+      onConfirm: () => {
+        startMutation.mutate(
+          { tournamentId: tournament.id, leagueId },
+          {
+            onSuccess: () => onRefresh(),
+            onError: (error) => {
+              showToast(`Failed to start tournament: ${error.message}`, { type: 'error' })
+            },
           }
-        }
-      ]
-    )
+        )
+      },
+    })
   }
 
   const handleSuspendTournament = () => {
-    Alert.alert(
-      'Suspend Tournament',
-      'This will pause the tournament temporarily. You can resume it later.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Suspend',
-          style: 'destructive',
-          onPress: () => {
-            // TODO: Implement suspend tournament mutation
-            console.log('Suspending tournament:', tournament.id)
-            onRefresh()
+    confirm({
+      title: 'Suspend Tournament',
+      message: 'This will pause the tournament temporarily. You can resume it later.',
+      confirmText: 'Suspend',
+      cancelText: 'Cancel',
+      destructive: true,
+      onConfirm: () => {
+        suspendMutation.mutate(
+          { tournamentId: tournament.id, leagueId },
+          {
+            onSuccess: () => {
+              showToast('Tournament suspended', { type: 'success' })
+              onRefresh()
+            },
+            onError: (error) => {
+              showToast(`Failed to suspend tournament: ${error.message}`, { type: 'error' })
+            },
           }
-        }
-      ]
-    )
+        )
+      },
+    })
   }
 
   const handleResumeTournament = () => {
-    Alert.alert(
-      'Resume Tournament',
-      'This will resume the suspended tournament.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Resume',
-          style: 'default',
-          onPress: () => {
-            // TODO: Implement resume tournament mutation
-            console.log('Resuming tournament:', tournament.id)
-            onRefresh()
+    confirm({
+      title: 'Resume Tournament',
+      message: 'This will resume the suspended tournament.',
+      confirmText: 'Resume',
+      cancelText: 'Cancel',
+      destructive: false,
+      onConfirm: () => {
+        resumeMutation.mutate(
+          { tournamentId: tournament.id, leagueId },
+          {
+            onSuccess: () => {
+              showToast('Tournament resumed', { type: 'success' })
+              onRefresh()
+            },
+            onError: (error) => {
+              showToast(`Failed to resume tournament: ${error.message}`, { type: 'error' })
+            },
           }
-        }
-      ]
-    )
+        )
+      },
+    })
   }
 
   const handleAdvanceRound = () => {
-    Alert.alert(
-      'Advance Round',
-      'This will advance to the next round. Make sure all current round matches are completed.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Advance',
-          style: 'default',
-          onPress: () => {
-            // TODO: Implement advance round mutation
-            console.log('Advancing round for tournament:', tournament.id)
-            onRefresh()
+    confirm({
+      title: 'Advance Round',
+      message: 'This will advance to the next round. Make sure all current round matches are completed.',
+      confirmText: 'Advance',
+      cancelText: 'Cancel',
+      destructive: false,
+      onConfirm: () => {
+        advanceMutation.mutate(
+          { tournamentId: tournament.id, leagueId },
+          {
+            onSuccess: () => {
+              showToast('Advanced to next round', { type: 'success' })
+              onRefresh()
+            },
+            onError: (error) => {
+              showToast(`Failed to advance round: ${error.message}`, { type: 'error' })
+            },
           }
-        }
-      ]
-    )
+        )
+      },
+    })
   }
 
   const renderMainControls = () => {

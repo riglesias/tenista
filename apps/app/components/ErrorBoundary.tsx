@@ -185,7 +185,7 @@ export function AsyncErrorBoundary({
     try {
       await onRetry?.()
     } catch (error) {
-      console.error('Retry failed:', error)
+      // silently handled
     }
   }
 

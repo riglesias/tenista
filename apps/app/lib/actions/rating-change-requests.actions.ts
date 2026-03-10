@@ -31,7 +31,7 @@ export async function canSubmitRatingChangeRequest(playerId: string) {
     .limit(1)
   
   if (error) {
-    console.error('Error checking rating change request eligibility:', error)
+    // silently handled
     return { canSubmit: false, error: error.message }
   }
   
@@ -82,7 +82,7 @@ export async function submitRatingChangeRequest(
     .single()
   
   if (error) {
-    console.error('Error submitting rating change request:', error)
+    // silently handled
     return { success: false, error: 'Failed to submit rating change request' }
   }
   
@@ -101,7 +101,7 @@ export async function getPlayerRatingChangeRequests(playerId: string) {
     .order('created_at', { ascending: false })
   
   if (error) {
-    console.error('Error getting player rating change requests:', error)
+    // silently handled
     return { data: null, error: error.message }
   }
   
@@ -132,13 +132,13 @@ export async function sendRatingChangeRequestEmail(
     })
     
     if (error) {
-      console.error('Error calling email function:', error)
+      // silently handled
       return { success: false, error: 'Failed to send email notification' }
     }
     
     return { success: true, data }
   } catch (error) {
-    console.error('Error sending rating change request email:', error)
+    // silently handled
     return { success: false, error: 'Failed to send email notification' }
   }
 }

@@ -218,7 +218,6 @@ export async function joinLeague(leagueId: string, playerId: string) {
     return { data, error: null }
   } catch (error) {
     Sentry.captureException(error);
-    console.error('Error joining league:', error)
     return { data: null, error }
   }
 }
@@ -301,7 +300,7 @@ export async function getLeagueStandings(
 
     return { data: validatedStandings, error: null }
   } catch (error) {
-    console.error('Error fetching league standings:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -441,7 +440,6 @@ export async function joinDoublesLeague(
     return { data: { team, memberships }, error: null };
   } catch (error) {
     Sentry.captureException(error);
-    console.error('Error joining doubles league:', error);
     return { data: null, error };
   }
 }
@@ -693,7 +691,7 @@ export async function retireFromLeague(leagueId: string, playerId: string) {
           });
 
           if (swapError) {
-            console.error('Error swapping positions during retirement:', swapError);
+            // silently handled
           }
         }
 
@@ -756,7 +754,6 @@ export async function retireFromLeague(leagueId: string, playerId: string) {
     return { data: true, error: null }
   } catch (error) {
     Sentry.captureException(error);
-    console.error('Error retiring from league:', error)
     return { data: false, error }
   }
 }
@@ -778,7 +775,7 @@ export async function createLeague(leagueData: LeagueInsert) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error creating league:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -1121,7 +1118,7 @@ export async function syncLeagueStandings(leagueId: string) {
 
     return { success: true, error: null }
   } catch (error) {
-    console.error('Error syncing league standings:', error)
+    // silently handled
     return { success: false, error }
   }
 } 

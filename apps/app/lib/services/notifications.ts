@@ -23,7 +23,6 @@ export interface NotificationPreferences {
 export class NotificationService {
   static async registerForPushNotifications(): Promise<string | null> {
     if (!Device.isDevice) {
-      console.log('Push notifications only work on physical devices');
       return null;
     }
 
@@ -39,7 +38,6 @@ export class NotificationService {
       }
 
       if (finalStatus !== 'granted') {
-        console.log('Failed to get push notification permissions');
         return null;
       }
 
@@ -57,7 +55,6 @@ export class NotificationService {
       // Get Expo push token
       const projectId = Constants.expoConfig?.extra?.eas?.projectId;
       if (!projectId) {
-        console.error('Project ID not found in app.json');
         return null;
       }
 
@@ -67,7 +64,6 @@ export class NotificationService {
 
       return tokenData.data;
     } catch (error) {
-      console.error('Error registering for push notifications:', error);
       return null;
     }
   }
@@ -89,7 +85,6 @@ export class NotificationService {
         });
 
       if (error) {
-        console.error('Error saving notification token:', error);
         throw error;
       }
 
@@ -105,7 +100,6 @@ export class NotificationService {
         });
 
     } catch (error) {
-      console.error('Error saving token to database:', error);
       throw error;
     }
   }
@@ -121,11 +115,9 @@ export class NotificationService {
         .eq('token', token.data);
 
       if (error) {
-        console.error('Error removing notification token:', error);
         throw error;
       }
     } catch (error) {
-      console.error('Error removing token:', error);
       throw error;
     }
   }
@@ -139,13 +131,11 @@ export class NotificationService {
         .single();
 
       if (error) {
-        console.error('Error fetching notification preferences:', error);
         return null;
       }
 
       return data;
     } catch (error) {
-      console.error('Error getting preferences:', error);
       return null;
     }
   }
@@ -165,11 +155,9 @@ export class NotificationService {
         });
 
       if (error) {
-        console.error('Error updating notification preferences:', error);
         throw error;
       }
     } catch (error) {
-      console.error('Error updating preferences:', error);
       throw error;
     }
   }
@@ -185,11 +173,9 @@ export class NotificationService {
         .eq('id', userId);
 
       if (error) {
-        console.error('Error updating Play Now notification status:', error);
         throw error;
       }
     } catch (error) {
-      console.error('Error updating Play Now status:', error);
       throw error;
     }
   }

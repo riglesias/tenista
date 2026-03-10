@@ -1,7 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { View, Text, TouchableOpacity, Alert, Platform } from 'react-native'
+import { View, Text, TouchableOpacity, Platform } from 'react-native'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { Play, Settings, Calendar } from 'lucide-react-native'
@@ -9,9 +11,11 @@ import { useCreatePlayoffTournament } from '@/hooks/usePlayoffs'
 import { StandaloneQualifiedPlayer } from '@/lib/validation/playoffs.validation'
 import CountryFlag from '@/components/ui/CountryFlag'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { useTranslation } from 'react-i18next'
 
 // Table header component matching LadderRankingsTable style
 const TableHeader = React.memo(function TableHeader({ colors, mode }: { colors: any; mode: 'league' | 'standalone' }) {
+  const { t } = useTranslation('league')
   const headerTextStyle = {
     fontSize: 10,
     fontWeight: '700' as const,
@@ -33,14 +37,14 @@ const TableHeader = React.memo(function TableHeader({ colors, mode }: { colors: 
       }}
     >
       <Text style={{ ...headerTextStyle, width: 32 }}>#</Text>
-      <Text style={{ ...headerTextStyle, flex: 1 }}>PLAYER</Text>
+      <Text style={{ ...headerTextStyle, flex: 1 }}>{t('standings.playerHeader')}</Text>
       {mode === 'standalone' ? (
         <>
-          <Text style={{ ...headerTextStyle, width: 36, textAlign: 'center' }}>W</Text>
-          <Text style={{ ...headerTextStyle, width: 36, textAlign: 'center' }}>L</Text>
+          <Text style={{ ...headerTextStyle, width: 36, textAlign: 'center' }}>{t('standings.wins')}</Text>
+          <Text style={{ ...headerTextStyle, width: 36, textAlign: 'center' }}>{t('standings.losses')}</Text>
         </>
       ) : (
-        <Text style={{ ...headerTextStyle, width: 60, textAlign: 'right' }}>PTS</Text>
+        <Text style={{ ...headerTextStyle, width: 60, textAlign: 'right' }}>{t('standings.ptsHeader')}</Text>
       )}
     </View>
   )
@@ -114,6 +118,8 @@ export default function QualifyingPlayersCard(props: QualifyingPlayersCardProps)
   const [showSettings, setShowSettings] = useState(false)
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [showDatePicker, setShowDatePicker] = useState(false)
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
 
   const createTournamentMutation = useCreatePlayoffTournament()
 
@@ -128,38 +134,31 @@ export default function QualifyingPlayersCard(props: QualifyingPlayersCardProps)
     : props.standaloneData.seedingCriteriaApplied
 
   const handleCreateTournament = () => {
-    Alert.alert(
-      'Create Playoff Tournament',
-      `Are you sure you want to create a playoff tournament with ${qualifyingCount} players? This action cannot be undone.`,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Create',
-          style: 'destructive',
-          onPress: () => {
-            createTournamentMutation.mutate(
-              {
-                league_id: leagueId,
-                qualifying_players_count: qualifyingCount,
-                start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
-              },
-              {
-                onSuccess: () => {
-                  Alert.alert('Success', 'Playoff tournament created successfully!')
-                  onTournamentCreated()
-                },
-                onError: (error) => {
-                  Alert.alert('Error', `Failed to create tournament: ${error.message}`)
-                },
-              }
-            )
+    confirm({
+      title: 'Create Playoff Tournament',
+      message: `Are you sure you want to create a playoff tournament with ${qualifyingCount} players? This action cannot be undone.`,
+      confirmText: 'Create',
+      cancelText: 'Cancel',
+      destructive: true,
+      onConfirm: () => {
+        createTournamentMutation.mutate(
+          {
+            league_id: leagueId,
+            qualifying_players_count: qualifyingCount,
+            start_date: startDate ? startDate.toISOString().split('T')[0] : undefined,
           },
-        },
-      ]
-    )
+          {
+            onSuccess: () => {
+              showToast('Playoff tournament created successfully!', { type: 'success' })
+              onTournamentCreated()
+            },
+            onError: (error) => {
+              showToast(`Failed to create tournament: ${error.message}`, { type: 'error' })
+            },
+          }
+        )
+      },
+    })
   }
 
   const qualifyingCountOptions = [4, 8, 16, 32]

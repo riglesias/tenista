@@ -16,7 +16,7 @@ export async function updateDailyAvailability(
     .single()
 
   if (error) {
-    console.error('Error updating daily availability:', error)
+    // silently handled
     return { data: null, error }
   }
 
@@ -37,12 +37,10 @@ export async function updateDailyAvailability(
       )
 
       if (notificationError) {
-        console.error('Failed to send Play Now notifications:', notificationError)
-      } else {
-        console.log('Play Now notifications sent:', notificationResult)
+        // Failed to send notifications - non-critical
       }
     } catch (err) {
-      console.error('Error triggering Play Now notifications:', err)
+      // silently handled
     }
   }
 
@@ -57,7 +55,7 @@ export async function getPlayerDailyAvailability(userId: string) {
     .single()
 
   if (error) {
-    console.error('Error fetching daily availability:', error)
+    // silently handled
     return { available: false, error }
   }
 

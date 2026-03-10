@@ -9,7 +9,6 @@ import {
 } from '@/lib/validation/leagues.validation'
 import React, { useMemo, useCallback } from 'react'
 import {
-  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -18,6 +17,8 @@ import {
   View,
 } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import { useAppToast } from '@/components/ui/Toast'
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Building2, MapPin, Trophy } from 'lucide-react-native'
 import EmptyDiscoverState from './EmptyDiscoverState'
 
@@ -172,6 +173,8 @@ export default function LeagueSelection({
 }: LeagueSelectionProps) {
   const { theme } = useTheme()
   const { t } = useTranslation('league')
+  const { showToast } = useAppToast()
+  const { confirm } = useConfirmDialog()
 
   // Filter out already-joined leagues when joinedLeagueIds is provided
   const filteredLeagues = React.useMemo(() => {
@@ -206,25 +209,23 @@ export default function LeagueSelection({
   const handleJoinLeague = useCallback(async (leagueId: string) => {
     if (!currentPlayer) return
 
-    Alert.alert(t('alerts.joinLeague'), t('alerts.confirmJoin'), [
-      { text: t('alerts.cancel'), style: 'cancel' },
-      {
-        text: t('alerts.join'),
-        onPress: async () => {
-          const { error } = await joinLeague(leagueId, currentPlayer.id)
-          if (error) {
-            Alert.alert(
-              t('alerts.error'),
-              (error as any)?.message || t('alerts.failedToJoin')
-            )
-          } else {
-            Alert.alert(t('alerts.success'), t('alerts.joinedLeague'))
-            onLeagueJoined()
-          }
-        },
+    confirm({
+      title: t('alerts.joinLeague'),
+      message: t('alerts.confirmJoin'),
+      confirmText: t('alerts.join'),
+      cancelText: t('alerts.cancel'),
+      destructive: false,
+      onConfirm: async () => {
+        const { error } = await joinLeague(leagueId, currentPlayer.id)
+        if (error) {
+          showToast((error as any)?.message || t('alerts.failedToJoin'), { type: 'error' })
+        } else {
+          showToast(t('alerts.joinedLeague'), { type: 'success' })
+          onLeagueJoined()
+        }
       },
-    ])
-  }, [currentPlayer, onLeagueJoined, t])
+    })
+  }, [currentPlayer, onLeagueJoined, t, confirm, showToast])
 
   // Combine both sections into a single data array for FlatList
   const sections = useMemo((): SectionItem[] => {

@@ -5,8 +5,9 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import React, { useEffect } from 'react'
-import { Alert, Platform, Text, TouchableOpacity, View } from 'react-native'
+import { Platform, Text, TouchableOpacity, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
+import { useAppToast } from '@/components/ui/Toast'
 
 // Configure Google Sign-In
 GoogleSignin.configure({
@@ -19,13 +20,14 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
   const { signInWithIdToken } = useAuth()
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
+  const { showToast } = useAppToast()
 
   useEffect(() => {
     // Check if Google Play Services are available (Android only)
     if (Platform.OS === 'android') {
       GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
-        .catch((err) => {
-          console.error('Google Play Services error:', err)
+        .catch(() => {
+          // silently handled
         })
     }
   }, [])
@@ -34,11 +36,7 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
     if (onError) {
       onError(errorMessage)
     } else {
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage)
-      } else {
-        Alert.alert('Google Sign In Error', errorMessage)
-      }
+      showToast(errorMessage, { type: 'error' })
     }
   }
 
@@ -64,7 +62,6 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
         return
       }
       
-      console.error('Google Sign-In error:', error)
       handleError(error.message || 'Failed to sign in with Google')
     }
   }

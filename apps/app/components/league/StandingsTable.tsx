@@ -5,11 +5,13 @@ import { getThemeColors } from '@/lib/utils/theme'
 import { LeagueStanding } from '@/lib/validation/leagues.validation'
 import { ChevronRight } from 'lucide-react-native'
 import CountryFlag from '@/components/ui/CountryFlag'
+import { useTranslation } from 'react-i18next'
 
 const TableHeader = React.memo(function TableHeader() {
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
-  
+  const { t } = useTranslation('league')
+
   return (
     <View style={{
       backgroundColor: colors.muted,
@@ -21,10 +23,10 @@ const TableHeader = React.memo(function TableHeader() {
       borderBottomColor: colors.border
     }}>
       <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 30 }}>#</Text>
-      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, flex: 1 }}>PLAYER</Text>
-      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 30, textAlign: 'center' }}>W</Text>
-      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 30, textAlign: 'center' }}>L</Text>
-      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 40, textAlign: 'center' }}>PTS</Text>
+      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, flex: 1 }}>{t('standings.playerHeader')}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 30, textAlign: 'center' }}>{t('standings.wins')}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 30, textAlign: 'center' }}>{t('standings.losses')}</Text>
+      <Text style={{ fontSize: 10, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase', color: colors.mutedForeground, width: 40, textAlign: 'center' }}>{t('standings.ptsHeader')}</Text>
       <View style={{ width: 20 }} />
     </View>
   )

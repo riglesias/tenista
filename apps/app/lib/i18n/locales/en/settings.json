@@ -58,6 +58,19 @@
     "confirmText": "Type DELETE to confirm",
     "placeholder": "Type DELETE",
     "deleteButton": "Delete Account",
-    "cancelButton": "Cancel"
+    "cancelButton": "Cancel",
+    "permanentWarning": "This action will permanently delete your account and all associated data, including:",
+    "dataProfile": "Your profile and personal information",
+    "dataRating": "Your tennis rating and match history",
+    "dataLeagues": "Your league memberships and standings",
+    "dataTournaments": "Your tournament participations",
+    "dataPhotos": "All uploaded photos and documents",
+    "cannotBeUndone": "This action cannot be undone.",
+    "confirmInstruction": "To confirm account deletion, please type",
+    "confirmInstructionSuffix": "in the field below:",
+    "confirmPlaceholder": "Type DELETE to confirm",
+    "mustTypeDelete": "You must type \"DELETE\" exactly to confirm",
+    "deleting": "Deleting...",
+    "confirm": "Confirm"
   }
 }

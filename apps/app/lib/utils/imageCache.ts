@@ -47,12 +47,12 @@ class ImageCacheManager {
             await Image.prefetch(url, 'memory-disk')
             this.preloadedImages.add(url)
           } catch (error) {
-            console.warn('Failed to preload image:', url)
+            // silently handled
           }
         })
       )
     } catch (error) {
-      console.warn('Error in batch preloading:', error)
+      // silently handled
     }
 
     // Continue processing
@@ -73,7 +73,7 @@ class ImageCacheManager {
       await Image.prefetch(url, 'memory-disk')
       this.preloadedImages.add(url)
     } catch (error) {
-      console.warn('Failed to preload image:', url)
+      // silently handled
     }
   }
 

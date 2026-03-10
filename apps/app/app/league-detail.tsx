@@ -30,12 +30,11 @@ export default function LeagueDetailScreen() {
 
       const { data, error } = await getLeagueDetail(leagueId, player.id)
       if (error) {
-        console.error('Error fetching league detail:', error)
         return
       }
       setUserLeague(data)
     } catch (error) {
-      console.error('Error in league detail:', error)
+      // silently handled
     } finally {
       setLoading(false)
     }

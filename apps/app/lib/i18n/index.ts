@@ -21,7 +21,7 @@ function getDeviceLanguage(): Language {
     }
   } catch (error) {
     // expo-localization not available (e.g., in Expo Go or web)
-    console.warn('expo-localization not available, using default language:', error);
+    // expo-localization not available (e.g., in Expo Go or web)
   }
   return defaultLanguage;
 }
@@ -43,7 +43,7 @@ const languageDetector = {
       const deviceLanguage = getDeviceLanguage();
       callback(deviceLanguage);
     } catch (error) {
-      console.warn('Error detecting language:', error);
+      // silently handled
       callback(defaultLanguage);
     }
   },
@@ -52,7 +52,7 @@ const languageDetector = {
     try {
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     } catch (error) {
-      console.warn('Error caching language:', error);
+      // silently handled
     }
   },
 };

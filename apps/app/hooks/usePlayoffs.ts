@@ -7,6 +7,9 @@ import {
   getPlayoffTournamentWithFullData,
   createPlayoffTournament,
   startPlayoffTournament,
+  suspendPlayoffTournament,
+  resumePlayoffTournament,
+  advancePlayoffRound,
   canUserManagePlayoffs
 } from '@/lib/actions/playoffs'
 import {
@@ -108,6 +111,60 @@ export function useStartPlayoffTournament() {
   return useMutation({
     mutationFn: ({ tournamentId, leagueId }: { tournamentId: string; leagueId: string }) =>
       startPlayoffTournament(tournamentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['playoff-tournament', variables.leagueId]
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['playoff-tournament-full', variables.leagueId]
+      })
+    },
+  })
+}
+
+// Hook for suspending an in-progress playoff tournament
+export function useSuspendPlayoffTournament() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ tournamentId }: { tournamentId: string; leagueId: string }) =>
+      suspendPlayoffTournament(tournamentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['playoff-tournament', variables.leagueId]
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['playoff-tournament-full', variables.leagueId]
+      })
+    },
+  })
+}
+
+// Hook for resuming a suspended playoff tournament
+export function useResumePlayoffTournament() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ tournamentId }: { tournamentId: string; leagueId: string }) =>
+      resumePlayoffTournament(tournamentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ['playoff-tournament', variables.leagueId]
+      })
+      queryClient.invalidateQueries({
+        queryKey: ['playoff-tournament-full', variables.leagueId]
+      })
+    },
+  })
+}
+
+// Hook for advancing to the next round in a playoff tournament
+export function useAdvancePlayoffRound() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ tournamentId }: { tournamentId: string; leagueId: string }) =>
+      advancePlayoffRound(tournamentId),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ['playoff-tournament', variables.leagueId]

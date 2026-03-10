@@ -14,7 +14,7 @@ export async function getCourtsByCity(cityId: string) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching courts:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -30,7 +30,7 @@ export async function getCourtById(courtId: string) {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching court:', error)
+    // silently handled
     return { data: null, error }
   }
 }
@@ -53,7 +53,7 @@ export async function getAllCourts() {
     if (error) throw error
     return { data, error: null }
   } catch (error) {
-    console.error('Error fetching all courts:', error)
+    // silently handled
     return { data: null, error }
   }
 } 

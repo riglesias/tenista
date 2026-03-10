@@ -53,6 +53,12 @@
     "resultUpdated": "Result updated successfully",
     "editTitle": "Edit Result",
     "editingResult": "Editing Result",
+    "ladderCompetition": "Ladder Competition",
+    "playoffTournament": "Playoff Tournament",
+    "ladderChallengeMatch": "Ladder Challenge Match",
+    "matchFormat": "Format: {{format}}",
+    "bestOfSets": "Best of {{count}} Set",
+    "bestOfSets_plural": "Best of {{count}} Sets",
     "editWarning": "Changing the winner may update ladder positions",
     "validation": {
       "selectCompetition": "Please select a competition for competitive matches",
@@ -143,6 +149,8 @@
     "done": "Done",
     "victoryTitle": "Victory!",
     "defeatTitle": "Better luck next time.",
-    "shareDescription": "Share with your friends"
+    "shareDescription": "Share with your friends",
+    "saving": "Saving...",
+    "save": "Save"
   }
 }

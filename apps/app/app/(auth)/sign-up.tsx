@@ -2,13 +2,13 @@
 
 import AppleSignInButton from '@/components/ui/AppleSignInButton'
 import GoogleSignInButton from '@/components/ui/GoogleSignInButton'
+import { useAppToast } from '@/components/ui/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { router, useFocusEffect } from 'expo-router'
 import React, { useCallback, useState } from 'react'
 import {
-    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -29,6 +29,7 @@ export default function SignUp() {
   const { t } = useTranslation('auth')
   const { t: tCommon } = useTranslation('common')
   const { t: tErrors } = useTranslation('errors')
+  const { showToast } = useAppToast()
 
   // Reset loading state when component is focused
   useFocusEffect(
@@ -60,11 +61,7 @@ export default function SignUp() {
   const handleSignUp = async () => {
     const validationError = validateForm()
     if (validationError) {
-      if (Platform.OS === 'web') {
-        window.alert(validationError)
-      } else {
-        Alert.alert(t('alerts.error'), validationError)
-      }
+      showToast(validationError, { type: 'error' })
       return
     }
 
@@ -86,11 +83,7 @@ export default function SignUp() {
           errorMessage = error.message
         }
 
-        if (Platform.OS === 'web') {
-          window.alert(errorMessage)
-        } else {
-          Alert.alert(t('alerts.error'), errorMessage)
-        }
+        showToast(errorMessage, { type: 'error' })
       } else {
         // Redirect to email confirmation page with the user's email
         router.replace(`/(auth)/email-confirmation?email=${encodeURIComponent(email.trim().toLowerCase())}`)
@@ -98,11 +91,7 @@ export default function SignUp() {
     } catch {
       const errorMessage = tErrors('generic.somethingWentWrong')
 
-      if (Platform.OS === 'web') {
-        window.alert(errorMessage)
-      } else {
-        Alert.alert(t('alerts.error'), errorMessage)
-      }
+      showToast(errorMessage, { type: 'error' })
     } finally {
       setLoading(false)
     }

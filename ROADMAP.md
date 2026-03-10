@@ -20,10 +20,10 @@ Tenista is a tennis community app for finding partners, joining flex leagues, tr
 
 ### What's Not Working / Missing
 - Android not on Google Play (builds exist but never submitted)
-- 89 `Alert.alert()` calls need migration to toast notifications
+- ~~89 `Alert.alert()` calls need migration to toast notifications~~ ✅ Done
 - No analytics (zero visibility into user behavior)
 - No monetization (league pricing fields exist but aren't enforced)
-- Playoff controls (suspend/resume/advance) are stubbed
+- ~~Playoff controls (suspend/resume/advance) are stubbed~~ ✅ Implemented
 - No push notification delivery (tokens registered but no backend sends)
 
 ---
@@ -32,16 +32,18 @@ Tenista is a tennis community app for finding partners, joining flex leagues, tr
 
 The goal is to get the Android APK/AAB into Google Play. iOS is already live, so Android is the bottleneck.
 
-### 1.1 Alert-to-Toast Migration
-Replace all 89 `Alert.alert()` / `window.alert()` calls with the existing `useAppToast` hook. This is a launch blocker — native alerts look broken on Android and hurt review chances.
+### 1.1 Alert-to-Toast Migration ✅ COMPLETE
+Replaced all `Alert.alert()` / `window.alert()` / `window.confirm()` calls with `useAppToast` (simple notifications) and a new `useConfirmDialog` (destructive confirmations). 39 files changed, 0 alerts remaining.
 
-- [ ] Auth screens (20 alerts)
-- [ ] Onboarding screens (15 alerts)
-- [ ] Edit profile screens (19 alerts)
-- [ ] Main app screens — community, results, settings, submit-result (15 alerts)
-- [ ] UI components — LeagueMenu, AvatarPicker, MatchCard, GoogleSignIn (14 alerts)
-- [ ] Other — player-profile, hooks, utils (6 alerts)
-- [ ] Build custom confirmation modal for destructive actions (logout, leave league, delete account)
+- [x] Auth screens (sign-in, sign-up, email-sign-in, forgot-password)
+- [x] Onboarding screens (profile, location, rating, availability, contact, flag, homecourt)
+- [x] Edit profile screens (edit-profile, edit-location, edit-flag, edit-rating, edit-availability, edit-homecourt)
+- [x] Main app screens (community, results, settings, submit-result, player-profile)
+- [x] UI components (GoogleSignIn, AppleSignIn, AvatarPicker, DeleteAccountModal, MatchResultScreen)
+- [x] League components (LeagueMenu, LeagueSelection, CurrentLeague, PlayoffControls, QualifyingPlayersCard)
+- [x] Ladder (LadderTab — 17 alerts migrated)
+- [x] Other (DoublesTeamFormSheet, useMatchData, onboarding-helpers)
+- [x] Built `ConfirmDialog` component for destructive actions (logout, leave league, delete account, challenges)
 
 ### 1.2 Android-Specific QA
 - [ ] Test Google Sign-In on real Android device (Play Services availability)
@@ -61,10 +63,17 @@ Replace all 89 `Alert.alert()` / `window.alert()` calls with the existing `useAp
 - [ ] Submit to Google Play review
 
 ### 1.4 Fix Broken Features
-- [ ] Implement playoff control mutations (suspend, resume, advance round)
+- [x] Implement playoff control mutations (suspend, resume, advance round)
 - [ ] Fix `/terms` page on landing to include privacy policy section
 - [ ] Fix "Get Started" button on landing navbar (currently non-functional)
 - [ ] Fix "Contact Us" and "Help Center" footer links on landing
+
+### 1.5 Code Quality Hardening ✅ COMPLETE
+- [x] Stripped 370+ console.log/error/warn statements from production code (35+ files)
+- [x] Fixed stubbed edit match — now navigates to submit-result with edit params
+- [x] Internationalized hardcoded English strings across 10 files (EN + ES translations)
+- [x] Fixed silent error handling in AuthContext (8 TODO catch blocks resolved)
+- [x] Added performance optimizations (useMemo/useCallback/React.memo) to 5 largest components
 
 ---
 

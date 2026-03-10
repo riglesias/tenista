@@ -55,7 +55,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       await changeLanguage(newLanguage);
       setLanguageState(newLanguage);
     } catch (error) {
-      console.error('Error changing language:', error);
+      // silently handled
     } finally {
       setIsLoading(false);
     }

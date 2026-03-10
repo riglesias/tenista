@@ -49,16 +49,11 @@ export class PerformanceMonitor {
   static end(label: string, logThreshold = 100): number {
     const startTime = this.instances.get(label)
     if (!startTime) {
-      console.warn(`Performance monitor: No start time found for "${label}"`)
       return 0
     }
     
     const duration = performance.now() - startTime
     this.instances.delete(label)
-    
-    if (duration > logThreshold) {
-      console.warn(`Performance: "${label}" took ${duration.toFixed(2)}ms`)
-    }
     
     return duration
   }
@@ -93,12 +88,7 @@ export function useRenderPerformance(componentName: string, props?: any) {
     }
   })
   
-  // Log when props change (useful for debugging unnecessary re-renders)
-  React.useEffect(() => {
-    if (props && process.env.NODE_ENV === 'development') {
-      console.log(`${componentName} re-rendered with props:`, props)
-    }
-  })
+  // Props change tracking available in development via React DevTools
 }
 
 // Debounce hook for performance optimization

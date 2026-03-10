@@ -2,12 +2,12 @@
 
 import AppleSignInButton from '@/components/ui/AppleSignInButton'
 import GoogleSignInButton from '@/components/ui/GoogleSignInButton'
+import { useAppToast } from '@/components/ui/Toast'
 import TenistaLogoNoColor from '@/components/ui/TenistaLogoNoColor'
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router'
 import { Mail } from 'lucide-react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
-  Alert,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -23,17 +23,18 @@ export default function SignIn() {
   const { success, error } = useLocalSearchParams<{ success?: string; error?: string }>()
   const [loading, setLoading] = useState(false)
   const { t } = useTranslation('auth')
+  const { showToast } = useAppToast()
 
   // Handle email confirmation status
   useEffect(() => {
     if (success === 'email_confirmed') {
-      Alert.alert(t('alerts.success'), t('alerts.emailConfirmed'))
+      showToast(t('alerts.emailConfirmed'), { type: 'success' })
     } else if (error === 'confirmation_failed') {
-      Alert.alert(t('alerts.error'), t('alerts.confirmationFailed'))
+      showToast(t('alerts.confirmationFailed'), { type: 'error' })
     } else if (error === 'invalid_link') {
-      Alert.alert(t('alerts.error'), t('alerts.invalidLink'))
+      showToast(t('alerts.invalidLink'), { type: 'error' })
     } else if (error === 'reset_failed') {
-      Alert.alert(t('alerts.error'), t('alerts.resetFailed'))
+      showToast(t('alerts.resetFailed'), { type: 'error' })
     }
   }, [success, error, t])
 

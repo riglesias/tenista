@@ -11,7 +11,7 @@ try {
   Notifications = require('expo-notifications');
   NotificationService = require('@/lib/services/notifications').NotificationService;
 } catch (error) {
-  console.log('Notifications not available in this environment');
+  // silently handled
 }
 
 interface NotificationContextValue {
@@ -36,10 +36,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     // Skip if notifications not available
     if (!Notifications || !NotificationService) {
-      console.log('Notifications not available in this environment');
       return;
     }
-    
+
     checkNotificationPermissions();
     registerNotificationListeners();
 
@@ -70,7 +69,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const { status } = await Notifications.getPermissionsAsync();
       setHasPermission(status === 'granted');
     } catch (error) {
-      console.log('Error checking notification permissions:', error);
       setHasPermission(false);
     }
   };
@@ -86,7 +84,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       setHasPermission(granted);
       return granted;
     } catch (error) {
-      console.log('Error requesting notification permissions:', error);
       return false;
     }
   };
@@ -98,25 +95,22 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const token = await NotificationService.registerForPushNotifications();
       if (token) {
         await NotificationService.saveTokenToDatabase(token, user.id);
-        console.log('Push token registered:', token);
       }
     } catch (error) {
-      console.error('Failed to register for push notifications:', error);
+      // silently handled
     }
   };
 
   const registerNotificationListeners = () => {
     if (!NotificationService) return;
-    
+
     // Handle notifications received while app is in foreground
     notificationListener.current = NotificationService.addNotificationReceivedListener((notification: any) => {
-      console.log('Notification received:', notification);
+      // Notification received in foreground
     });
 
     // Handle notification taps
     responseListener.current = NotificationService.addNotificationResponseListener((response: any) => {
-      console.log('Notification response:', response);
-      
       const data = response.notification.request.content.data;
       if (data?.type === 'play_now') {
         // Navigate to community tab to see available players
@@ -145,11 +139,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
           await registerForPushNotifications();
         }
       }
-      
+
       setIsNotificationEnabled(true);
-      console.log('Notifications enabled');
     } catch (error) {
-      console.error('Failed to enable notifications:', error);
       throw error; // Re-throw to let the caller handle it
     }
   };
@@ -162,11 +154,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       if (NotificationService) {
         await NotificationService.removeToken(user.id);
       }
-      
+
       setIsNotificationEnabled(false);
-      console.log('Notifications disabled');
     } catch (error) {
-      console.error('Failed to disable notifications:', error);
       throw error; // Re-throw to let the caller handle it
     }
   };

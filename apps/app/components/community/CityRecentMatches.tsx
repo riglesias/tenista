@@ -38,7 +38,7 @@ export default function CityRecentMatches({ cityId, cityName }: CityRecentMatche
         setMatches(data)
       }
     } catch (error) {
-      console.error('Error loading recent matches:', error)
+      // silently handled
     } finally {
       setIsLoading(false)
     }

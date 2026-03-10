@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { getThemeColors } from '@/lib/utils/theme';
 import React from 'react';
 import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface BottomButtonsProps {
   onCancel: () => void;
@@ -20,12 +21,16 @@ export default function BottomButtons({
   onSave,
   loading = false,
   disabled = false,
-  cancelText = 'Cancel',
-  saveText = 'Save Changes',
-  loadingText = 'Saving...'
+  cancelText,
+  saveText,
+  loadingText,
 }: BottomButtonsProps) {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
+  const { t } = useTranslation('common');
+  const resolvedCancelText = cancelText || t('buttons.cancel');
+  const resolvedSaveText = saveText || t('buttons.saveChanges');
+  const resolvedLoadingText = loadingText || t('buttons.saving');
 
   return (
     <View 
@@ -46,7 +51,7 @@ export default function BottomButtons({
         disabled={loading}
       >
         <Text className="text-base font-semibold" style={{ color: colors.foreground }}>
-          {cancelText}
+          {resolvedCancelText}
         </Text>
       </TouchableOpacity>
 
@@ -61,12 +66,12 @@ export default function BottomButtons({
           <View className="flex-row items-center">
             <ActivityIndicator size="small" color={colors.primaryForeground} />
             <Text className="text-base font-semibold ml-2" style={{ color: colors.primaryForeground }}>
-              {loadingText}
+              {resolvedLoadingText}
             </Text>
           </View>
         ) : (
           <Text className="text-base font-semibold" style={{ color: colors.primaryForeground }}>
-            {saveText}
+            {resolvedSaveText}
           </Text>
         )}
       </TouchableOpacity>

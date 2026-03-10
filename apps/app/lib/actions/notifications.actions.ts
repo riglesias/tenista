@@ -27,7 +27,6 @@ export async function getUsersForPlayNowNotification(
     .neq('id', activatingUserId);
 
   if (error) {
-    console.error('Error fetching eligible users for notifications:', error);
     return [];
   }
 
@@ -65,7 +64,7 @@ export async function logNotification(
     });
 
   if (error) {
-    console.error('Error logging notification:', error);
+    // silently handled
   }
 }
 
@@ -86,7 +85,6 @@ export async function getNotificationHistory(userId: string) {
     .limit(50);
 
   if (error) {
-    console.error('Error fetching notification history:', error);
     return [];
   }
 
@@ -104,7 +102,6 @@ export async function updatePlayerNotificationPreference(
     .eq('auth_user_id', authUserId);
 
   if (error) {
-    console.error('Error updating player notification preference:', error);
     throw error;
   }
 

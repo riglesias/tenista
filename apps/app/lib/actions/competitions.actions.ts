@@ -121,7 +121,6 @@ export async function getPlayerActiveCompetitions(playerId: string): Promise<{ d
     
     return { data: competitions, error: null }
   } catch (error) {
-    console.error('Error getting player competitions:', error)
     return { data: null, error }
   }
 }
@@ -184,7 +183,6 @@ export async function validateCompetitionMatch(
     
     return { valid: false, error: 'Invalid competition type' }
   } catch (error) {
-    console.error('Error validating competition match:', error)
     return { valid: false, error: 'Failed to validate match' }
   }
 }

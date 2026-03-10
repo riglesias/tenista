@@ -11,7 +11,6 @@ import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    Alert,
     BackHandler,
     Keyboard,
     StyleSheet,
@@ -22,6 +21,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { useAppToast } from '@/components/ui/Toast';
 
 export default function ProfileOnboarding() {
   const { user, signOut } = useAuth();
@@ -32,6 +32,7 @@ export default function ProfileOnboarding() {
   const { t } = useTranslation('onboarding');
   const { t: tCommon } = useTranslation('common');
   const { t: tErrors } = useTranslation('errors');
+  const { showToast } = useAppToast();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -77,7 +78,7 @@ export default function ProfileOnboarding() {
           setAvatarUrl(profileResult.data.avatar_url);
         }
       } catch (error) {
-        console.error('Error loading profile:', error);
+        // silently handled
       } finally {
         setIsLoadingProfile(false);
       }
@@ -94,7 +95,7 @@ export default function ProfileOnboarding() {
     if (!user) return;
 
     if (!firstName || !lastName || !gender) {
-      Alert.alert(tErrors('validation.required'), tErrors('validation.required'));
+      showToast(tErrors('validation.required'), { type: 'error' });
       return;
     }
 
@@ -108,14 +109,12 @@ export default function ProfileOnboarding() {
       });
 
       if (error) {
-        Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-        console.error('Profile save error:', error);
+        showToast(tErrors('generic.tryAgain'), { type: 'error' });
       } else {
         router.push('/onboarding/flag-selection' as any);
       }
     } catch (error) {
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
-      console.error('Profile save exception:', error);
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     } finally {
       setLoading(false);
     }
@@ -126,8 +125,7 @@ export default function ProfileOnboarding() {
       await signOut();
       router.replace('/(auth)/sign-in');
     } catch (error) {
-      console.error('Logout error:', error);
-      Alert.alert(tErrors('generic.somethingWentWrong'), tErrors('generic.tryAgain'));
+      showToast(tErrors('generic.tryAgain'), { type: 'error' });
     }
   };
 
@@ -268,7 +266,7 @@ export default function ProfileOnboarding() {
                 onPress={(value) => setGender(value as 'female')}
               />
             </View>
-            <TouchableOpacity onPress={() => Alert.alert(t('profile.genderInfoTitle'), t('profile.genderInfoMessage'))}>
+            <TouchableOpacity onPress={() => showToast(t('profile.genderInfoMessage'), { type: 'info' })}>
               <Text style={{
                 color: colors.mutedForeground,
                 fontSize: 14,

@@ -6,10 +6,12 @@ import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { LadderRankingWithPlayer } from '@/lib/validation/ladder.validation'
 import LadderRankingRow from './LadderRankingRow'
+import { useTranslation } from 'react-i18next'
 
 const TableHeader = React.memo(function TableHeader() {
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
+  const { t } = useTranslation('league')
 
   return (
     <View
@@ -45,7 +47,7 @@ const TableHeader = React.memo(function TableHeader() {
           flex: 1,
         }}
       >
-        PLAYER
+        {t('standings.playerHeader')}
       </Text>
       <Text
         style={{
@@ -58,7 +60,7 @@ const TableHeader = React.memo(function TableHeader() {
           textAlign: 'center',
         }}
       >
-        W
+        {t('standings.wins')}
       </Text>
       <Text
         style={{
@@ -71,7 +73,7 @@ const TableHeader = React.memo(function TableHeader() {
           textAlign: 'center',
         }}
       >
-        L
+        {t('standings.losses')}
       </Text>
       <View style={{ width: 32 }} />
     </View>
