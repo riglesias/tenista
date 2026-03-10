@@ -31,7 +31,6 @@ function EmailConfirmationContent() {
 
     // If the URL contains an error from Supabase, the link was invalid.
     if (error) {
-      console.error('Email confirmation error:', error);
       setState('error');
     }
 

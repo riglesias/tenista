@@ -7,31 +7,30 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Only apply webpack config when not using Turbopack
-  ...(process.env.TURBOPACK !== '1' && {
-    webpack: (config, { isServer }) => {
-      if (isServer) {
-        config.externals.push('encoding');
-      }
-      return config;
+  headers: async () => [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "X-Frame-Options", value: "DENY" },
+        { key: "X-XSS-Protection", value: "1; mode=block" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=31536000; includeSubDomains",
+        },
+      ],
     },
-  }),
+  ],
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
       },
     ],
-  },
-  // Turbopack configuration (if needed in future)
-  experimental: {
-    turbo: {
-      // Turbopack-specific configuration can go here
-      // Currently empty as 'encoding' external isn't needed with Turbopack
-    },
   },
 };
 

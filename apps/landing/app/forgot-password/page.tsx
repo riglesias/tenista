@@ -19,8 +19,9 @@ export default function ForgotPasswordPage() {
 
     // This is the correct way to trigger the password reset flow
     // that matches your email template and API route.
+    const origin = window.location.origin;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://www.tenista.app/reset-password',
+      redirectTo: `${origin}/reset-password`,
     });
 
     setIsSubmitting(false);

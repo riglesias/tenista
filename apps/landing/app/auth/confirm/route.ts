@@ -9,15 +9,8 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type') as EmailOtpType | null;
   const next = searchParams.get('next') ?? '/';
 
-  console.log('Auth Confirm:', {
-    token_hash: token_hash ? `${token_hash.substring(0, 10)}...` : 'missing',
-    type,
-    next,
-  });
-
   // Redirect to error page if token hash or type is missing
   if (!token_hash || !type) {
-    console.error('Missing required params');
     return NextResponse.redirect(new URL('/reset-password?error=invalid_link', origin));
   }
 
@@ -31,12 +24,9 @@ export async function GET(request: NextRequest) {
   });
 
   if (error) {
-    console.error('OTP verification error:', error);
     return NextResponse.redirect(new URL(`/reset-password?error=${encodeURIComponent(error.message)}`, origin));
   }
 
-  console.log('OTP verified successfully, redirecting to:', next);
-  
   // Redirect to the specified next URL (should be /reset-password for recovery)
   return NextResponse.redirect(new URL(next, origin));
 }

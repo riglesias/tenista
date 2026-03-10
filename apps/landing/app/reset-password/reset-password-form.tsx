@@ -72,8 +72,6 @@ export default function ResetPasswordForm() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth state change:', event, { hasSession: !!session });
-      
       if (event === 'PASSWORD_RECOVERY') {
         // User has clicked the recovery link and session is ready
         setState('form');
@@ -86,11 +84,7 @@ export default function ResetPasswordForm() {
     // Check initial session state
     const checkInitialSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      console.log('Initial session check:', { 
-        hasSession: !!session,
-        isRecovery: !!session?.user?.recovery_sent_at 
-      });
-      
+
       // If we have a session with recovery_sent_at, show the form
       if (session?.user?.recovery_sent_at) {
         setState('form');
@@ -139,16 +133,13 @@ export default function ResetPasswordForm() {
       });
 
       if (error) {
-        console.error('Password update error:', error);
         setErrorMessage(error.message || 'Failed to reset password');
       } else {
-        console.log('Password updated successfully');
         setState('success');
         
         await supabase.auth.signOut();
       }
-    } catch (error) {
-      console.error('Password reset error:', error);
+    } catch {
       setErrorMessage('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
