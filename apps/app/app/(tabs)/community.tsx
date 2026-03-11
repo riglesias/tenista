@@ -2,7 +2,7 @@
 
 import { router, useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useState } from 'react'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 import { useTranslation } from 'react-i18next'
 
 import { DaySelector, FilterBottomSheet } from '@/components/community'
@@ -13,7 +13,6 @@ import PlayNowModal from '@/components/community/PlayNowModal'
 import CityRecentMatches from '@/components/community/CityRecentMatches'
 import { EmptyState } from '@/components/ui/ErrorMessage'
 import LoadingSpinner from '@/components/ui/LoadingSpinner'
-import { useAppToast } from '@/components/ui/Toast'
 
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -23,6 +22,7 @@ import { useAsyncOperation } from '@/hooks/useLoadingState'
 import { usePlayerFiltering } from '@/hooks/usePlayerFiltering'
 import { useAvailabilityRealtime } from '@/hooks/useAvailabilityRealtime'
 import { getAllAvailablePlayersInCity } from '@/lib/actions/availability.actions'
+import { trackCommunityFilterUsed } from '@/lib/analytics/events'
 import { getPlayerDailyAvailability, updateDailyAvailability } from '@/lib/actions/daily-availability.actions'
 import { getPlayerProfile } from '@/lib/actions/player.actions'
 
@@ -50,8 +50,7 @@ export default function CommunityScreen() {
   const colors = getThemeColors(isDark)
   const { t } = useTranslation('community')
   const { t: tErrors } = useTranslation('errors')
-  const { showToast } = useAppToast()
-
+  
   // Data state
   const [allPlayers, setAllPlayers] = useState<Player[]>([])
   const [userProfile, setUserProfile] = useState<any>(null)
@@ -73,6 +72,11 @@ export default function CommunityScreen() {
     getPlayerAvailability,
     clearFilters,
   } = usePlayerFiltering(allPlayers)
+
+  const handleRatingRangeChange = useCallback((range: [number, number]) => {
+    trackCommunityFilterUsed({ ratingMin: range[0], ratingMax: range[1] });
+    setRatingRange(range);
+  }, [setRatingRange])
 
   // Real-time availability updates from other players
   const handleAvailabilityChange = useCallback(async () => {
@@ -152,14 +156,14 @@ export default function CommunityScreen() {
         
       },
       {
-        onError: () => {
-          // silently handled
+        onError: (error) => {
+          console.error('Error loading available players:', error)
         }
       }
     )
 
     if (error && !isRefresh) {
-      showToast(t('errors.loadPlayers'), { type: 'error' })
+      Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.loadPlayers'))
     }
   }
 
@@ -199,7 +203,7 @@ export default function CommunityScreen() {
       if (error) {
         // Revert optimistic update on error
         setIsAvailableToday(!newAvailability)
-        showToast(t('errors.updateAvailability'), { type: 'error' })
+        Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.updateAvailability'))
       } else {
         // Silently refresh player list in background without triggering loading state
         if (user && userProfile?.city_id) {
@@ -215,7 +219,8 @@ export default function CommunityScreen() {
     } catch (error) {
       // Revert optimistic update on error
       setIsAvailableToday(!newAvailability)
-      showToast(t('errors.unexpected'), { type: 'error' })
+      Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.unexpected'))
+      console.error('Availability toggle error:', error)
     } finally {
       setIsUpdatingAvailability(false)
     }
@@ -335,7 +340,7 @@ export default function CommunityScreen() {
         isVisible={isFilterVisible}
         onClose={handleCloseFilter}
         ratingRange={ratingRange}
-        onRatingRangeChange={setRatingRange}
+        onRatingRangeChange={handleRatingRangeChange}
         onApplyFilters={handleApplyFilters}
         onClearFilters={handleClearFilters}
       />

@@ -4,6 +4,7 @@ import ScreenHeader from '@/components/ui/ScreenHeader'
 import { useAppToast } from '@/components/ui/Toast'
 import { useTheme } from '@/contexts/ThemeContext'
 import { SubmitMatchData, submitMatchResult } from '@/lib/actions/matches.actions'
+import { trackMatchSubmitted } from '@/lib/analytics/events'
 import { getPlayerById, getPlayerProfile } from '@/lib/actions/player.actions'
 import { getPlayerActiveCompetitions, PlayerCompetition } from '@/lib/actions/competitions.actions'
 import { completeChallenge, getActiveChallenge, editLadderMatchResult } from '@/lib/actions/ladder.actions'
@@ -238,7 +239,7 @@ export default function SubmitResultScreen() {
             leagueId,
             opponentId: matchOpponentId,
             matchFormat,
-            leagueName: league?.name || t('submitResult.ladderCompetition')
+            leagueName: league?.name || 'Ladder Competition'
           })
 
           // Set edit mode state
@@ -317,7 +318,7 @@ export default function SubmitResultScreen() {
             leagueId,
             opponentId: challengeOpponentId,
             matchFormat,
-            leagueName: league?.name || t('submitResult.ladderCompetition')
+            leagueName: league?.name || 'Ladder Competition'
           })
 
           // Set number of sets based on match format
@@ -356,7 +357,7 @@ export default function SubmitResultScreen() {
           leagueId,
           opponentId,
           matchFormat,
-          leagueName: league?.name || t('submitResult.playoffTournament')
+          leagueName: league?.name || 'Playoff Tournament'
         })
 
         // Set number of sets based on league match format
@@ -394,6 +395,7 @@ export default function SubmitResultScreen() {
         }
       }
     } catch (error) {
+      console.error('Error loading data:', error)
       showToast(t('submitResult.couldNotLoadData'), { type: 'error' })
     } finally {
       setLoading(false)
@@ -737,9 +739,10 @@ export default function SubmitResultScreen() {
         )
 
         if (challengeError) {
+          console.error('Error completing challenge:', challengeError)
           // Match was submitted, but challenge completion failed
           // Show warning but don't fail the entire operation
-          showToast('Match recorded, but challenge update failed. Please contact support.', { type: 'error' })
+          showToast('Match recorded, but challenge update failed. Please contact support.', { type: 'warning' })
         }
 
         // Invalidate ladder-specific queries
@@ -766,6 +769,11 @@ export default function SubmitResultScreen() {
       queryClient.invalidateQueries({ queryKey: ['player-matches'] })
       queryClient.invalidateQueries({ queryKey: ['player-profile'] })
 
+      trackMatchSubmitted({
+        leagueId: challengeContext?.leagueId || playoffContext?.leagueId || selectedCompetition?.id,
+        winnerId,
+      });
+
       // Show celebration screen instead of toast + navigate
       setCelebrationData({
         isWinner: winnerId === currentPlayer.id,
@@ -775,6 +783,7 @@ export default function SubmitResultScreen() {
       })
       setShowCelebration(true)
     } catch (error) {
+      console.error('Error submitting match:', error)
       showToast(t('alerts.submitError'), { type: 'error' })
     } finally {
       setSubmitting(false)
@@ -875,7 +884,7 @@ export default function SubmitResultScreen() {
                     color: isEditMode ? '#92400e' : colors.foreground,
                     marginBottom: 4
                   }}>
-                    {isEditMode ? t('submitResult.editingResult') : t('submitResult.ladderChallengeMatch')}
+                    {isEditMode ? t('submitResult.editingResult') : 'Ladder Challenge Match'}
                   </Text>
                   <Text style={{
                     fontSize: 13,
@@ -897,7 +906,7 @@ export default function SubmitResultScreen() {
                     fontSize: 12,
                     color: colors.mutedForeground
                   }}>
-                    {t('submitResult.matchFormat', { format: getMatchFormatDescription(challengeContext.matchFormat) })}
+                    Format: {getMatchFormatDescription(challengeContext.matchFormat)}
                   </Text>
                 </View>
               </View>
@@ -931,7 +940,7 @@ export default function SubmitResultScreen() {
                     fontSize: 12,
                     color: colors.mutedForeground
                   }}>
-                    {t('submitResult.matchFormat', { format: t('submitResult.bestOfSets', { count: playoffContext.matchFormat.number_of_sets }) })}
+                    Format: Best of {playoffContext.matchFormat.number_of_sets} {playoffContext.matchFormat.number_of_sets === 1 ? 'Set' : 'Sets'}
                   </Text>
                 </View>
               </View>

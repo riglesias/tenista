@@ -1,14 +1,14 @@
 'use client'
 
 import { useAuth } from '@/contexts/AuthContext'
+import { trackLogin } from '@/lib/analytics/events'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import * as Google from 'expo-auth-session/providers/google'
 import * as WebBrowser from 'expo-web-browser'
 import React, { useEffect } from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Platform, Text, TouchableOpacity, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import { useAppToast } from '@/components/ui/Toast'
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -16,7 +16,6 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
   const { signInWithIdToken } = useAuth()
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
-  const { showToast } = useAppToast()
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: '251208589749-gctj4up1ce36inf0l7cr99702hc8un3b.apps.googleusercontent.com',
@@ -28,9 +27,14 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
     if (response?.type === 'success') {
       const { id_token } = response.params
       if (id_token) {
+        console.log('Got ID token, signing in with Supabase...')
         signInWithIdToken(id_token).then(({ error }) => {
           if (error) {
+            console.error('Supabase sign-in error:', error)
             handleError(error.message || 'Failed to sign in with Supabase')
+          } else {
+            console.log('Successfully signed in with Supabase')
+            trackLogin('google')
           }
         })
       } else {
@@ -46,7 +50,11 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
     if (onError) {
       onError(errorMessage)
     } else {
-      showToast(errorMessage, { type: 'error' })
+      if (Platform.OS === 'web') {
+        window.alert(errorMessage)
+      } else {
+        Alert.alert('Google Sign In Error', errorMessage)
+      }
     }
   }
 

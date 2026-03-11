@@ -1,5 +1,7 @@
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import "@/global.css";
+import { PostHogProvider } from 'posthog-react-native';
+import { posthog } from '@/lib/analytics/posthog';
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -12,7 +14,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AuthGuard from '@/components/AuthGuard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastContainer } from '@/components/ui/Toast';
-import { ConfirmDialogContainer } from '@/components/ui/ConfirmDialog';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
@@ -83,7 +84,6 @@ function AppContent() {
       </Stack>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <ToastContainer />
-      <ConfirmDialogContainer />
     </NavigationThemeProvider>
   );
 }
@@ -96,26 +96,26 @@ function RootLayout() {
   });
 
   // Debug logging
-  if (__DEV__) {
-    console.log('[RootLayout] Starting app with env:', {
-      NODE_ENV: process.env.NODE_ENV,
-      hasSupabaseUrl: !!process.env.EXPO_PUBLIC_SUPABASE_URL,
-      hasSupabaseKey: !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
-    });
-  }
+  console.log('[RootLayout] Starting app with env:', {
+    NODE_ENV: process.env.NODE_ENV,
+    hasSupabaseUrl: !!process.env.EXPO_PUBLIC_SUPABASE_URL,
+    hasSupabaseKey: !!process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY,
+  });
 
   if (!loaded) {
     return null;
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <ThemedApp />
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </QueryClientProvider>
+    <PostHogProvider client={posthog}>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <ThemedApp />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </PostHogProvider>
   );
 }
 
@@ -127,23 +127,23 @@ function ThemedApp() {
     <GluestackUIProvider mode={colorScheme}>
       <LanguageProvider>
         <ErrorBoundary
-          onError={() => {
-            // silently handled
+          onError={(error) => {
+            console.error('Global error boundary caught:', error);
           }}
           resetOnPropsChange={false}
         >
           <AuthProvider>
             <ErrorBoundary
-              onError={() => {
-                // silently handled
+              onError={(error) => {
+                console.error('Auth error boundary caught:', error);
               }}
               resetKeys={[colorScheme]}
             >
               <NotificationProvider>
                 <AuthGuard>
                   <ErrorBoundary
-                    onError={() => {
-                      // silently handled
+                    onError={(error) => {
+                      console.error('App content error boundary caught:', error);
                     }}
                     resetKeys={[colorScheme]}
                   >
