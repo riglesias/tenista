@@ -189,8 +189,8 @@ export default function SettingsScreen() {
       // Update playerProfile state as well
       setPlayerProfile((prev: any) => prev ? { ...prev, match_result_notifications_enabled: value } : prev);
 
-      // If enabling and notifications are available, ensure permissions
-      if (value && hasPermission) {
+      // If enabling, ensure push notification permissions and token registration
+      if (value) {
         await enableNotifications();
       }
     } catch (error) {

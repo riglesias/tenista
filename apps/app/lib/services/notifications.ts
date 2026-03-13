@@ -41,10 +41,17 @@ export class NotificationService {
         return null;
       }
 
-      // Configure notification channel for Android
+      // Configure notification channels for Android
       if (Platform.OS === 'android') {
         await Notifications.setNotificationChannelAsync('play-now', {
           name: 'Play Now Notifications',
+          importance: Notifications.AndroidImportance.HIGH,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#84FE0C',
+          sound: 'default',
+        });
+        await Notifications.setNotificationChannelAsync('match-results', {
+          name: 'Match Result Notifications',
           importance: Notifications.AndroidImportance.HIGH,
           vibrationPattern: [0, 250, 250, 250],
           lightColor: '#84FE0C',
@@ -198,6 +205,14 @@ export class NotificationService {
     });
 
     return notificationId;
+  }
+
+  static async clearBadgeCount(): Promise<void> {
+    try {
+      await Notifications.setBadgeCountAsync(0);
+    } catch {
+      // Badge count not supported on all platforms
+    }
   }
 
   static addNotificationReceivedListener(

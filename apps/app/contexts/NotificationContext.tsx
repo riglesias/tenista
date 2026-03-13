@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -42,7 +42,18 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     checkNotificationPermissions();
     registerNotificationListeners();
 
+    // Clear badge count when app comes to foreground
+    if (NotificationService) {
+      NotificationService.clearBadgeCount();
+    }
+    const subscription = AppState.addEventListener('change', (nextState) => {
+      if (nextState === 'active' && NotificationService) {
+        NotificationService.clearBadgeCount();
+      }
+    });
+
     return () => {
+      subscription.remove();
       if (notificationListener.current && Notifications) {
         Notifications.removeNotificationSubscription(notificationListener.current);
       }
