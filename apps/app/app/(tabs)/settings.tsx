@@ -390,9 +390,6 @@ export default function SettingsScreen() {
                     {user.email}
                   </Text>
                 )}
-                <Text style={{ fontSize: 14, color: colors.mutedForeground, marginBottom: 4 }}>
-                  {homecourt ? homecourt.name : t('profile.noHomecourt')}
-                </Text>
                 <Text style={{ fontSize: 14, color: colors.mutedForeground }}>
                   {t('profile.memberSince', { date: formatMemberSince(playerProfile.created_at, language) })}
                 </Text>
@@ -400,6 +397,48 @@ export default function SettingsScreen() {
             </View>
           ) : null}
         </View>
+
+        {/* Homecourt Card */}
+        {!loading && playerProfile && (
+          <TouchableOpacity
+            onPress={() => router.push('/edit-homecourt')}
+            activeOpacity={0.7}
+            style={{
+              backgroundColor: colors.card,
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 12,
+              padding: 16,
+              marginBottom: 32,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginRight: 12,
+                backgroundColor: colors.muted,
+              }}>
+                <Ionicons name="tennisball-outline" size={20} color={colors.foreground} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 13, color: colors.mutedForeground }}>
+                  {t('profile.editHomecourtAndClub')}
+                </Text>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground, marginTop: 2 }}>
+                  {homecourt ? homecourt.name : t('profile.noHomecourt')}
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.mutedForeground} />
+          </TouchableOpacity>
+        )}
 
         {/* Profile Section */}
         <View style={{ marginBottom: 32 }}>
@@ -475,32 +514,6 @@ export default function SettingsScreen() {
                 <View style={{ flex: 1 }}>
                   <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
                     {t('profile.editLocation')}
-                  </Text>
-                </View>
-              </View>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.mutedForeground}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.push('/edit-homecourt')}
-              activeOpacity={0.7}
-              style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-                <View style={{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginRight: 16, backgroundColor: colors.muted }}>
-                  <Ionicons
-                    name="tennisball-outline"
-                    size={20}
-                    color={colors.foreground}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ fontSize: 16, fontWeight: '600', color: colors.foreground }}>
-                    {t('profile.editHomecourtAndClub')}
                   </Text>
                 </View>
               </View>
@@ -707,57 +720,28 @@ export default function SettingsScreen() {
           </View>
         </View>
 
-        {/* Account Management Section */}
+        {/* Account Section */}
         <View style={{ marginBottom: 32 }}>
-          <Text style={{ fontSize: 18, fontWeight: '600', color: colors.foreground, marginBottom: 16 }}>
-            {t('account.title')}
-          </Text>
-
-          <View style={{ gap: 12 }}>
-            {/* Delete Account Button */}
-            <TouchableOpacity
-              onPress={() => setShowDeleteModal(true)}
-              activeOpacity={0.7}
-              disabled={deletingAccount}
-              style={{
-                backgroundColor: 'transparent',
-                borderWidth: 1,
-                borderColor: '#ef4444',
-                borderRadius: 12,
-                padding: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: deletingAccount ? 0.6 : 1
-              }}
-            >
-              <Ionicons name="trash-outline" size={20} color="#ef4444" />
-              <Text style={{ color: '#ef4444', fontSize: 16, fontWeight: '600', marginLeft: 8 }}>
-                {deletingAccount ? t('account.deletingAccount') : t('account.deleteAccount')}
-              </Text>
-            </TouchableOpacity>
-
-            {/* Logout Button */}
-            <TouchableOpacity
-              onPress={confirmLogout}
-              activeOpacity={0.7}
-              disabled={deletingAccount}
-              style={{
-                backgroundColor: colors.destructive,
-                borderRadius: 12,
-                padding: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                opacity: deletingAccount ? 0.6 : 1
-              }}
-            >
-              <Ionicons name="log-out-outline" size={20} color={colors.destructiveForeground} />
-              <Text style={{ color: colors.destructiveForeground, fontSize: 16, fontWeight: '600', marginLeft: 8 }}>
-                {t('account.logout')}
-              </Text>
-            </TouchableOpacity>
-          </View>
+          {/* Logout Button */}
+          <TouchableOpacity
+            onPress={confirmLogout}
+            activeOpacity={0.7}
+            disabled={deletingAccount}
+            style={{
+              backgroundColor: colors.destructive,
+              borderRadius: 12,
+              padding: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: deletingAccount ? 0.6 : 1
+            }}
+          >
+            <Ionicons name="log-out-outline" size={20} color={colors.destructiveForeground} />
+            <Text style={{ color: colors.destructiveForeground, fontSize: 16, fontWeight: '600', marginLeft: 8 }}>
+              {t('account.logout')}
+            </Text>
+          </TouchableOpacity>
 
           {/* Version Information */}
           <View style={{ marginTop: 24, alignItems: 'center' }}>
@@ -772,6 +756,35 @@ export default function SettingsScreen() {
               })}
             </Text>
           </View>
+        </View>
+
+        {/* Danger Zone Section */}
+        <View style={{ marginBottom: 32 }}>
+          <Text style={{ fontSize: 18, fontWeight: '600', color: colors.destructive, marginBottom: 16 }}>
+            {t('account.dangerZone')}
+          </Text>
+
+          <TouchableOpacity
+            onPress={() => setShowDeleteModal(true)}
+            activeOpacity={0.7}
+            disabled={deletingAccount}
+            style={{
+              backgroundColor: 'transparent',
+              borderWidth: 1,
+              borderColor: '#ef4444',
+              borderRadius: 12,
+              padding: 16,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: deletingAccount ? 0.6 : 1
+            }}
+          >
+            <Ionicons name="trash-outline" size={20} color="#ef4444" />
+            <Text style={{ color: '#ef4444', fontSize: 16, fontWeight: '600', marginLeft: 8 }}>
+              {deletingAccount ? t('account.deletingAccount') : t('account.deleteAccount')}
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
 

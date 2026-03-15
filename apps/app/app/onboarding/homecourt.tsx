@@ -1,7 +1,6 @@
 'use client'
 
 import { OnboardingButtons, OnboardingLayout, createOnboardingStyles } from '@/components/onboarding';
-import CourtSelectionSheet from '@/components/ui/CourtSelectionSheet';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getCourtsByCity } from '@/lib/actions/courts.actions';
@@ -9,10 +8,9 @@ import { createOrUpdatePlayerProfile, getPlayerProfile } from '@/lib/actions/pla
 import { getOrganizationByCourtId, joinClub } from '@/lib/actions/organizations.actions';
 import { getThemeColors } from '@/lib/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
-import { Building2 } from 'lucide-react-native';
+import { Building2, Globe, Lock, ArrowLeft } from 'lucide-react-native';
 import { router } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
     ActivityIndicator,
     Image,
@@ -32,6 +30,9 @@ type Court = {
   name: string;
   city_id: string;
   is_public: boolean | null;
+  address?: string | null;
+  surface_type?: string | null;
+  number_of_courts?: number | null;
 };
 
 type CourtOrg = {
@@ -45,6 +46,8 @@ type LinkedOrg = {
   join_code: string | null;
   image_url: string | null;
 };
+
+const SEARCH_THRESHOLD = 5;
 
 export default function HomecourtOnboarding() {
   const { user } = useAuth();
@@ -63,7 +66,7 @@ export default function HomecourtOnboarding() {
   const [courts, setCourts] = useState<Court[]>([]);
   const [courtOrgs, setCourtOrgs] = useState<CourtOrg[]>([]);
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
-  const [showCourtSheet, setShowCourtSheet] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [cityName, setCityName] = useState<string | null>(null);
   const [playerId, setPlayerId] = useState<string | null>(null);
 
@@ -73,6 +76,16 @@ export default function HomecourtOnboarding() {
   const [verifying, setVerifying] = useState(false);
   const [clubVerified, setClubVerified] = useState(false);
   const [verifiedClubName, setVerifiedClubName] = useState<string | null>(null);
+
+
+  const filteredCourts = useMemo(() => {
+    if (searchQuery.trim() === '') return courts;
+    const q = searchQuery.toLowerCase();
+    return courts.filter(court =>
+      court.name.toLowerCase().includes(q) ||
+      (court.address && court.address.toLowerCase().includes(q))
+    );
+  }, [searchQuery, courts]);
 
   useEffect(() => {
     loadData();
@@ -90,29 +103,27 @@ export default function HomecourtOnboarding() {
         setPlayerId(profile.id);
 
         if (profile.city_id) {
-          const { data: courtsData } = await getCourtsByCity(profile.city_id);
-          if (courtsData) {
-            setCourts(courtsData);
-          }
+          const [courtsResult, orgsResult] = await Promise.all([
+            getCourtsByCity(profile.city_id),
+            supabase
+              .from('organizations')
+              .select('court_id, name')
+              .not('court_id', 'is', null),
+          ]);
 
-          // Fetch organizations linked to courts
-          const { data: orgs } = await supabase
-            .from('organizations')
-            .select('court_id, name')
-            .not('court_id', 'is', null);
-          if (orgs) {
-            setCourtOrgs(orgs.map((o: any) => ({ court_id: o.court_id, org_name: o.name })));
-          }
-        }
+          if (courtsResult.data) {
+            setCourts(courtsResult.data);
 
-        // If user already has a homecourt, pre-select it
-        if (profile.homecourt_id && profile.city_id) {
-          const { data: courtsData } = await getCourtsByCity(profile.city_id);
-          if (courtsData) {
-            const userCourt = courtsData.find(court => court.id === profile.homecourt_id);
-            if (userCourt) {
-              setSelectedCourt(userCourt);
+            if (profile.homecourt_id) {
+              const userCourt = courtsResult.data.find((court: Court) => court.id === profile.homecourt_id);
+              if (userCourt) {
+                setSelectedCourt(userCourt);
+              }
             }
+          }
+
+          if (orgsResult.data) {
+            setCourtOrgs(orgsResult.data.map((o: any) => ({ court_id: o.court_id, org_name: o.name })));
           }
         }
       }
@@ -134,15 +145,12 @@ export default function HomecourtOnboarding() {
       return;
     }
 
-    // Check if the selected court has a linked organization
     const { data: linkedOrg } = await getOrganizationByCourtId(court.id);
 
     if (linkedOrg) {
-      // Private club court — need verification
       setPendingOrg(linkedOrg);
       setSelectedCourt(court);
     } else {
-      // Public court with no linked org
       setSelectedCourt(court);
     }
   };
@@ -180,7 +188,6 @@ export default function HomecourtOnboarding() {
   const handleContinue = async () => {
     if (!user) return;
 
-    // If there's a pending org that needs verification, block
     if (pendingOrg) {
       showToast(tProfile('editHomecourt.verifyFirst'), { type: 'error' });
       return;
@@ -192,7 +199,6 @@ export default function HomecourtOnboarding() {
         ? selectedCourt.id
         : null;
 
-      // Only save homecourt if not already saved by joinClub
       if (!clubVerified) {
         const { error } = await createOrUpdatePlayerProfile(user.id, {
           homecourt_id: homecourtId,
@@ -212,15 +218,13 @@ export default function HomecourtOnboarding() {
     }
   };
 
-  const handleSkip = () => {
-    router.push('/onboarding/contact' as any);
-  };
 
   const handleBack = () => {
     router.back();
   };
 
-  const selectedCourtData = selectedCourt;
+
+  const isSelected = (court: Court) => selectedCourt?.id === court.id;
 
   if (loading) {
     return (
@@ -239,7 +243,7 @@ export default function HomecourtOnboarding() {
 
   return (
     <>
-      {/* Back Button - Absolute positioned at top-left */}
+      {/* Back Button */}
       <TouchableOpacity
         style={{
           position: 'absolute',
@@ -270,68 +274,214 @@ export default function HomecourtOnboarding() {
         buttons={
           <OnboardingButtons
             onContinue={handleContinue}
-            onSkip={handleSkip}
             loading={saving}
             continueDisabled={!!pendingOrg}
             hideBack
           />
         }
       >
-        {/* City (read-only context) */}
-        {cityName && (
-          <View style={styles.sectionContainer}>
-            <View style={[styles.cityBadge, { backgroundColor: colors.muted }]}>
-              <Ionicons name="location" size={16} color={colors.mutedForeground} />
-              <Text style={[styles.cityText, { color: colors.mutedForeground }]}>
-                {cityName}
-              </Text>
-            </View>
+        {/* City badge removed — context already clear from previous onboarding step */}
+
+        {courts.length === 0 ? (
+          /* No courts available */
+          <View style={[styles.noCourtsContainer, { backgroundColor: colors.card }]}>
+            <Ionicons name="tennisball-outline" size={48} color={colors.mutedForeground} />
+            <Text style={[styles.noCourtsText, { color: colors.foreground }]}>
+              {t('location.noCourts')}
+            </Text>
+            <Text style={[styles.noCourtsSubtext, { color: colors.mutedForeground }]}>
+              {t('location.addingCourts')}
+            </Text>
           </View>
-        )}
-
-        {/* Court Selector */}
-        <View style={styles.sectionContainer}>
-          <Text style={onboardingStyles.sectionTitle}>{t('location.homecourt')}</Text>
-
-          {courts.length === 0 ? (
-            <View style={[styles.noCourtsContainer, { backgroundColor: colors.card }]}>
-              <Ionicons name="tennisball-outline" size={48} color={colors.mutedForeground} />
-              <Text style={[styles.noCourtsText, { color: colors.foreground }]}>
-                {t('location.noCourts')}
-              </Text>
-              <Text style={[styles.noCourtsSubtext, { color: colors.mutedForeground }]}>
-                {t('location.addingCourts')}
-              </Text>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={[
-                styles.selectorButton,
-                {
-                  backgroundColor: colors.input,
-                  borderColor: colors.border,
-                }
-              ]}
-              onPress={() => setShowCourtSheet(true)}
-              activeOpacity={0.7}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={[
-                  styles.selectorText,
-                  { color: selectedCourtData ? colors.foreground : colors.mutedForeground }
-                ]}>
-                  {selectedCourtData ? selectedCourtData.name : t('location.selectHomecourt')}
-                </Text>
-                {selectedCourtData && selectedCourtData.id !== 'other' && selectedCourtData.id !== 'none' && selectedCourtData.is_public !== null && (
-                  <Text style={[styles.courtSubtext, { color: colors.mutedForeground }]}>
-                    {selectedCourtData.is_public ? t('location.public') : t('location.private')}
-                  </Text>
+        ) : (
+          <>
+            {/* Search bar (only when enough courts) */}
+            {courts.length > SEARCH_THRESHOLD && (
+              <View
+                style={{
+                  backgroundColor: colors.muted,
+                  borderRadius: 12,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  marginBottom: 12,
+                }}
+              >
+                <Ionicons
+                  name="search-outline"
+                  size={18}
+                  color={colors.mutedForeground}
+                  style={{ marginRight: 10 }}
+                />
+                <TextInput
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  placeholder={t('location.searchCourts') || 'Search courts...'}
+                  placeholderTextColor={colors.mutedForeground}
+                  style={{ flex: 1, fontSize: 15, color: colors.foreground }}
+                />
+                {searchQuery.length > 0 && (
+                  <TouchableOpacity onPress={() => setSearchQuery('')}>
+                    <Ionicons name="close-circle" size={18} color={colors.mutedForeground} />
+                  </TouchableOpacity>
                 )}
               </View>
-              <Ionicons name="chevron-down" size={24} color={colors.mutedForeground} />
-            </TouchableOpacity>
-          )}
-        </View>
+            )}
+
+            {/* Inline court cards */}
+            {filteredCourts.length === 0 ? (
+              <View style={{ paddingVertical: 24, alignItems: 'center' }}>
+                <Text style={{ fontSize: 15, color: colors.mutedForeground }}>
+                  No courts found
+                </Text>
+              </View>
+            ) : (
+              filteredCourts.map(court => {
+                const selected = isSelected(court);
+                return (
+                  <TouchableOpacity
+                    key={court.id}
+                    onPress={() => handleCourtSelect(court)}
+                    style={{
+                      backgroundColor: selected
+                        ? (isDark ? 'rgba(132, 254, 12, 0.08)' : 'rgba(59, 130, 246, 0.06)')
+                        : colors.card,
+                      borderRadius: 12,
+                      padding: 14,
+                      marginBottom: 8,
+                      borderWidth: selected ? 1.5 : 1,
+                      borderColor: selected ? colors.primary : colors.border,
+                    }}
+                    activeOpacity={0.7}
+                  >
+                    {/* Name + checkmark */}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: '600',
+                          color: selected ? colors.primary : colors.foreground,
+                          flex: 1,
+                        }}
+                        numberOfLines={1}
+                      >
+                        {court.name}
+                      </Text>
+                      {selected && (
+                        <View style={{
+                          width: 22,
+                          height: 22,
+                          borderRadius: 11,
+                          backgroundColor: colors.primary,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          marginLeft: 8,
+                        }}>
+                          <Ionicons name="checkmark" size={14} color={colors.primaryForeground} />
+                        </View>
+                      )}
+                    </View>
+
+                    {/* Public/Private badge */}
+                    {court.is_public !== null && (
+                      <View style={{ flexDirection: 'row', marginTop: 6 }}>
+                        <View
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            backgroundColor: court.is_public ? 'rgba(34, 197, 94, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                            paddingHorizontal: 8,
+                            paddingVertical: 3,
+                            borderRadius: 6,
+                            gap: 4,
+                          }}
+                        >
+                          {court.is_public
+                            ? <Globe size={11} color={colors.success} />
+                            : <Lock size={11} color={colors.warning} />
+                          }
+                          <Text style={{
+                            fontSize: 11,
+                            fontWeight: '600',
+                            color: court.is_public ? colors.success : colors.warning,
+                          }}>
+                            {court.is_public ? 'Public' : 'Private'}
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                );
+              })
+            )}
+
+            {/* Other / None options */}
+            {searchQuery.trim() === '' && (
+              <>
+                {([
+                  { id: 'other', label: 'Other', subtitle: 'My court is not listed' },
+                  { id: 'none', label: 'None', subtitle: 'No preferred homecourt' },
+                ] as const).map(({ id, label, subtitle }) => {
+                  const selected = selectedCourt?.id === id;
+                  return (
+                    <TouchableOpacity
+                      key={id}
+                      onPress={() => handleCourtSelect({
+                        id,
+                        name: label,
+                        city_id: courts.length > 0 ? courts[0].city_id : '',
+                        is_public: null,
+                      })}
+                      style={{
+                        backgroundColor: selected
+                          ? (isDark ? 'rgba(132, 254, 12, 0.08)' : 'rgba(59, 130, 246, 0.06)')
+                          : colors.card,
+                        borderRadius: 12,
+                        padding: 14,
+                        marginBottom: 8,
+                        borderWidth: selected ? 1.5 : 1,
+                        borderColor: selected ? colors.primary : colors.border,
+                      }}
+                      activeOpacity={0.7}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <View>
+                          <Text style={{
+                            fontSize: 16,
+                            fontWeight: '600',
+                            color: selected ? colors.primary : colors.foreground,
+                          }}>
+                            {label}
+                          </Text>
+                          <Text style={{
+                            fontSize: 13,
+                            color: colors.mutedForeground,
+                            marginTop: 2,
+                          }}>
+                            {subtitle}
+                          </Text>
+                        </View>
+                        {selected && (
+                          <View style={{
+                            width: 22,
+                            height: 22,
+                            borderRadius: 11,
+                            backgroundColor: colors.primary,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}>
+                            <Ionicons name="checkmark" size={14} color={colors.primaryForeground} />
+                          </View>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </>
+            )}
+          </>
+        )}
 
         {/* Club Verification Section */}
         {pendingOrg && (
@@ -415,7 +565,7 @@ export default function HomecourtOnboarding() {
         )}
 
         {/* Club Verified Badge */}
-        {clubVerified && selectedCourtData && (
+        {clubVerified && selectedCourt && (
           <View style={styles.sectionContainer}>
             <View style={[styles.verifiedBadge, { backgroundColor: colors.card, borderColor: colors.primary }]}>
               <Building2 size={16} color={colors.primary} />
@@ -426,17 +576,6 @@ export default function HomecourtOnboarding() {
             </View>
           </View>
         )}
-
-        {/* Court Selection Sheet */}
-        <CourtSelectionSheet
-          isVisible={showCourtSheet}
-          courts={courts}
-          selectedCourt={selectedCourt}
-          onSelectCourt={handleCourtSelect}
-          onClose={() => setShowCourtSheet(false)}
-          cityName={cityName || undefined}
-          courtOrgs={courtOrgs}
-        />
       </OnboardingLayout>
     </>
   );
@@ -445,35 +584,6 @@ export default function HomecourtOnboarding() {
 const styles = StyleSheet.create({
   sectionContainer: {
     marginBottom: 24,
-  },
-  cityBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-    gap: 6,
-  },
-  cityText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  selectorButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderRadius: 8,
-    padding: 16,
-    borderWidth: 1,
-  },
-  selectorText: {
-    fontSize: 16,
-    flex: 1,
-  },
-  courtSubtext: {
-    fontSize: 14,
-    marginTop: 4,
   },
   noCourtsContainer: {
     alignItems: 'center',

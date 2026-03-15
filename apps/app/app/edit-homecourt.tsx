@@ -28,6 +28,9 @@ type Court = {
   name: string;
   city_id: string;
   is_public: boolean | null;
+  address?: string | null;
+  surface_type?: string | null;
+  number_of_courts?: number | null;
 };
 
 type CourtOrg = {
