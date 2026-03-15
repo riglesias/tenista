@@ -1,8 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { PlayersTable } from "@/components/tables/players-table"
-import { Plus, Users, UserCheck, UserX, Download } from "lucide-react"
+import { PlayersPageContent } from "@/components/players/players-page-content"
 
 async function getPlayers() {
   const supabase = await createServerSupabaseClient()
@@ -46,84 +43,6 @@ async function getPlayers() {
 
 export default async function PlayersPage() {
   const players = await getPlayers()
-  const activePlayers = players.filter(p => p.is_active)
-  const inactivePlayers = players.filter(p => !p.is_active)
 
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Players</h2>
-          <p className="text-muted-foreground">
-            Manage player profiles and information
-          </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export CSV
-          </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Player
-          </Button>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Players</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activePlayers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Active players only
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Players</CardTitle>
-            <UserCheck className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{activePlayers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently active
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inactive Players</CardTitle>
-            <UserX className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{inactivePlayers.length}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently inactive
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Players Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Players</CardTitle>
-          <CardDescription>
-            View and manage player profiles. Click on any player for more options.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PlayersTable players={players} />
-        </CardContent>
-      </Card>
-    </div>
-  )
+  return <PlayersPageContent players={players} />
 }

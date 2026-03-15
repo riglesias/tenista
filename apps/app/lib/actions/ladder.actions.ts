@@ -16,7 +16,6 @@ import {
   calculateMatchDeadline,
 } from '@/lib/validation/ladder.validation';
 import { DEFAULT_LADDER_CONFIG, LadderConfig } from '@/lib/validation/leagues.validation';
-import * as Sentry from '@sentry/react-native';
 
 /**
  * Get ladder rankings for a league
@@ -125,13 +124,6 @@ export async function createChallenge(
   challengedPosition: number
 ): Promise<ApiResponse<LadderChallenge>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'ladder',
-      message: 'Creating ladder challenge',
-      data: { leagueId, challengedPosition },
-      level: 'info',
-    });
-
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -206,10 +198,8 @@ export async function createChallenge(
 
     const validatedChallenge = LadderChallengeSchema.parse(challenge);
 
-    Sentry.captureMessage('Ladder challenge created', 'info');
     return { data: validatedChallenge, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'createChallenge');
     return { data: null, error: appError };
   }
@@ -222,13 +212,6 @@ export async function acceptChallenge(
   challengeId: string
 ): Promise<ApiResponse<LadderChallenge>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'ladder',
-      message: 'Accepting ladder challenge',
-      data: { challengeId },
-      level: 'info',
-    });
-
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -291,10 +274,8 @@ export async function acceptChallenge(
 
     const validatedChallenge = LadderChallengeSchema.parse(updatedChallenge);
 
-    Sentry.captureMessage('Ladder challenge accepted', 'info');
     return { data: validatedChallenge, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'acceptChallenge');
     return { data: null, error: appError };
   }
@@ -307,13 +288,6 @@ export async function declineChallenge(
   challengeId: string
 ): Promise<ApiResponse<LadderChallenge>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'ladder',
-      message: 'Declining ladder challenge',
-      data: { challengeId },
-      level: 'info',
-    });
-
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -365,10 +339,8 @@ export async function declineChallenge(
 
     const validatedChallenge = LadderChallengeSchema.parse(updatedChallenge);
 
-    Sentry.captureMessage('Ladder challenge declined', 'info');
     return { data: validatedChallenge, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'declineChallenge');
     return { data: null, error: appError };
   }
@@ -381,13 +353,6 @@ export async function cancelChallenge(
   challengeId: string
 ): Promise<ApiResponse<LadderChallenge>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'ladder',
-      message: 'Cancelling ladder challenge',
-      data: { challengeId },
-      level: 'info',
-    });
-
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -439,10 +404,8 @@ export async function cancelChallenge(
 
     const validatedChallenge = LadderChallengeSchema.parse(updatedChallenge);
 
-    Sentry.captureMessage('Ladder challenge cancelled', 'info');
     return { data: validatedChallenge, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'cancelChallenge');
     return { data: null, error: appError };
   }
@@ -457,13 +420,6 @@ export async function completeChallenge(
   winnerId: string
 ): Promise<ApiResponse<LadderChallenge>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'ladder',
-      message: 'Completing ladder challenge',
-      data: { challengeId, matchId, winnerId },
-      level: 'info',
-    });
-
     // Get the challenge
     const { data: challenge, error: fetchError } = await supabase
       .from('ladder_challenges')
@@ -546,10 +502,8 @@ export async function completeChallenge(
 
     const validatedChallenge = LadderChallengeSchema.parse(updatedChallenge);
 
-    Sentry.captureMessage('Ladder challenge completed', 'info');
     return { data: validatedChallenge, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'completeChallenge');
     return { data: null, error: appError };
   }
@@ -949,13 +903,6 @@ export async function adjustPosition(
   reason: string = 'admin_adjustment'
 ): Promise<ApiResponse<LadderRanking>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'ladder',
-      message: 'Admin adjusting ladder position',
-      data: { leagueId, playerId, newPosition, reason },
-      level: 'info',
-    });
-
     // Get current position
     const { data: currentRanking, error: fetchError } = await supabase
       .from('ladder_rankings')
@@ -1016,10 +963,8 @@ export async function adjustPosition(
 
     const validatedRanking = LadderRankingSchema.parse(updatedRanking);
 
-    Sentry.captureMessage('Admin adjusted ladder position', 'info');
     return { data: validatedRanking, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'adjustPosition');
     return { data: null, error: appError };
   }

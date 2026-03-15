@@ -18,6 +18,7 @@ import { ArrowLeft, Loader2, Trophy } from "lucide-react"
 import { City, EliminationFormat, MatchFormat, DEFAULT_MATCH_FORMAT } from "@/types/database.types"
 import { createBrowserSupabaseClient } from "@/lib/supabase/client"
 import { toast } from "sonner"
+import { notifyEligiblePlayers } from "@/lib/actions/league-notifications.actions"
 
 interface CreateLeagueFormProps {
   cities: City[]
@@ -90,9 +91,11 @@ export function CreateLeagueForm({ cities }: CreateLeagueFormProps) {
         match_format: matchFormat,
       }
 
-      const { error } = await supabase
+      const { data: createdLeague, error } = await supabase
         .from('leagues')
         .insert([leagueData])
+        .select('id, name, city_id, min_rating, max_rating, is_private, organization_id, start_date, division')
+        .single()
 
       if (error) {
         console.error('Error creating league:', error)
@@ -102,6 +105,15 @@ export function CreateLeagueForm({ cities }: CreateLeagueFormProps) {
       }
 
       toast.success("Competition created successfully!")
+
+      // Notify eligible players in the background
+      if (createdLeague) {
+        notifyEligiblePlayers(createdLeague).then(({ notified }) => {
+          if (notified > 0) {
+            toast.info(`${notified} player${notified > 1 ? 's' : ''} notified about the new competition`)
+          }
+        })
+      }
       router.push("/leagues")
       router.refresh()
     } catch (error: any) {

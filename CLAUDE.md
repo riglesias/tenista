@@ -22,24 +22,103 @@ pnpm install          # Installs all workspace dependencies
 
 ### Environment Configuration
 
-**apps/app** requires `.env`:
-```
-EXPO_PUBLIC_SUPABASE_URL=your_supabase_project_url
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+**Production** (`.env` / `.env.local` — used by Vercel and EAS builds):
+
+- `apps/app/.env` — `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_POSTHOG_API_KEY`
+- `apps/admin/.env.local` — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- `apps/landing/.env.local` — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY`
+
+**Local Development** (auto-loaded, points to local Supabase):
+
+- `apps/admin/.env.development.local` — pre-configured with local Supabase keys
+- `apps/landing/.env.development.local` — pre-configured with local Supabase keys
+- `apps/app/.env.local` — copy from `.env.local.example` to use local Supabase
+
+Next.js auto-loads `.env.development.local` in dev mode. Expo loads `.env.local` over `.env`.
+
+## Supabase Local Development
+
+### Prerequisites
+- Docker Desktop installed and running
+- Supabase CLI (`brew install supabase/tap/supabase`)
+- PostgreSQL client (`brew install postgresql@15` — needed for psql)
+
+### Daily Development
+```bash
+# Start local Supabase (first terminal) — uses setup script
+./supabase/setup.sh start
+
+# Start app dev server (second terminal)
+pnpm dev:app    # or pnpm dev:admin
+
+# Stop when done
+supabase stop
 ```
 
-**apps/admin** requires `.env.local`:
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+**Important:** Use `./supabase/setup.sh start` instead of plain `supabase start`. The Supabase CLI can't apply dollar-quoted function bodies via its migration runner, so the setup script applies functions and RLS policies via psql after the tables migration.
+
+Local services:
+- **Postgres:** `localhost:54322` (user: postgres, password: postgres)
+- **API:** `localhost:54321`
+- **Studio Dashboard:** `localhost:54323`
+- **Inbucket (email testing):** `localhost:54324`
+
+### Auth Locally
+- Use email/password (e.g., `admin@tenista.local` / `password123`)
+- Check verification emails at `localhost:54324` (Inbucket)
+- Google/Apple OAuth only works in production builds
+
+### Schema Changes
+```bash
+# Create a new migration
+supabase migration new add_some_feature
+
+# Edit the migration file in supabase/migrations/
+# Note: if the migration contains function definitions, put it in supabase/.skipped/
+# and the setup script will apply it via psql
+
+# Reset local database (re-runs all migrations + seed + functions)
+./supabase/setup.sh reset
+
+# When ready, push to production
+supabase db push
 ```
 
-**apps/landing** requires `.env.local`:
+### Seed Data
+`supabase/seed.sql` contains synthetic test data: 8 players, 4 leagues, 10 courts, sample matches. Reset with `./supabase/setup.sh reset`.
+
+Seed player avatar_urls are set to NULL so the app renders the `FallbackAvatar` component (centered initials). Do **not** use DiceBear SVG URLs — expo-image renders SVG text off-center on iOS.
+
+### Troubleshooting: `99-roles.sql` / Unhealthy DB Container
+
+Supabase CLI 2.78.1 ships a PG 15 Docker image (`public.ecr.aws/supabase/postgres:15.8.1.094`) whose entrypoint references `/docker-entrypoint-initdb.d/init-scripts/99-roles.sql`, but the file doesn't exist in the image. This causes the DB container to fail its healthcheck and enter a restart loop.
+
+**Fix:** Build a patched image once and tag it to replace the original:
+```bash
+# One-time fix (only needed once per machine)
+echo 'FROM public.ecr.aws/supabase/postgres:15.8.1.094
+RUN echo "-- placeholder" > /docker-entrypoint-initdb.d/init-scripts/99-roles.sql' \
+  | docker build -t public.ecr.aws/supabase/postgres:15.8.1.094 -
+
+# Then start normally
+./supabase/setup.sh start
 ```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY=your_supabase_anon_key
+
+If the container is stuck in a restart loop:
+```bash
+supabase stop --no-backup
+docker rm -f $(docker ps -a --filter "name=supabase" --format "{{.ID}}")
+docker volume rm supabase_db_tenista
+# Re-apply the patched image tag (see above), then:
+./supabase/setup.sh start
 ```
+
+### Key Files
+- `supabase/config.toml` — local dev configuration
+- `supabase/migrations/` — SQL migration files (tables, indexes)
+- `supabase/.skipped/` — Functions, RLS policies, triggers (applied via psql)
+- `supabase/seed.sql` — test data for local dev
+- `supabase/setup.sh` — start/reset script that handles the psql workaround
 
 ## Development Commands
 
@@ -301,10 +380,18 @@ components.json       # shadcn/ui configuration
 
 ## Shared Backend (Supabase)
 
-**Project Details:**
+**Production:**
 - Project ID: `zktbpqsqocblwjhcezum`
 - Project Name: Tenista
 - Region: us-west-1
+
+**Local Dev:**
+- Schema: `supabase/migrations/` (source of truth)
+- Seed data: `supabase/seed.sql`
+- Config: `supabase/config.toml`
+- Start: `supabase start` / Stop: `supabase stop`
+- Use `supabase db push` to deploy migrations to production
+- Use `supabase db reset` to rebuild local from migrations + seed
 
 ### Database Schema
 
@@ -553,11 +640,13 @@ export default async function YourFeaturePage() {
 ```
 
 ### Database Changes
-1. Update Supabase schema via SQL editor or migrations
-2. Regenerate TypeScript types: `supabase gen types typescript`
-3. Update both app and admin TypeScript type files
-4. Update RLS policies as needed
-5. Test in both applications
+1. Create a migration: `supabase migration new your_feature_name`
+2. Write SQL in `supabase/migrations/<timestamp>_your_feature_name.sql`
+3. Test locally: `supabase db reset` (re-runs all migrations + seed)
+4. Push to production: `supabase db push`
+5. Regenerate TypeScript types: `supabase gen types typescript`
+6. Update both app and admin TypeScript type files
+7. Update seed.sql if new tables need test data
 
 ## Deployment
 

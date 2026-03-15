@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, Pressable, Modal, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, Animated } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { getThemeColors } from '@/lib/utils/theme';
 
@@ -96,9 +96,7 @@ export const ConfirmDialogContainer = () => {
   } = state;
 
   const confirmBg = destructive ? colors.destructive : colors.primary;
-  const confirmFg = destructive
-    ? colors.destructiveForeground
-    : colors.primaryForeground;
+  const confirmFg = destructive ? '#ffffff' : colors.primaryForeground;
 
   return (
     <Modal transparent visible animationType="none" onRequestClose={handleCancel}>
@@ -107,47 +105,44 @@ export const ConfirmDialogContainer = () => {
           flex: 1,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           opacity: fadeAnim,
+          padding: 20,
         }}
       >
-        <Pressable
+        <TouchableOpacity
           style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
           onPress={handleCancel}
+          activeOpacity={1}
         />
         <Animated.View
           style={{
-            width: '85%',
-            maxWidth: 340,
-            backgroundColor: colors.card,
-            borderRadius: 16,
+            width: '100%',
+            maxWidth: 400,
+            backgroundColor: colors.background,
+            borderRadius: 12,
             padding: 24,
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.25,
-            shadowRadius: 12,
-            elevation: 8,
+            borderWidth: 1,
+            borderColor: colors.border,
             transform: [{ scale: scaleAnim }],
           }}
         >
           <Text
             style={{
-              fontSize: 18,
-              fontWeight: '700',
+              fontSize: 20,
+              fontWeight: 'bold',
               color: colors.foreground,
               marginBottom: 8,
-              fontFamily: 'Lato_700Bold',
             }}
           >
             {title}
           </Text>
           <Text
             style={{
-              fontSize: 15,
+              fontSize: 16,
               color: colors.mutedForeground,
               marginBottom: 24,
-              lineHeight: 22,
-              fontFamily: 'Lato_400Regular',
+              lineHeight: 24,
             }}
           >
             {message}
@@ -158,53 +153,48 @@ export const ConfirmDialogContainer = () => {
               gap: 12,
             }}
           >
-            <Pressable
+            <TouchableOpacity
               onPress={handleCancel}
-              style={({ pressed }) => ({
+              activeOpacity={0.7}
+              style={{
                 flex: 1,
-                paddingVertical: 12,
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: colors.border,
-                backgroundColor: pressed
-                  ? colors.secondary
-                  : 'transparent',
+                padding: 16,
+                borderRadius: 8,
+                backgroundColor: colors.secondary,
                 alignItems: 'center',
-              })}
+              }}
             >
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: '600',
-                  color: colors.mutedForeground,
-                  fontFamily: 'Lato_700Bold',
+                  color: colors.secondaryForeground,
                 }}
               >
                 {cancelText}
               </Text>
-            </Pressable>
-            <Pressable
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={handleConfirm}
-              style={({ pressed }) => ({
+              activeOpacity={0.7}
+              style={{
                 flex: 1,
-                paddingVertical: 12,
-                borderRadius: 12,
+                padding: 16,
+                borderRadius: 8,
                 backgroundColor: confirmBg,
-                opacity: pressed ? 0.85 : 1,
                 alignItems: 'center',
-              })}
+              }}
             >
               <Text
                 style={{
-                  fontSize: 15,
+                  fontSize: 16,
                   fontWeight: '600',
                   color: confirmFg,
-                  fontFamily: 'Lato_700Bold',
                 }}
               >
                 {confirmText}
               </Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </Animated.View>
       </Animated.View>

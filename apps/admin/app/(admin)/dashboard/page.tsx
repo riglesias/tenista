@@ -1,7 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, MapPin, Users, TrendingUp, UserPlus, Calendar, Award } from "lucide-react"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
-import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow, format } from "date-fns"
+import { DashboardCharts } from "@/components/dashboard/dashboard-charts"
 
 interface DashboardStats {
   totalMatches: number
@@ -138,10 +139,46 @@ function getActivityIcon(type: ActivityItem['type']) {
   }
 }
 
+interface ChartDataPoint {
+  month: string
+  count: number
+}
+
+function groupByMonth(dates: string[]): ChartDataPoint[] {
+  const counts = new Map<string, number>()
+  for (const dateStr of dates) {
+    const key = format(new Date(dateStr), "MMM yyyy")
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  return Array.from(counts.entries()).map(([month, count]) => ({ month, count }))
+}
+
+async function getPlayerSignupsByMonth(): Promise<ChartDataPoint[]> {
+  const supabase = await createServerSupabaseClient()
+  const { data } = await supabase
+    .from("players")
+    .select("created_at")
+    .order("created_at", { ascending: true })
+  if (!data) return []
+  return groupByMonth(data.map((p) => p.created_at))
+}
+
+async function getMatchesByMonth(): Promise<ChartDataPoint[]> {
+  const supabase = await createServerSupabaseClient()
+  const { data } = await supabase
+    .from("player_matches")
+    .select("match_date")
+    .order("match_date", { ascending: true })
+  if (!data) return []
+  return groupByMonth(data.map((m) => m.match_date))
+}
+
 export default async function DashboardPage() {
-  const [stats, activities] = await Promise.all([
+  const [stats, activities, playerSignups, matchesByMonth] = await Promise.all([
     getDashboardStats(),
     getRecentActivity(),
+    getPlayerSignupsByMonth(),
+    getMatchesByMonth(),
   ])
 
   return (
@@ -197,6 +234,9 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Charts */}
+      <DashboardCharts playerSignups={playerSignups} matchesByMonth={matchesByMonth} />
 
       {/* Recent Activity */}
       <Card>

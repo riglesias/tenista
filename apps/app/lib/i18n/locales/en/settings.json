@@ -37,9 +37,10 @@
   },
   "account": {
     "title": "Account Management",
-    "deleteAccount": "Delete",
+    "deleteAccount": "Delete Account",
     "deletingAccount": "Deleting Account...",
-    "logout": "Logout"
+    "logout": "Logout",
+    "dangerZone": "Danger Zone"
   },
   "version": "Version {{version}} ({{buildNumber}})",
   "alerts": {

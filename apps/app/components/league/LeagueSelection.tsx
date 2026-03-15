@@ -17,6 +17,7 @@ import {
   View,
 } from 'react-native'
 import { useTranslation } from 'react-i18next'
+import i18n from '@/lib/i18n'
 import { useAppToast } from '@/components/ui/Toast'
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Building2, MapPin, Trophy } from 'lucide-react-native'
@@ -91,8 +92,8 @@ const LeagueCard = React.memo(function LeagueCard({
               { backgroundColor: league.is_free ? '#22c55e' : theme.primary },
             ]}
           >
-            <Text style={styles.priceBadgeText}>
-              {league.is_free ? t('selection.free') : `$${((league.price_cents || 0) / 100).toFixed(0)}`}
+            <Text style={[styles.priceBadgeText, { color: league.is_free ? '#fff' : theme.primaryForeground }]}>
+              {league.is_free ? t('selection.free') : `$${new Intl.NumberFormat(i18n.language).format((league.price_cents || 0) / 100)}`}
             </Text>
           </View>
         </View>

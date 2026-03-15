@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { FlatList, RefreshControl } from 'react-native'
+import { ActivityIndicator, FlatList, RefreshControl, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next'
 import { PlayerCard } from '@/components/community'
@@ -29,6 +29,8 @@ interface PlayerListProps {
   refreshing: boolean
   onRefresh: () => void
   getPlayerAvailability: (availability: AvailabilityData | null) => TimeSlot[]
+  onEndReached?: () => void
+  isLoadingMore?: boolean
 }
 
 export default function PlayerList({
@@ -36,6 +38,8 @@ export default function PlayerList({
   refreshing,
   onRefresh,
   getPlayerAvailability,
+  onEndReached,
+  isLoadingMore = false,
 }: PlayerListProps) {
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
@@ -47,7 +51,7 @@ export default function PlayerList({
     const avatarUrls = players
       .map(player => player.avatar_url)
       .filter((url): url is string => url !== null && url !== undefined)
-    
+
     if (avatarUrls.length > 0) {
       imageCache.preloadImages(avatarUrls)
     }
@@ -55,10 +59,10 @@ export default function PlayerList({
 
   const renderPlayer = ({ item }: { item: Player }) => {
     const slots = getPlayerAvailability(item.availability)
-    
+
     return (
-      <PlayerCard 
-        player={item} 
+      <PlayerCard
+        player={item}
         timeSlots={slots}
         onPress={() => {
           router.push(`/player-profile?playerId=${item.id}`)
@@ -83,12 +87,21 @@ export default function PlayerList({
     />
   )
 
+  const renderFooter = () => {
+    if (!isLoadingMore) return null
+    return (
+      <View style={{ paddingVertical: 16, alignItems: 'center' }}>
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    )
+  }
+
   return (
     <FlatList
       data={players}
       renderItem={renderPlayer}
       keyExtractor={item => item.id}
-      style={{ 
+      style={{
         paddingHorizontal: 24
       }}
       refreshControl={
@@ -99,12 +112,15 @@ export default function PlayerList({
         />
       }
       ListEmptyComponent={renderEmptyState}
+      ListFooterComponent={renderFooter}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={
-        players.length === 0 
-          ? { flexGrow: 1 } 
+        players.length === 0
+          ? { flexGrow: 1 }
           : { paddingBottom: Math.max(insets.bottom, 20) + 100 } // Tab bar height + safe area
       }
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
       // Performance optimizations
       initialNumToRender={8}
       maxToRenderPerBatch={5}

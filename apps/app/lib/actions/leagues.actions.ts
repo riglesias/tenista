@@ -17,7 +17,6 @@ import {
     UserLeaguesSchema
 } from '@/lib/validation/leagues.validation';
 import { getTournamentResultForPlayer, PlayoffMatchRow } from '@/lib/validation/playoffs.validation';
-import * as Sentry from '@sentry/react-native';
 
 type LeagueInsert = Database['public']['Tables']['leagues']['Insert']
 type LeaguePlayerInsert =
@@ -84,16 +83,6 @@ export async function getAvailableLeagues(cityId: string, playerOrganizationId?:
 // Join a league
 export async function joinLeague(leagueId: string, playerId: string) {
   try {
-    Sentry.addBreadcrumb({
-      category: 'league',
-      message: 'Attempting to join league',
-      data: {
-        leagueId,
-        playerId,
-      },
-      level: 'info',
-    });
-
     // Check for any existing membership (active or retired)
     const { data: existingMembership } = await supabase
       .from('league_players')
@@ -106,12 +95,10 @@ export async function joinLeague(leagueId: string, playerId: string) {
       // Check if player has retired from this league
       if (existingMembership.status === 'retired') {
         const error = new Error('You have already retired from this league and cannot rejoin');
-        Sentry.captureException(error);
         return { data: null, error }
       }
       // Already an active member
       const error = new Error('Already a member of this league');
-      Sentry.captureException(error);
       return { data: null, error }
     }
 
@@ -129,7 +116,6 @@ export async function joinLeague(leagueId: string, playerId: string) {
         today.setHours(0, 0, 0, 0) // Compare dates only, not times
         if (today >= startDate) {
           const error = new Error('Registration is closed. This league has already started.');
-          Sentry.captureException(error);
           return { data: null, error }
         }
       }
@@ -141,14 +127,12 @@ export async function joinLeague(leagueId: string, playerId: string) {
 
       if (league.max_players && count && count >= league.max_players) {
         const error = new Error('League is full');
-        Sentry.captureException(error);
         return { data: null, error }
       }
 
       // Check if this is a doubles league - require team registration separately
       if (league.participant_type === 'doubles') {
         const error = new Error('This is a doubles league. Please register with a partner.');
-        Sentry.captureException(error);
         return { data: null, error }
       }
     }
@@ -169,7 +153,6 @@ export async function joinLeague(leagueId: string, playerId: string) {
       .single()
 
     if (error) {
-      Sentry.captureException(error);
       throw error;
     }
 
@@ -214,10 +197,8 @@ export async function joinLeague(leagueId: string, playerId: string) {
         });
     }
 
-    Sentry.captureMessage('User joined league successfully', 'info');
     return { data, error: null }
   } catch (error) {
-    Sentry.captureException(error);
     return { data: null, error }
   }
 }
@@ -313,13 +294,6 @@ export async function joinDoublesLeague(
   teamName?: string
 ): Promise<{ data: any; error: any }> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'league',
-      message: 'Attempting to join doubles league',
-      data: { leagueId, player1Id, player2Id, teamName },
-      level: 'info',
-    });
-
     // Import doubles actions dynamically to avoid circular dependencies
     const { createDoublesTeam } = await import('./doubles.actions');
     const { orderPlayerIds } = await import('@/lib/validation/doubles.validation');
@@ -436,10 +410,8 @@ export async function joinDoublesLeague(
         });
     }
 
-    Sentry.captureMessage('Users joined doubles league successfully', 'info');
     return { data: { team, memberships }, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     return { data: null, error };
   }
 }
@@ -643,16 +615,6 @@ export async function getMultipleLeagueStandings(
 // Retire from a league (soft delete - keeps player visible but marked as retired)
 export async function retireFromLeague(leagueId: string, playerId: string) {
   try {
-    Sentry.addBreadcrumb({
-      category: 'league',
-      message: 'Attempting to retire from league',
-      data: {
-        leagueId,
-        playerId,
-      },
-      level: 'info',
-    });
-
     // Check if this is a ladder league
     const { data: league } = await supabase
       .from('leagues')
@@ -746,14 +708,11 @@ export async function retireFromLeague(leagueId: string, playerId: string) {
       .eq('player_id', playerId)
 
     if (error) {
-      Sentry.captureException(error);
       throw error
     }
 
-    Sentry.captureMessage('User retired from league successfully', 'info');
     return { data: true, error: null }
   } catch (error) {
-    Sentry.captureException(error);
     return { data: false, error }
   }
 }

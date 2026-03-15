@@ -26,38 +26,17 @@ export async function createOrUpdatePlayerProfile(
   profile: Partial<PlayerProfile>
 ) {
   try {
-    // First check if player profile exists
-    const { data: existingPlayer } = await supabase
+    const { data, error } = await supabase
       .from('players')
-      .select('id')
-      .eq('auth_user_id', userId)
+      .upsert(
+        { ...profile, auth_user_id: userId },
+        { onConflict: 'auth_user_id' }
+      )
+      .select()
       .single()
 
-    if (existingPlayer) {
-      // Update existing profile
-      const { data, error } = await supabase
-        .from('players')
-        .update(profile)
-        .eq('auth_user_id', userId)
-        .select()
-        .single()
-
-      if (error) throw error
-      return { data, error: null }
-    } else {
-      // Create new profile
-      const { data, error } = await supabase
-        .from('players')
-        .insert({
-          ...profile,
-          auth_user_id: userId,
-        })
-        .select()
-        .single()
-
-      if (error) throw error
-      return { data, error: null }
-    }
+    if (error) throw error
+    return { data, error: null }
   } catch (error) {
     // silently handled
     return { data: null, error }

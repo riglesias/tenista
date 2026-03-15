@@ -6,6 +6,7 @@ const path = require('path');
 const { getDefaultConfig } = require('expo/metro-config');
 
 const monorepoRoot = path.resolve(__dirname, '../..');
+const appNodeModules = path.resolve(__dirname, 'node_modules');
 
 /** @type {import('expo/metro-config').MetroConfig} */
 const config = getDefaultConfig(__dirname);
@@ -13,7 +14,7 @@ const config = getDefaultConfig(__dirname);
 // Monorepo support: watch the root and resolve modules from both locations
 config.watchFolders = [monorepoRoot];
 config.resolver.nodeModulesPaths = [
-  path.resolve(__dirname, 'node_modules'),
+  appNodeModules,
   path.resolve(monorepoRoot, 'node_modules'),
 ];
 
@@ -26,10 +27,10 @@ const nodeCoreModules = [
   'url',
   'net',
   'tls',
-  'fs', // Explicitly mock fs as it's definitely not available
+  'fs',
   'path',
-  'zlib', 
-  'vm', 
+  'zlib',
+  'vm',
   'tty'
 ];
 
@@ -42,68 +43,91 @@ const shims = {
   url: require.resolve('url/'),
   net: require.resolve('react-native-tcp-socket'),
   path: require.resolve('path-browserify'),
-  // For modules we want to mock (make empty or non-functional but present)
-  tls: false, // Setting to false tells Metro to provide a basic mock
+  tls: false,
   fs: false,
-  zlib: false, // Example: if zlib is not strictly needed for client operations
+  zlib: false,
   vm: false,
   tty: false,
-  // Crucially, mock 'ws' itself if it's the source of deep Node.js dependencies
-  // that are hard to shim completely for Expo Go.
-  ws: false, 
+  ws: false,
 };
 
-config.resolver = {
-  ...config.resolver,
-  extraNodeModules: new Proxy(
-    { ...shims }, // Start with our shims
-    {
-      get: (target, name) => {
-        if (target.hasOwnProperty(name)) {
-          return target[name];
-        }
-        // For any other Node core module not explicitly shimmed/mocked, 
-        // return a basic mock to prevent resolution errors.
-        if (nodeCoreModules.includes(name) && typeof name === 'string') {
-          // console.log(`Metro: Providing basic mock for Node core module: ${name}`);
-          return false; // false tells Metro to use an empty mock
-        }
-        // Fallback to default behavior for non-Node core modules
-        return undefined;
-      },
-    }
-  ),
-  // For more fine-grained control if extraNodeModules isn't sufficient
-  resolveRequest: (context, moduleName, platform) => {
-    if (shims.hasOwnProperty(moduleName)) {
-      const filePath = shims[moduleName];
-      if (filePath === false) {
-        // console.log(`Metro: resolveRequest mocking module: ${moduleName}`);
-        return { type: 'empty' }; // Use Metro's empty module mock
+config.resolver.extraNodeModules = new Proxy(
+  { ...shims },
+  {
+    get: (target, name) => {
+      if (target.hasOwnProperty(name)) {
+        return target[name];
       }
-      // console.log(`Metro: resolveRequest shimming ${moduleName} with ${filePath}`);
-      return {
-        filePath: filePath,
-        type: 'sourceFile',
-      };
-    }
-    // Fallback to the default resolver for other modules
-    return context.resolveRequest(context, moduleName, platform);
-  },
-};
+      if (nodeCoreModules.includes(name) && typeof name === 'string') {
+        return false;
+      }
+      return undefined;
+    },
+  }
+);
 
-// If you have a 'transformer' configuration, ensure it's preserved
-// config.transformer = {
-//   ...config.transformer,
-//   // your transformer config
-// };
-
-// If you have a 'server' configuration, ensure it's preserved
-// config.server = {
-//   ...config.server,
-//   // your server config
-// };
-
-module.exports = withNativeWind(config, {
+// Apply NativeWind FIRST so it can set up its transformer/resolver
+const nativeWindConfig = withNativeWind(config, {
   input: "./global.css"
 });
+
+// Singleton packages: force React to always resolve from the app's node_modules
+// to prevent duplicate copies (monorepo root may have a different React version)
+const singletonPackages = ['react', 'react-dom', 'react-native'];
+
+// Resolve the exact entry file for each singleton package at config time
+const singletonResolutions = {};
+for (const pkg of singletonPackages) {
+  try {
+    singletonResolutions[pkg] = require.resolve(pkg, { paths: [appNodeModules] });
+  } catch {}
+}
+
+// Chain our resolver ON TOP of whatever NativeWind set up
+const nativeWindResolver = nativeWindConfig.resolver.resolveRequest;
+
+nativeWindConfig.resolver.resolveRequest = (context, moduleName, platform) => {
+  // 1. Singleton React packages — return exact file path
+  if (singletonResolutions[moduleName]) {
+    return {
+      filePath: singletonResolutions[moduleName],
+      type: 'sourceFile',
+    };
+  }
+
+  // 2. Subpath imports of singleton packages (e.g. react/jsx-runtime)
+  const singletonPkg = singletonPackages.find(
+    pkg => moduleName.startsWith(pkg + '/')
+  );
+  if (singletonPkg) {
+    try {
+      const resolved = require.resolve(moduleName, { paths: [appNodeModules] });
+      return {
+        filePath: resolved,
+        type: 'sourceFile',
+      };
+    } catch {
+      // Fall through to default resolver if subpath doesn't exist
+    }
+  }
+
+  // 3. Node core module shims
+  if (shims.hasOwnProperty(moduleName)) {
+    const filePath = shims[moduleName];
+    if (filePath === false) {
+      return { type: 'empty' };
+    }
+    return {
+      filePath: filePath,
+      type: 'sourceFile',
+    };
+  }
+
+  // 4. Chain to NativeWind's resolver, or default
+  if (nativeWindResolver) {
+    return nativeWindResolver(context, moduleName, platform);
+  }
+  return context.resolveRequest(context, moduleName, platform);
+};
+
+module.exports = nativeWindConfig;

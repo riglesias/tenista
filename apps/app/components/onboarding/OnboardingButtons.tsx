@@ -9,27 +9,30 @@ import { useTranslation } from 'react-i18next';
 
 interface OnboardingButtonsProps {
   onContinue?: () => void;
+  onSkip?: () => void;
   continueText?: string;
+  skipText?: string;
   loading?: boolean;
   continueDisabled?: boolean;
   continueStyle?: 'primary' | 'success';
-  hideBack?: boolean; // Legacy prop - no longer used but kept for backward compatibility
+  hideBack?: boolean;
 }
 
 export function OnboardingButtons({
   onContinue,
+  onSkip,
   continueText,
+  skipText,
   loading = false,
   continueDisabled = false,
   continueStyle = 'primary',
-  hideBack = false, // Legacy prop - ignored
 }: OnboardingButtonsProps) {
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
   const onboardingStyles = createOnboardingStyles(isDark);
   const { t } = useTranslation('onboarding');
   const displayText = continueText || t('common.continue');
-  
+
   const continueButtonStyle = [
     onboardingStyles.continueButton,
     continueStyle === 'success' && { backgroundColor: colors.success || '#10b981' },
@@ -51,9 +54,9 @@ export function OnboardingButtons({
       >
         {loading ? (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <ActivityIndicator 
-              size="small" 
-              color={continueStyle === 'success' ? (colors.successForeground || '#fff') : colors.primaryForeground} 
+            <ActivityIndicator
+              size="small"
+              color={continueStyle === 'success' ? (colors.successForeground || '#fff') : colors.primaryForeground}
               style={{ marginRight: 8 }}
             />
             <Text style={continueTextStyle}>{t('common.saving')}</Text>
@@ -62,6 +65,18 @@ export function OnboardingButtons({
           <Text style={continueTextStyle}>{displayText}</Text>
         )}
       </TouchableOpacity>
+      {onSkip && (
+        <TouchableOpacity
+          onPress={onSkip}
+          disabled={loading}
+          activeOpacity={0.7}
+          style={{ paddingVertical: 12, alignItems: 'center' }}
+        >
+          <Text style={{ color: colors.mutedForeground, fontSize: 16, fontWeight: '500' }}>
+            {skipText || t('common.skip')}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 } 

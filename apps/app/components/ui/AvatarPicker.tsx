@@ -40,10 +40,10 @@ const FallbackAvatar = React.memo(({
       alignItems: 'center',
       justifyContent: 'center',
     }}>
-      <Text style={{ 
-        fontSize: size * 0.3, 
-        fontWeight: 'bold', 
-        color: colors.primaryForeground 
+      <Text style={{
+        fontSize: size * 0.3,
+        fontWeight: 'bold',
+        color: colors.primaryForeground
       }}>
         {firstName.charAt(0).toUpperCase()}
       </Text>

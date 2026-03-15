@@ -8,7 +8,6 @@ import {
   calculateCombinedRating,
   orderPlayerIds,
 } from '@/lib/validation/doubles.validation';
-import * as Sentry from '@sentry/react-native';
 
 /**
  * Create a doubles team for a league
@@ -20,13 +19,6 @@ export async function createDoublesTeam(
   teamName?: string
 ): Promise<ApiResponse<DoublesTeam>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'doubles',
-      message: 'Creating doubles team',
-      data: { leagueId, player1Id, player2Id, teamName },
-      level: 'info',
-    });
-
     // Ensure player IDs are ordered correctly (constraint requires player1_id < player2_id)
     const { player1_id, player2_id } = orderPlayerIds(player1Id, player2Id);
 
@@ -74,10 +66,8 @@ export async function createDoublesTeam(
 
     const validatedTeam = DoublesTeamSchema.parse(team);
 
-    Sentry.captureMessage('Doubles team created', 'info');
     return { data: validatedTeam, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'createDoublesTeam');
     return { data: null, error: appError };
   }
@@ -220,13 +210,6 @@ export async function updateDoublesTeam(
   updates: { team_name?: string }
 ): Promise<ApiResponse<DoublesTeam>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'doubles',
-      message: 'Updating doubles team',
-      data: { teamId, updates },
-      level: 'info',
-    });
-
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -272,10 +255,8 @@ export async function updateDoublesTeam(
 
     const validatedTeam = DoublesTeamSchema.parse(updatedTeam);
 
-    Sentry.captureMessage('Doubles team updated', 'info');
     return { data: validatedTeam, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'updateDoublesTeam');
     return { data: null, error: appError };
   }
@@ -288,13 +269,6 @@ export async function disbandDoublesTeam(
   teamId: string
 ): Promise<ApiResponse<boolean>> {
   try {
-    Sentry.addBreadcrumb({
-      category: 'doubles',
-      message: 'Disbanding doubles team',
-      data: { teamId },
-      level: 'info',
-    });
-
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -354,10 +328,8 @@ export async function disbandDoublesTeam(
       .update({ is_active: false })
       .eq('doubles_team_id', teamId);
 
-    Sentry.captureMessage('Doubles team disbanded', 'info');
     return { data: true, error: null };
   } catch (error) {
-    Sentry.captureException(error);
     const appError = reportError(error, 'disbandDoublesTeam');
     return { data: null, error: appError };
   }

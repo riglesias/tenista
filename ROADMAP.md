@@ -114,6 +114,31 @@ The mobile app already registers device tokens and has notification preferences.
 - [ ] Enable Android download button on landing page once Play Store listing is live
 - [ ] Fix admin TypeScript/ESLint errors and remove `ignoreDuringBuilds` flags
 
+### 2.5 Admin Panel — Operational Features
+Priority admin improvements to unblock day-to-day league operations.
+
+**Dashboard Analytics (high impact)**
+- [ ] Matches played over time chart (weekly/monthly trend line)
+- [ ] New player signups over time chart
+- [ ] League participation rate chart
+- [ ] Use Recharts (already installed, currently unused)
+
+**Player Edit Capability (unblocks support)**
+- [ ] Player edit dialog — edit rating, name, contact info directly
+- [ ] Toggle player active/inactive status from table
+- [ ] Inline rating override (bypass rating request workflow)
+
+**Admin Users Management (enables delegation)**
+- [ ] Settings → Admin Users page with list of current admins
+- [ ] Add/remove admin users with role assignment (super_admin, league_admin, support)
+- [ ] No more raw SQL to onboard new admins
+
+**Secondary improvements**
+- [ ] Match result editing from admin (close the loop: review report → fix match → resolve)
+- [ ] Audit log viewer page (data already logged to `admin_audit_log`, needs UI)
+- [ ] CSV export for players, matches, and standings (buttons exist, not wired)
+- [ ] League archive/delete capability (prevent clutter as seasons accumulate)
+
 ---
 
 ## Phase 3: Growth Features (4 weeks)

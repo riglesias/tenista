@@ -3,7 +3,6 @@ import "@/global.css";
 import { PostHogProvider } from 'posthog-react-native';
 import { posthog } from '@/lib/analytics/posthog';
 import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
-import * as Sentry from '@sentry/react-native';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useFonts, Lato_300Light, Lato_400Regular, Lato_700Bold } from '@expo-google-fonts/lato';
 import { Stack } from 'expo-router';
@@ -14,6 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AuthGuard from '@/components/AuthGuard';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ToastContainer } from '@/components/ui/Toast';
+import { ConfirmDialogContainer } from '@/components/ui/ConfirmDialog';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { NotificationProvider } from '@/contexts/NotificationContext';
@@ -21,15 +21,6 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 
 // Initialize i18n
 import '@/lib/i18n';
-
-// Initialize Sentry only in production with a valid DSN
-if (process.env.NODE_ENV === 'production' && process.env.EXPO_PUBLIC_SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-    debug: false,
-    tracesSampleRate: 1.0,
-  });
-}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +75,7 @@ function AppContent() {
       </Stack>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
       <ToastContainer />
+      <ConfirmDialogContainer />
     </NavigationThemeProvider>
   );
 }
@@ -106,17 +98,21 @@ function RootLayout() {
     return null;
   }
 
-  return (
-    <PostHogProvider client={posthog}>
-      <QueryClientProvider client={queryClient}>
-        <SafeAreaProvider>
-          <ThemeProvider>
-            <ThemedApp />
-          </ThemeProvider>
-        </SafeAreaProvider>
-      </QueryClientProvider>
-    </PostHogProvider>
+  const content = (
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <ThemedApp />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
+
+  if (posthog) {
+    return <PostHogProvider client={posthog}>{content}</PostHogProvider>;
+  }
+
+  return content;
 }
 
 function ThemedApp() {
@@ -159,7 +155,4 @@ function ThemedApp() {
   );
 }
 
-// Only wrap with Sentry in production
-export default process.env.NODE_ENV === 'production' && process.env.EXPO_PUBLIC_SENTRY_DSN 
-  ? Sentry.wrap(RootLayout) 
-  : RootLayout;
+export default RootLayout;

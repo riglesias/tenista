@@ -1,6 +1,6 @@
 {
   "name": "@tenista/app",
-  "main": "expo-router/entry",
+  "main": "./index.js",
   "version": "1.0.2",
   "scripts": {
     "start": "expo start",
@@ -11,6 +11,8 @@
     "ios": "DARK_MODE=media expo start --ios",
     "web": "DARK_MODE=media expo start --web",
     "lint": "expo lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "build:preview": "eas build --platform all --profile preview",
     "build:production": "eas build --platform all --profile production",
     "build:ios": "eas build --platform ios --profile production",
@@ -34,7 +36,6 @@
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
-    "@sentry/react-native": "~6.14.0",
     "@supabase/supabase-js": "^2.49.8",
     "@tanstack/react-query": "^5.81.5",
     "clsx": "^2.1.1",
@@ -69,13 +70,13 @@
     "i18next": "^25.8.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react-native": "^0.511.0",
-    "nativewind": "^4.1.23",
+    "nativewind": "~4.1.23",
     "posthog-react-native": "^4.37.1",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-i18next": "^16.5.4",
     "react-native": "^0.79.5",
-    "react-native-css-interop": "^0.1.22",
+    "react-native-css-interop": "~0.1.22",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-phone-number-input": "^2.1.0",
@@ -107,7 +108,8 @@
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "typescript": "~5.8.3",
-    "url": "^0.11.4"
+    "url": "^0.11.4",
+    "vitest": "^4.1.0"
   },
   "private": true
 }

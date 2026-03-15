@@ -91,6 +91,36 @@ export async function getNotificationHistory(userId: string) {
   return data || [];
 }
 
+export async function getNewLeagueNotificationPreference(
+  authUserId: string
+): Promise<boolean> {
+  const { data } = await supabase
+    .from('notification_preferences')
+    .select('new_league_notifications')
+    .eq('user_id', authUserId)
+    .single();
+
+  return data?.new_league_notifications === true;
+}
+
+export async function toggleNewLeagueNotification(
+  authUserId: string,
+  enabled: boolean
+): Promise<{ success: boolean }> {
+  const { error } = await supabase
+    .from('notification_preferences')
+    .upsert(
+      { user_id: authUserId, new_league_notifications: enabled },
+      { onConflict: 'user_id' }
+    );
+
+  if (error) {
+    throw error;
+  }
+
+  return { success: true };
+}
+
 export async function updatePlayerNotificationPreference(
   authUserId: string,
   enabled: boolean

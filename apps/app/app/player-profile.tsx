@@ -20,7 +20,7 @@ import {
 } from '@/lib/utils/messaging'
 import { Ionicons } from '@expo/vector-icons'
 import { Building2 } from 'lucide-react-native'
-import { Image } from 'expo-image'
+import CachedImage from '@/components/ui/CachedImage'
 import { router, Stack, useLocalSearchParams, useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useState } from 'react'
 import {
@@ -498,39 +498,39 @@ export default function PlayerProfile() {
                   alignItems: 'center',
                 }}
               >
-                {player.avatar_url ? (
-                  <Image
-                    source={{ uri: player.avatar_url }}
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 30,
-                      marginRight: 12,
-                    }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 30,
-                      backgroundColor: colors.primary,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginRight: 12,
-                    }}
-                  >
-                    <Text
+                <CachedImage
+                  source={player.avatar_url}
+                  priority="high"
+                  style={{
+                    width: 60,
+                    height: 60,
+                    borderRadius: 30,
+                    marginRight: 12,
+                  }}
+                  fallback={
+                    <View
                       style={{
-                        fontSize: 24,
-                        fontWeight: 'bold',
-                        color: colors.primaryForeground,
+                        width: 60,
+                        height: 60,
+                        borderRadius: 30,
+                        backgroundColor: colors.primary,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 12,
                       }}
                     >
-                      {player.first_name?.charAt(0)?.toUpperCase() || 'P'}
-                    </Text>
-                  </View>
-                )}
+                      <Text
+                        style={{
+                          fontSize: 24,
+                          fontWeight: 'bold',
+                          color: colors.primaryForeground,
+                        }}
+                      >
+                        {player.first_name?.charAt(0)?.toUpperCase() || 'P'}
+                      </Text>
+                    </View>
+                  }
+                />
 
                 <View style={{ flex: 1 }}>
                   <View

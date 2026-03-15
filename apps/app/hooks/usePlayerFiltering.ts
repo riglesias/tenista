@@ -50,36 +50,24 @@ export function usePlayerFiltering(allPlayers: Player[]) {
     return options
   }, [t])
 
-  // Filter players by day and rating
+  // Filter players by day (rating filtering is done server-side via pagination)
   const filteredPlayers = useMemo(() => {
-    let filteredByDay = allPlayers
+    if (selectedDay === 'all') return allPlayers
 
-    // Filter by day
-    if (selectedDay !== 'all') {
-      let dayKey: string
-      if (selectedDay === 'today') {
-        const today = new Date().getDay()
-        dayKey = DAY_MAP[today]
-      } else {
-        // Convert day option to day key
-        const dayIndex = DAY_KEYS.findIndex(d => d === selectedDay)
-        dayKey = DAY_MAP[dayIndex]
-      }
-
-      filteredByDay = allPlayers.filter(player => {
-        const availability = player.availability?.[dayKey as keyof AvailabilityData]
-        return availability && availability.length > 0
-      })
+    let dayKey: string
+    if (selectedDay === 'today') {
+      const today = new Date().getDay()
+      dayKey = DAY_MAP[today]
+    } else {
+      const dayIndex = DAY_KEYS.findIndex(d => d === selectedDay)
+      dayKey = DAY_MAP[dayIndex]
     }
 
-    // Filter by rating range
-    const finalFiltered = filteredByDay.filter(player => {
-      const rating = player.rating || 1 // Default to 1.0 for players without rating
-      return rating >= ratingRange[0] && rating <= ratingRange[1]
+    return allPlayers.filter(player => {
+      const availability = player.availability?.[dayKey as keyof AvailabilityData]
+      return availability && availability.length > 0
     })
-
-    return finalFiltered
-  }, [allPlayers, selectedDay, ratingRange])
+  }, [allPlayers, selectedDay])
 
   // Get player availability for display
   const getPlayerAvailability = (availability: AvailabilityData | null): TimeSlot[] => {

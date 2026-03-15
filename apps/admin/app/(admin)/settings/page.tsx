@@ -1,5 +1,6 @@
+import Link from "next/link"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Settings, Shield, Database, Bell } from "lucide-react"
+import { Settings, Shield, Database, Bell, ChevronRight } from "lucide-react"
 
 export default function SettingsPage() {
   return (
@@ -12,22 +13,27 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Admin Users
-            </CardTitle>
-            <CardDescription>
-              Manage admin roles and permissions
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Configure who has access to the admin panel and their permission levels.
-            </p>
-          </CardContent>
-        </Card>
+        <Link href="/settings/admin-users">
+          <Card className="cursor-pointer transition-colors hover:bg-muted/50">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Admin Users
+                </span>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
+              </CardTitle>
+              <CardDescription>
+                Manage admin roles and permissions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Configure who has access to the admin panel and their permission levels.
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
         <Card>
           <CardHeader>

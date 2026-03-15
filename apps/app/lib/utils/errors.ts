@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/react-native'
-
 // Strongly typed error interfaces
 export interface AppError {
   code: string
@@ -138,19 +136,7 @@ function getUserFriendlyMessage(message: string): string {
 
 // Centralized error logging
 export function logError(error: AppError, context?: string) {
-  // Sentry logging for production
-  if (error.code !== 'COMPONENT_ERROR') {
-    Sentry.captureException(error.originalError || new Error(error.message), {
-      tags: {
-        errorCode: error.code,
-        context,
-      },
-      extra: {
-        errorDetails: error.details,
-        timestamp: error.timestamp,
-      },
-    })
-  }
+  // Log errors for debugging (PostHog captures errors via its SDK automatically)
 }
 
 // Error reporting utilities

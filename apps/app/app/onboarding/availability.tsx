@@ -19,7 +19,7 @@ const DAYS_OF_WEEK: DayOfWeek[] = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'su
 const TIME_SLOTS: TimeSlot[] = ['morning', 'afternoon', 'evening'];
 
 export default function Availability() {
-  const { user, refreshUser } = useAuth();
+  const { user } = useAuth();
   const { isDark } = useTheme();
   const colors = getThemeColors(isDark);
   const insets = useSafeAreaInsets();
@@ -74,14 +74,8 @@ export default function Availability() {
       if (error) {
         showToast(t('availability.saveError'), { type: 'error' });
       } else {
-        // Refresh user context to trigger re-check in AuthGuard
-        refreshUser();
-
-        // Add a small delay to ensure database update is propagated
-        setTimeout(() => {
-          // Navigate to main app
-          router.replace('/(tabs)/community');
-        }, 500);
+        // Navigate to main app
+        router.replace('/(tabs)/community');
       }
     } catch (error) {
       showToast(tErrors('generic.tryAgain'), { type: 'error' });

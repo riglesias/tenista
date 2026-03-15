@@ -44,6 +44,12 @@ export default function AuthLayout() {
         }}
       />
       <Stack.Screen
+        name="reset-password"
+        options={{
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
         name="email-confirmation"
         options={{
           title: t('layout.emailConfirmationTitle'),

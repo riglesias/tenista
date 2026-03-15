@@ -15,27 +15,23 @@ import {
   Star,
 } from "lucide-react"
 
+import Image from "next/image"
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { createBrowserSupabaseClient } from "@/lib/supabase/client"
 
 // Navigation data for Tenista Admin
 const navData = {
-  teams: [
-    {
-      name: "Tenista Admin",
-      logo: Trophy,
-      plan: "Admin Panel",
-    },
-  ],
   navMain: [
     {
       title: "Dashboard",
@@ -123,7 +119,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={navData.teams} />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton size="lg" asChild>
+              <a href="/dashboard">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Image
+                    src="/logo-icon.svg"
+                    alt="Tenista"
+                    width={32}
+                    height={32}
+                    className="size-8 rounded-lg"
+                  />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">Tenista</span>
+                  <span className="truncate text-xs text-muted-foreground">Admin Panel</span>
+                </div>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navData.navMain} />

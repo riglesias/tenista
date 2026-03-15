@@ -21,6 +21,8 @@ interface AuthContextType {
   signInWithApple: (identityToken: string, user: string, userInfo: { fullName: any, email: string | null }) => Promise<{ error: any }>
   signOut: () => Promise<{ error: any }>
   resetPassword: (email: string) => Promise<{ error: any }>
+  verifyPasswordResetOtp: (email: string, token: string) => Promise<{ error: any }>
+  updatePassword: (newPassword: string) => Promise<{ error: any }>
   deleteAccount: () => Promise<{ success: boolean; error: string | null }>
   verifySignUpOtp: (email: string, token: string) => Promise<{ error: any }>
   resendSignUpOtp: (email: string) => Promise<{ error: any }>
@@ -286,6 +288,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const verifyPasswordResetOtp = useCallback(async (email: string, token: string) => {
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'recovery',
+      })
+      return { error }
+    } catch (error) {
+      return { error }
+    }
+  }, [])
+
+  const updatePassword = useCallback(async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      return { error }
+    } catch (error) {
+      return { error }
+    }
+  }, [])
+
   // Helper function to delete auth user via edge function
   const deleteAuthUser = useCallback(async (userId: string, accessToken: string): Promise<boolean> => {
     try {
@@ -405,11 +429,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithApple,
     signOut,
     resetPassword,
+    verifyPasswordResetOtp,
+    updatePassword,
     deleteAccount,
     verifySignUpOtp,
     resendSignUpOtp,
     refreshUser,
-  }), [user, session, loading, signUp, signIn, signInWithIdToken, signInWithApple, signOut, resetPassword, deleteAccount, verifySignUpOtp, resendSignUpOtp, refreshUser, attemptAccountLinking])
+  }), [user, session, loading, signUp, signIn, signInWithIdToken, signInWithApple, signOut, resetPassword, verifyPasswordResetOtp, updatePassword, deleteAccount, verifySignUpOtp, resendSignUpOtp, refreshUser, attemptAccountLinking])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

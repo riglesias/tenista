@@ -68,10 +68,7 @@ export default function ForgotPassword() {
 
         showToast(errorMessage, { type: 'error' })
       } else {
-        const successMessage = t('forgotPassword.successMessage')
-
-        showToast(successMessage, { type: 'success' })
-        router.back()
+        router.replace(`/(auth)/reset-password?email=${encodeURIComponent(email.trim().toLowerCase())}` as any)
       }
     } catch (err) {
       const errorMessage = tErrors('generic.somethingWentWrong')

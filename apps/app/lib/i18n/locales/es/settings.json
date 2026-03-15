@@ -37,9 +37,10 @@
   },
   "account": {
     "title": "Gestión de Cuenta",
-    "deleteAccount": "Eliminar",
+    "deleteAccount": "Eliminar Cuenta",
     "deletingAccount": "Eliminando Cuenta...",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "dangerZone": "Zona de Peligro"
   },
   "version": "Versión {{version}} ({{buildNumber}})",
   "alerts": {

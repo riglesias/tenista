@@ -21,7 +21,7 @@ import { getThemeColors } from '@/lib/utils/theme'
 import { useAsyncOperation } from '@/hooks/useLoadingState'
 import { usePlayerFiltering } from '@/hooks/usePlayerFiltering'
 import { useAvailabilityRealtime } from '@/hooks/useAvailabilityRealtime'
-import { getAllAvailablePlayersInCity } from '@/lib/actions/availability.actions'
+import { getAvailablePlayersPage } from '@/lib/actions/availability.actions'
 import { trackCommunityFilterUsed } from '@/lib/analytics/events'
 import { getPlayerDailyAvailability, updateDailyAvailability } from '@/lib/actions/daily-availability.actions'
 import { getPlayerProfile } from '@/lib/actions/player.actions'
@@ -59,6 +59,11 @@ export default function CommunityScreen() {
   const [isAvailableToday, setIsAvailableToday] = useState(false)
   const [isUpdatingAvailability, setIsUpdatingAvailability] = useState(false)
   const [needsRefreshOnFocus, setNeedsRefreshOnFocus] = useState(false)
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
   
   // Custom hooks
   const { execute, isLoading } = useAsyncOperation()
@@ -78,17 +83,18 @@ export default function CommunityScreen() {
     setRatingRange(range);
   }, [setRatingRange])
 
-  // Real-time availability updates from other players
+  // Real-time availability updates from other players — refetch current pages
   const handleAvailabilityChange = useCallback(async () => {
     if (!user || !userProfile?.city_id) return
-    const { data: players } = await getAllAvailablePlayersInCity(
+    const { data: players } = await getAvailablePlayersPage(
       user.id,
-      userProfile.city_id
+      userProfile.city_id,
+      { page: 0, pageSize: (currentPage + 1) * 20, ratingMin: ratingRange[0], ratingMax: ratingRange[1] }
     )
     if (players) {
       setAllPlayers(players)
     }
-  }, [user, userProfile?.city_id])
+  }, [user, userProfile?.city_id, currentPage, ratingRange])
 
   useAvailabilityRealtime(
     userProfile?.city_id ?? null,
@@ -143,17 +149,21 @@ export default function CommunityScreen() {
           throw new Error('Could not load user profile')
         }
         setUserProfile(profile)
-        
+
         if (profile.city_id) {
-          const { data: players } = await getAllAvailablePlayersInCity(
+          const { data: players, hasMore: more } = await getAvailablePlayersPage(
             user.id,
-            profile.city_id
+            profile.city_id,
+            { page: 0, ratingMin: ratingRange[0], ratingMax: ratingRange[1] }
           )
           setAllPlayers(players || [])
+          setCurrentPage(0)
+          setHasMore(more)
         } else {
           setAllPlayers([])
+          setHasMore(false)
         }
-        
+
       },
       {
         onError: (error) => {
@@ -166,6 +176,29 @@ export default function CommunityScreen() {
       Alert.alert(tErrors('generic.somethingWentWrong'), t('errors.loadPlayers'))
     }
   }
+
+  const loadMorePlayers = useCallback(async () => {
+    if (!hasMore || isLoadingMore || !user || !userProfile?.city_id) return
+
+    setIsLoadingMore(true)
+    try {
+      const nextPage = currentPage + 1
+      const { data: players, hasMore: more } = await getAvailablePlayersPage(
+        user.id,
+        userProfile.city_id,
+        { page: nextPage, ratingMin: ratingRange[0], ratingMax: ratingRange[1] }
+      )
+      if (players) {
+        setAllPlayers(prev => [...prev, ...players])
+        setCurrentPage(nextPage)
+        setHasMore(more)
+      }
+    } catch (error) {
+      console.error('Error loading more players:', error)
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [hasMore, isLoadingMore, user, userProfile?.city_id, currentPage, ratingRange])
 
   const handleRefresh = () => {
     loadAvailablePlayers(true)
@@ -207,12 +240,14 @@ export default function CommunityScreen() {
       } else {
         // Silently refresh player list in background without triggering loading state
         if (user && userProfile?.city_id) {
-          const { data: players } = await getAllAvailablePlayersInCity(
+          const { data: players, hasMore: more } = await getAvailablePlayersPage(
             user.id,
-            userProfile.city_id
+            userProfile.city_id,
+            { page: 0, pageSize: (currentPage + 1) * 20, ratingMin: ratingRange[0], ratingMax: ratingRange[1] }
           )
           if (players) {
             setAllPlayers(players)
+            setHasMore(more)
           }
         }
       }
@@ -251,13 +286,16 @@ export default function CommunityScreen() {
   }
 
   const handleApplyFilters = () => {
-    // Filters are applied automatically through the hook
     handleCloseFilter()
+    // Rating filter changed — refetch from server with new range
+    loadAvailablePlayers(true)
   }
 
   const handleClearFilters = () => {
     clearFilters()
     handleCloseFilter()
+    // Reset filters — refetch from server with default range
+    loadAvailablePlayers(true)
   }
 
   // Loading state
@@ -334,6 +372,8 @@ export default function CommunityScreen() {
         refreshing={refreshing}
         onRefresh={handleRefresh}
         getPlayerAvailability={getPlayerAvailability}
+        onEndReached={loadMorePlayers}
+        isLoadingMore={isLoadingMore}
       />
 
       <FilterBottomSheet
