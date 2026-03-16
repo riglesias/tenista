@@ -37,10 +37,10 @@ export function OnboardingLayout({
 }: OnboardingLayoutProps) {
   const { isDark } = useTheme();
   const onboardingStyles = createOnboardingStyles(isDark);
-  
+
   // Calculate button container height: button height + padding + safe area
   const buttonContainerHeight = 56 + 48 + (Platform.OS === 'ios' ? 34 : 24);
-  
+
   const content = (
     <>
       <Text style={onboardingStyles.title}>{title}</Text>
@@ -54,7 +54,7 @@ export function OnboardingLayout({
     return (
       <SafeAreaView style={onboardingStyles.container}>
         <View style={[
-          styles.content, 
+          styles.content,
           contentStyle,
           buttons ? { paddingBottom: buttonContainerHeight } : {}
         ]}>
@@ -103,11 +103,11 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 24,
-    paddingTop: 80, // Add space for back button
+    paddingTop: 80,
   },
   scrollContent: {
     padding: 24,
-    paddingTop: 80, // Add space for back button
+    paddingTop: 80,
     flexGrow: 1,
   },
-}); 
+});

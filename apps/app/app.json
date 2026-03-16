@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tenista.app",
-      "buildNumber": "30",
+      "buildNumber": "31",
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -28,7 +28,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.tenista.app",
-      "versionCode": 14,
+      "versionCode": 15,
       "permissions": [
         "CAMERA",
         "ACCESS_MEDIA_LIBRARY"
@@ -58,6 +58,7 @@
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to take profile pictures."
         }
       ],
+      "@react-native-google-signin/google-signin",
       "expo-web-browser",
       [
         "expo-notifications",

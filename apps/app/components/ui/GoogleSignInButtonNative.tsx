@@ -43,13 +43,13 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
   const handlePress = async () => {
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
-      
+
       // Sign in with Google
       await GoogleSignin.signIn()
 
       // Get the ID token
       const tokens = await GoogleSignin.getTokens()
-      
+
       if (tokens.idToken) {
         // Sign in with Supabase using the ID token
         await signInWithIdToken(tokens.idToken)
@@ -61,7 +61,7 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
         // User cancelled the sign-in flow
         return
       }
-      
+
       handleError(error.message || 'Failed to sign in with Google')
     }
   }

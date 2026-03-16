@@ -13,6 +13,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
     BackHandler,
     Keyboard,
+    Platform,
     StyleSheet,
     Text,
     TextInput,
@@ -152,7 +153,7 @@ export default function ProfileOnboarding() {
       <TouchableOpacity
         style={{
           position: 'absolute',
-          top: insets.top + 16,
+          top: insets.top + (Platform.OS === 'android' ? 4 : 16),
           left: 20,
           flexDirection: 'row',
           alignItems: 'center',
