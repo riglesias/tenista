@@ -9,7 +9,7 @@ interface LeagueInfoCardProps {
 
 const LeagueInfoCard = React.memo(function LeagueInfoCard({ selectedLeague }: LeagueInfoCardProps) {
   const { theme } = useTheme()
-  const divisionInfo = getDivisionInfo(selectedLeague.league.division || 'A')
+  const divisionInfo = getDivisionInfo(selectedLeague.league.division || 'A', selectedLeague.league.min_rating, selectedLeague.league.max_rating)
 
   return (
     <View style={{

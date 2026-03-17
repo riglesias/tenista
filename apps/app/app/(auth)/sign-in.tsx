@@ -1,7 +1,7 @@
 'use client'
 
 import AppleSignInButton from '@/components/ui/AppleSignInButton'
-import GoogleSignInButton from '@/components/ui/GoogleSignInButton'
+import GoogleSignInButton from '@/components/ui/GoogleSignInButtonNative'
 import { useAppToast } from '@/components/ui/Toast'
 import TenistaLogoNoColor from '@/components/ui/TenistaLogoNoColor'
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router'

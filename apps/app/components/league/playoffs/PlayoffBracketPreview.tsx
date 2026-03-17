@@ -672,7 +672,8 @@ export default function PlayoffBracketPreview({
       : generateBracketPreview()
   }, [isActiveTournament, tournamentData, qualifyingData.qualifiedPlayers, qualifyingCount, participantMap])
 
-  if (qualifyingData.qualifiedPlayers.length === 0) {
+  if (qualifyingData.qualifiedPlayers.length === 0 || bracketRounds.length === 0) {
+    const hasPlayers = qualifyingData.qualifiedPlayers.length > 0
     return (
       <View style={{ paddingHorizontal: 24, paddingBottom: 16 }}>
         <View style={{
@@ -691,14 +692,16 @@ export default function PlayoffBracketPreview({
             marginTop: 8,
             marginBottom: 4
           }}>
-            No Qualifying Players
+            {hasPlayers ? 'Not Enough Players' : 'No Qualifying Players'}
           </Text>
           <Text style={{
             fontSize: 14,
             color: colors.mutedForeground,
             textAlign: 'center'
           }}>
-            Play more matches to see the playoff bracket
+            {hasPlayers
+              ? 'At least 2 players are needed to generate a playoff bracket'
+              : 'Play more matches to see the playoff bracket'}
           </Text>
         </View>
       </View>

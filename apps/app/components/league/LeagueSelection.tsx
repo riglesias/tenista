@@ -49,7 +49,7 @@ const LeagueCard = React.memo(function LeagueCard({
 }) {
   const { theme } = useTheme()
   const { t } = useTranslation('league')
-  const divisionInfo = league.division ? getDivisionInfo(league.division) : null
+  const divisionInfo = league.division ? getDivisionInfo(league.division, league.min_rating, league.max_rating) : null
   const playerRating = currentPlayer?.rating || 0
   const isEligible = isPlayerEligibleForLeague(playerRating, league)
   const isLeagueFull = league.player_count >= (league.max_players || 50)

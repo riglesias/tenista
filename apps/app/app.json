@@ -28,7 +28,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.tenista.app",
-      "versionCode": 15,
+      "versionCode": 16,
       "permissions": [
         "CAMERA",
         "ACCESS_MEDIA_LIBRARY"

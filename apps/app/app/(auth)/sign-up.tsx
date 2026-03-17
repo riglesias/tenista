@@ -1,7 +1,7 @@
 'use client'
 
 import AppleSignInButton from '@/components/ui/AppleSignInButton'
-import GoogleSignInButton from '@/components/ui/GoogleSignInButton'
+import GoogleSignInButton from '@/components/ui/GoogleSignInButtonNative'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'

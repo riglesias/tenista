@@ -232,14 +232,35 @@ export function getDivisionFromRating(rating: number): string {
 }
 
 // Helper function to get division display info
-export function getDivisionInfo(division: string) {
-  const divisions = {
-    division_1: { name: 'Division 1', range: 'NTRP 5.0+', color: '#EF4444' },
-    division_2: { name: 'Division 2', range: 'NTRP 4.0-4.5', color: '#8B5CF6' },
-    division_3: { name: 'Division 3', range: 'NTRP 3.0-3.5', color: '#3B82F6' },
-    division_4: { name: 'Division 4', range: 'NTRP 1.0-2.5', color: '#10B981' }
+export function getDivisionInfo(division: string, minRating?: number | null, maxRating?: number | null) {
+  const divisionColors: Record<string, string> = {
+    division_1: '#EF4444',
+    division_2: '#8B5CF6',
+    division_3: '#3B82F6',
+    division_4: '#10B981',
   }
-  return divisions[division as keyof typeof divisions] || divisions.division_4
+  const color = divisionColors[division] || '#10B981'
+
+  // Build range from actual min/max ratings
+  let range: string
+  if (minRating != null && maxRating != null) {
+    range = `NTRP ${minRating}-${maxRating}`
+  } else if (minRating != null) {
+    range = `NTRP ${minRating}+`
+  } else if (maxRating != null) {
+    range = `NTRP ${maxRating} & below`
+  } else {
+    range = 'All levels'
+  }
+
+  const divisionNames: Record<string, string> = {
+    division_1: 'Division 1',
+    division_2: 'Division 2',
+    division_3: 'Division 3',
+    division_4: 'Division 4',
+  }
+
+  return { name: divisionNames[division] || division, range, color }
 }
 
 // Convert a league's general MatchFormat into a LadderMatchFormat
