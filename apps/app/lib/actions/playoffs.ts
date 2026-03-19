@@ -619,21 +619,21 @@ export async function getPlayoffRoundMatches(roundId: string): Promise<PlayoffMa
         first_name,
         last_name,
         rating,
-        country_code
+        nationality_code
       ),
       player2:players!playoff_matches_player2_id_fkey(
         id,
         first_name,
         last_name,
         rating,
-        country_code
+        nationality_code
       ),
       winner:players!playoff_matches_winner_id_fkey(
         id,
         first_name,
         last_name,
         rating,
-        country_code
+        nationality_code
       )
     `)
     .eq('playoff_round_id', roundId)

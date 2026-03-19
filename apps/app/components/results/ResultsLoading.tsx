@@ -73,12 +73,54 @@ export default function ResultsLoading() {
           ))}
         </View>
 
+        {/* Completed Competitions Title */}
+        <Skeleton
+          width={200}
+          height={20}
+          borderRadius={8}
+          style={{ marginBottom: 16 }}
+        />
+
+        {/* Completed Competition Card Skeletons */}
+        {[0, 1].map((i) => (
+          <View
+            key={`comp-${i}`}
+            style={[
+              styles.competitionCard,
+              {
+                borderColor: theme.muted,
+                padding: 14,
+                marginBottom: 10,
+              },
+            ]}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Skeleton width={56} height={56} borderRadius={8} />
+              <View style={{ marginLeft: 12, flex: 1 }}>
+                <Skeleton
+                  width={140}
+                  height={14}
+                  borderRadius={6}
+                  style={{ marginBottom: 6 }}
+                />
+                <Skeleton
+                  width={180}
+                  height={12}
+                  borderRadius={6}
+                  style={{ marginBottom: 6 }}
+                />
+                <Skeleton width={100} height={12} borderRadius={6} />
+              </View>
+            </View>
+          </View>
+        ))}
+
         {/* Past Matches Title */}
         <Skeleton
           width={150}
           height={20}
           borderRadius={8}
-          style={{ marginBottom: 16 }}
+          style={{ marginBottom: 16, marginTop: 16 }}
         />
 
         {/* Match Card Skeletons */}
@@ -160,6 +202,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     borderRadius: 8,
+    borderWidth: 1,
+  },
+  competitionCard: {
+    borderRadius: 12,
     borderWidth: 1,
   },
   matchCard: {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, ViewStyle } from 'react-native';
+import { Image, View, ViewStyle } from 'react-native';
 
 interface CountryFlagProps {
   countryCode: string | null | undefined;
@@ -8,39 +8,36 @@ interface CountryFlagProps {
   borderRadius?: number;
 }
 
-const FONT_SIZE_MAP = {
-  xs: 10,
-  sm: 13,
-  md: 16,
-  lg: 20,
-  xl: 26,
+// Pixel dimensions (width) for each named size — flags are 3:2 aspect ratio
+const SIZE_MAP = {
+  xs: 14,
+  sm: 18,
+  md: 22,
+  lg: 28,
+  xl: 36,
 };
-
-function getFlagEmoji(countryCode: string): string {
-  const codePoints = countryCode
-    .toUpperCase()
-    .split('')
-    .map((char) => 127397 + char.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
 
 export default function CountryFlag({
   countryCode,
   size = 'md',
   style,
+  borderRadius = 2,
 }: CountryFlagProps) {
   if (!countryCode || countryCode.length !== 2) {
     return null;
   }
 
-  const fontSize =
-    typeof size === 'number' ? size : FONT_SIZE_MAP[size];
+  const width = typeof size === 'number' ? size : SIZE_MAP[size];
+  const height = Math.round(width * (2 / 3));
+  const code = countryCode.toLowerCase();
 
   return (
     <View style={style}>
-      <Text style={{ fontSize, lineHeight: fontSize * 1.2 }}>
-        {getFlagEmoji(countryCode)}
-      </Text>
+      <Image
+        source={{ uri: `https://flagcdn.com/w80/${code}.png` }}
+        style={{ width, height, borderRadius }}
+        resizeMode="cover"
+      />
     </View>
   );
 }

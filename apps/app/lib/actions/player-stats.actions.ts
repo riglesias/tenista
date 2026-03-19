@@ -9,6 +9,9 @@ export interface PlayerStatsData {
     division: string
     points: number
     totalPlayers: number
+    matchesPlayed: number
+    wins: number
+    losses: number
   }
   matchesPlayed: number
   wins: number
@@ -36,10 +39,10 @@ export interface MatchData {
   gameType: string
 }
 
-export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerStatsData; recentMatches: MatchData[] }> {
+export async function getPlayerStats(playerId: string, matchLimit: number = 10): Promise<{ stats: PlayerStatsData; recentMatches: MatchData[]; hasMore: boolean }> {
   try {
     const { data: matches } = await getPlayerMatches(playerId)
-    
+
     if (!matches) {
       return {
         stats: {
@@ -48,6 +51,7 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
           losses: 0,
         },
         recentMatches: [],
+        hasMore: false,
       }
     }
 
@@ -98,7 +102,10 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
               name: league.name,
               division: league.division,
               points: leaguePlayerData.points,
-              totalPlayers: allLeaguePlayers.length
+              totalPlayers: allLeaguePlayers.length,
+              matchesPlayed: leaguePlayerData.matches_played || 0,
+              wins: leaguePlayerData.wins || 0,
+              losses: leaguePlayerData.losses || 0,
             }
           }
         }
@@ -115,8 +122,10 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
       losses,
     }
 
-    // Format recent matches (limit to 10 most recent)
-    const recentMatches: MatchData[] = matches.slice(0, 10).map(match => {
+    const hasMore = matches.length > matchLimit
+
+    // Format recent matches
+    const recentMatches: MatchData[] = matches.slice(0, matchLimit).map(match => {
       const isPlayer1 = match.player1_id === playerId
       const currentPlayer = isPlayer1 ? match.player1 : match.player2
       const opponent = isPlayer1 ? match.player2 : match.player1
@@ -142,12 +151,12 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
         date: match.match_date,
         currentPlayer: {
           name: `${currentPlayer?.first_name || ''} ${currentPlayer?.last_name || ''}`.trim(),
-          countryCode: currentPlayer?.country_code || 'US',
+          countryCode: currentPlayer?.nationality_code || 'US',
           rating: currentPlayer?.rating ? parseFloat(currentPlayer.rating.toString()) : undefined,
         },
         opponent: {
           name: `${opponent?.first_name || ''} ${opponent?.last_name || ''}`.trim(),
-          countryCode: opponent?.country_code || 'US',
+          countryCode: opponent?.nationality_code || 'US',
           rating: opponent?.rating ? parseFloat(opponent.rating.toString()) : undefined,
         },
         scores: formattedScores.length > 0 ? formattedScores : [{ player1: 6, player2: 4 }, { player1: 6, player2: 1 }], // Fallback scores
@@ -164,6 +173,7 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
     return {
       stats,
       recentMatches,
+      hasMore,
     }
   } catch (error) {
     return {
@@ -173,6 +183,7 @@ export async function getPlayerStats(playerId: string): Promise<{ stats: PlayerS
         losses: 0,
       },
       recentMatches: [],
+      hasMore: false,
     }
   }
 } 

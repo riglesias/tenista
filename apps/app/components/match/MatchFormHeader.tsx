@@ -21,7 +21,7 @@ const MatchFormHeader = React.memo(function MatchFormHeader({ currentPlayer, opp
       </Text>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <CountryFlag
-          countryCode={player.country_code}
+          countryCode={player.nationality_code}
           size="md"
           style={{ marginRight: 6 }}
         />

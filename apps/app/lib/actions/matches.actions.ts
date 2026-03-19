@@ -159,14 +159,14 @@ export async function getPlayerMatches(playerId: string) {
           id,
           first_name,
           last_name,
-          country_code,
+          nationality_code,
           rating
         ),
         player2:players!player_matches_player2_id_fkey(
           id,
           first_name,
           last_name,
-          country_code,
+          nationality_code,
           rating
         ),
         league:leagues(

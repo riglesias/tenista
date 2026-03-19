@@ -132,6 +132,11 @@ export default function CompletedLeagueCard({ userLeague, onPress }: CompletedLe
           </Text>
         </View>
 
+        {/* Competition type description */}
+        <Text style={{ fontSize: 11, color: colors.mutedForeground, marginTop: 2, fontStyle: 'italic' }}>
+          {t(`results.competitionTypeInfo.${league.competition_type}`, { defaultValue: '' })}
+        </Text>
+
         <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
           {isTournamentType ? (
             <>
@@ -158,12 +163,17 @@ export default function CompletedLeagueCard({ userLeague, onPress }: CompletedLe
             </>
           ) : (
             <>
-              {user_position > 0 && (
+              {user_position > 0 && total_players > 1 && (
                 <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
                   Final: {t('results.finalPosition', {
                     position: `${user_position}${getOrdinalSuffix(user_position, i18n.language)}`,
                     total: total_players
                   })}
+                </Text>
+              )}
+              {user_position > 0 && total_players <= 1 && (
+                <Text style={{ fontSize: 12, color: colors.mutedForeground }}>
+                  {t('results.soloEntry')}
                 </Text>
               )}
               {user_position > 0 && (wins > 0 || losses > 0) && (

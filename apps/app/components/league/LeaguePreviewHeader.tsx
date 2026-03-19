@@ -37,7 +37,21 @@ export default function LeaguePreviewHeader({ league }: LeaguePreviewHeaderProps
       {/* Hero image */}
       <View style={styles.heroContainer}>
         {league.image_url ? (
-          <Image source={{ uri: league.image_url }} style={styles.heroImage} resizeMode="cover" />
+          <>
+            {/* Blurred zoomed background */}
+            <Image
+              source={{ uri: league.image_url }}
+              style={styles.heroBlurredBg}
+              resizeMode="cover"
+              blurRadius={50}
+            />
+            {/* Centered square image */}
+            <Image
+              source={{ uri: league.image_url }}
+              style={styles.heroSquareImage}
+              resizeMode="cover"
+            />
+          </>
         ) : (
           <View style={[styles.heroPlaceholder, { backgroundColor: colors.muted }]}>
             <Trophy size={48} color={colors.mutedForeground} />
@@ -124,12 +138,22 @@ const styles = StyleSheet.create({
   },
   heroContainer: {
     width: '100%',
-    height: 180,
+    height: 200,
     position: 'relative',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  heroImage: {
+  heroBlurredBg: {
+    ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
+    transform: [{ scale: 2.0 }],
+  },
+  heroSquareImage: {
+    width: 170,
+    height: 170,
+    borderRadius: 14,
   },
   heroPlaceholder: {
     width: '100%',

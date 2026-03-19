@@ -10,6 +10,7 @@ export interface PlayerData {
   first_name: string | null
   last_name: string | null
   country_code: string | null
+  nationality_code: string | null
   rating: number | null
 }
 

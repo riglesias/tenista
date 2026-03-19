@@ -118,22 +118,35 @@
   "results": {
     "title": "Mis Resultados",
     "loading": "Cargando...",
+    "currentLeague": "Liga Actual",
     "leagueRanking": "Clasificación de Liga",
+    "rankingOfTotal": "{{ranking}} de {{total}}",
     "notInLeague": "No estás en ninguna liga",
     "joinLeagueMessage": "Únete a una liga para ver tu clasificación",
     "pastMatches": "Partidos Anteriores",
     "noMatchesFound": "No se encontraron partidos",
     "submitFirstMatch": "Envía tu primer partido para verlo aquí",
+    "loadMore": "Cargar Más",
     "stats": {
       "played": "Jugados",
       "won": "Ganados",
       "lost": "Perdidos",
-      "points": "puntos"
+      "points": "puntos",
+      "winRate": "% Victorias",
+      "leagueStats": "Stats de Liga",
+      "overallStats": "Stats Generales"
     },
     "completedCompetitions": "Competiciones Finalizadas",
     "ended": "Finalizó {{date}}",
     "finalPosition": "{{position}} de {{total}}",
+    "soloEntry": "Participación individual",
     "noCompletedCompetitions": "No hay competiciones finalizadas aún",
+    "competitionTypeInfo": {
+      "round_robin": "Todos juegan contra todos",
+      "ladder": "Desafía a jugadores por encima",
+      "playoffs_only": "Eliminación directa",
+      "elimination": "Formato eliminatorio"
+    },
     "tournamentResult": {
       "champion": "Campeón",
       "finalist": "Finalista",

@@ -118,22 +118,35 @@
   "results": {
     "title": "My Results",
     "loading": "Loading...",
+    "currentLeague": "Current League",
     "leagueRanking": "League Ranking",
+    "rankingOfTotal": "{{ranking}} of {{total}}",
     "notInLeague": "Not in any league",
     "joinLeagueMessage": "Join a league to see your ranking",
     "pastMatches": "Past Matches",
     "noMatchesFound": "No matches found",
     "submitFirstMatch": "Submit your first match to see it here",
+    "loadMore": "Load More",
     "stats": {
       "played": "Played",
       "won": "Won",
       "lost": "Lost",
-      "points": "points"
+      "points": "points",
+      "winRate": "Win Rate",
+      "leagueStats": "League Stats",
+      "overallStats": "Overall Stats"
     },
     "completedCompetitions": "Completed Competitions",
     "ended": "Ended {{date}}",
     "finalPosition": "{{position}} of {{total}}",
+    "soloEntry": "Solo entry",
     "noCompletedCompetitions": "No completed competitions yet",
+    "competitionTypeInfo": {
+      "round_robin": "Everyone plays each other",
+      "ladder": "Challenge players above you",
+      "playoffs_only": "Single-elimination bracket",
+      "elimination": "Knockout format"
+    },
     "tournamentResult": {
       "champion": "Champion",
       "finalist": "Finalist",
