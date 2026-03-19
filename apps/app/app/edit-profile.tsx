@@ -11,7 +11,8 @@ import { createOrUpdatePlayerProfile, getPlayerProfile } from '@/lib/actions/pla
 import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
-import { ActivityIndicator, Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { Keyboard, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -111,12 +112,7 @@ export default function EditProfile() {
           title={t('edit.title')}
           onBack={handleCancel}
         />
-        <View className="flex-1 justify-center items-center px-6">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text className={`text-base mt-4 text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {t('edit.loading')}
-          </Text>
-        </View>
+        <LoadingSpinner variant="overlay" />
       </SafeAreaView>
     );
   }

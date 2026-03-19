@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Building2 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -377,12 +378,7 @@ export default function EditHomecourt() {
           title={t('editHomecourt.title')}
           onBack={handleCancel}
         />
-        <View className="flex-1 justify-center items-center px-6">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text className={`text-base mt-4 text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {t('editHomecourt.loading')}
-          </Text>
-        </View>
+        <LoadingSpinner variant="overlay" />
       </SafeAreaView>
     );
   }

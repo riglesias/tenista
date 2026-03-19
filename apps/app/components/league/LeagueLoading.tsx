@@ -1,36 +1,10 @@
 'use client'
 
 import { useTheme } from '@/contexts/ThemeContext'
+import { Skeleton } from '@/components/ui/LoadingSpinner'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-const SkeletonPlaceholder = ({
-  width,
-  height,
-  borderRadius = 4,
-  style,
-}: {
-  width: number | string
-  height: number
-  borderRadius?: number
-  style?: any
-}) => {
-  const { theme } = useTheme()
-  return (
-    <View
-      style={[
-        {
-          width,
-          height,
-          borderRadius,
-          backgroundColor: theme.muted,
-        },
-        style,
-      ]}
-    />
-  )
-}
 
 export default function LeagueLoading() {
   const { theme } = useTheme()
@@ -42,50 +16,50 @@ export default function LeagueLoading() {
       <View style={[styles.innerContainer, { paddingHorizontal: theme.spacing.l, paddingTop: theme.spacing.m }]}>
         {/* Header */}
         <View style={[styles.header, { paddingBottom: theme.spacing.m }]}>
-          <SkeletonPlaceholder width={120} height={28} borderRadius={8} />
-          <SkeletonPlaceholder width={24} height={24} borderRadius={8} />
+          <Skeleton width={120} height={28} borderRadius={8} />
+          <Skeleton width={24} height={24} borderRadius={8} />
         </View>
 
         {/* Tabs */}
         <View style={[styles.tabsContainer, { paddingBottom: theme.spacing.m }]}>
-          <SkeletonPlaceholder
+          <Skeleton
             width={120}
             height={42}
             borderRadius={8}
             style={{ marginRight: theme.spacing.s }}
           />
-          <SkeletonPlaceholder width={120} height={42} borderRadius={8} />
+          <Skeleton width={120} height={42} borderRadius={8} />
         </View>
 
         {/* Info Card */}
         <View style={[styles.card, { marginBottom: theme.spacing.m, padding: theme.spacing.m }]}>
           <View style={[styles.cardHeader, { marginBottom: theme.spacing.m }]}>
-            <SkeletonPlaceholder width={150} height={20} borderRadius={8} />
-            <SkeletonPlaceholder width={80} height={24} borderRadius={6} />
+            <Skeleton width={150} height={20} borderRadius={8} />
+            <Skeleton width={80} height={24} borderRadius={6} />
           </View>
           <View style={styles.statsRow}>
-            <SkeletonPlaceholder width={80} height={30} borderRadius={8} />
-            <SkeletonPlaceholder width={60} height={30} borderRadius={8} />
-            <SkeletonPlaceholder width={70} height={30} borderRadius={8} />
+            <Skeleton width={80} height={30} borderRadius={8} />
+            <Skeleton width={60} height={30} borderRadius={8} />
+            <Skeleton width={70} height={30} borderRadius={8} />
           </View>
         </View>
 
         {/* Standings */}
         <View style={[styles.standingsContainer, { paddingBottom: theme.spacing.l }]}>
-          <SkeletonPlaceholder
+          <Skeleton
             width={180}
             height={20}
             borderRadius={8}
             style={{ marginBottom: theme.spacing.m }}
           />
-          <SkeletonPlaceholder
+          <Skeleton
             width="100%"
             height={40}
             borderRadius={8}
             style={{ marginBottom: theme.spacing.xs }}
           />
           {[...Array(5)].map((_, i) => (
-            <SkeletonPlaceholder
+            <Skeleton
               key={i}
               width="100%"
               height={50}

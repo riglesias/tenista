@@ -11,7 +11,8 @@ import { getThemeColors } from '@/lib/utils/theme';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { FlatList, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -399,12 +400,7 @@ export default function EditFlag() {
           title={t('editFlag.title')}
           onBack={handleCancel}
         />
-        <View className="flex-1 justify-center items-center px-6">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text className={`text-base mt-4 text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {t('editFlag.loading')}
-          </Text>
-        </View>
+        <LoadingSpinner variant="overlay" />
       </SafeAreaView>
     );
   }

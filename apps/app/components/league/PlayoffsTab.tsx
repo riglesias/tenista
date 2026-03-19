@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { View, Text, ActivityIndicator, ScrollView } from 'react-native'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import {
@@ -92,21 +93,7 @@ export default function PlayoffsTab({
   // Loading state
   if (isLoading) {
     return (
-      <View style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 24
-      }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{
-          color: colors.mutedForeground,
-          marginTop: 16,
-          fontSize: 16
-        }}>
-          Loading playoffs...
-        </Text>
-      </View>
+      <LoadingSpinner variant="overlay" />
     )
   }
 

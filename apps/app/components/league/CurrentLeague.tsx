@@ -8,8 +8,8 @@ import { UserLeague, DEFAULT_LADDER_CONFIG } from '@/lib/validation/leagues.vali
 import { useQuery } from '@tanstack/react-query'
 import { router } from 'expo-router'
 import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import {
-    ActivityIndicator,
     Image,
     Text,
     TouchableOpacity,
@@ -451,9 +451,7 @@ function CurrentLeagueComponent({
   // Loading state (only for non-ladder and non-playoffs_only leagues that need standings)
   if (!isLadderLeague && !isPlayoffsOnlyLeague && loading) {
     return (
-      <View style={{ alignItems: 'center', padding: 20 }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      <LoadingSpinner variant="inline" />
     )
   }
 

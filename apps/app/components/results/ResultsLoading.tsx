@@ -1,36 +1,10 @@
 'use client'
 
 import { useTheme } from '@/contexts/ThemeContext'
+import { Skeleton } from '@/components/ui/LoadingSpinner'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-const SkeletonPlaceholder = ({
-  width,
-  height,
-  borderRadius = 4,
-  style,
-}: {
-  width: number | string
-  height: number
-  borderRadius?: number
-  style?: any
-}) => {
-  const { theme } = useTheme()
-  return (
-    <View
-      style={[
-        {
-          width,
-          height,
-          borderRadius,
-          backgroundColor: theme.muted,
-        },
-        style,
-      ]}
-    />
-  )
-}
 
 export default function ResultsLoading() {
   const { theme } = useTheme()
@@ -42,7 +16,7 @@ export default function ResultsLoading() {
       <View style={{ paddingHorizontal: 24, paddingTop: 16 }}>
         {/* Header */}
         <View style={styles.header}>
-          <SkeletonPlaceholder width={160} height={28} borderRadius={8} />
+          <Skeleton width={160} height={28} borderRadius={8} />
         </View>
 
         {/* League Ranking Card */}
@@ -57,19 +31,19 @@ export default function ResultsLoading() {
             },
           ]}
         >
-          <SkeletonPlaceholder
+          <Skeleton
             width={140}
             height={14}
             borderRadius={6}
             style={{ marginBottom: 8 }}
           />
-          <SkeletonPlaceholder
+          <Skeleton
             width={180}
             height={12}
             borderRadius={6}
             style={{ marginBottom: 12 }}
           />
-          <SkeletonPlaceholder width={80} height={48} borderRadius={8} />
+          <Skeleton width={80} height={48} borderRadius={8} />
         </View>
 
         {/* Stats Row */}
@@ -82,25 +56,25 @@ export default function ResultsLoading() {
                 { borderColor: theme.muted, padding: 16 },
               ]}
             >
-              <SkeletonPlaceholder
+              <Skeleton
                 width={20}
                 height={20}
                 borderRadius={10}
                 style={{ marginBottom: 8 }}
               />
-              <SkeletonPlaceholder
+              <Skeleton
                 width={36}
                 height={24}
                 borderRadius={6}
                 style={{ marginBottom: 4 }}
               />
-              <SkeletonPlaceholder width={48} height={10} borderRadius={4} />
+              <Skeleton width={48} height={10} borderRadius={4} />
             </View>
           ))}
         </View>
 
         {/* Past Matches Title */}
-        <SkeletonPlaceholder
+        <Skeleton
           width={150}
           height={20}
           borderRadius={8}
@@ -122,8 +96,8 @@ export default function ResultsLoading() {
           >
             {/* Badge row (date + type) */}
             <View style={[styles.badgeRow, { marginBottom: 12 }]}>
-              <SkeletonPlaceholder width={80} height={20} borderRadius={10} />
-              <SkeletonPlaceholder
+              <Skeleton width={80} height={20} borderRadius={10} />
+              <Skeleton
                 width={60}
                 height={20}
                 borderRadius={10}
@@ -137,8 +111,8 @@ export default function ResultsLoading() {
                 style={[styles.playerRow, { marginBottom: j === 0 ? 8 : 0 }]}
               >
                 <View style={styles.playerInfo}>
-                  <SkeletonPlaceholder width={20} height={14} borderRadius={3} />
-                  <SkeletonPlaceholder
+                  <Skeleton width={20} height={14} borderRadius={3} />
+                  <Skeleton
                     width={100}
                     height={14}
                     borderRadius={4}
@@ -146,8 +120,8 @@ export default function ResultsLoading() {
                   />
                 </View>
                 <View style={styles.scoreBoxes}>
-                  <SkeletonPlaceholder width={24} height={20} borderRadius={4} />
-                  <SkeletonPlaceholder
+                  <Skeleton width={24} height={20} borderRadius={4} />
+                  <Skeleton
                     width={24}
                     height={20}
                     borderRadius={4}

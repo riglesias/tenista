@@ -1,6 +1,7 @@
 'use client'
 
 import AvatarPicker from '@/components/ui/AvatarPicker';
+import { Skeleton } from '@/components/ui/LoadingSpinner';
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import DeleteAccountModal from '@/components/ui/DeleteAccountModal';
 import LanguageSelectionSheet from '@/components/ui/LanguageSelectionSheet';
@@ -257,28 +258,17 @@ export default function SettingsScreen() {
 
   // Skeleton component for loading states
   const SkeletonCard = ({ height = 80 }: { height?: number }) => (
-    <View style={{ 
-      backgroundColor: colors.card, 
-      borderWidth: 1, 
-      borderColor: colors.border, 
-      borderRadius: 12, 
+    <View style={{
+      backgroundColor: colors.card,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 12,
       padding: 20,
       height: height,
       justifyContent: 'center'
     }}>
-      <View style={{
-        height: 16,
-        backgroundColor: colors.muted,
-        borderRadius: 8,
-        marginBottom: 8,
-        width: '60%'
-      }} />
-      <View style={{
-        height: 12,
-        backgroundColor: colors.muted,
-        borderRadius: 6,
-        width: '40%'
-      }} />
+      <Skeleton width="60%" height={16} borderRadius={8} style={{ marginBottom: 8 }} />
+      <Skeleton width="40%" height={12} borderRadius={6} />
     </View>
   );
 
@@ -311,12 +301,7 @@ export default function SettingsScreen() {
           ) : loading ? (
             // Skeleton for avatar
             <View style={{ alignItems: 'center' }}>
-              <View style={{
-                width: 96,
-                height: 96,
-                borderRadius: 48,
-                backgroundColor: colors.muted,
-              }} />
+              <Skeleton width={96} height={96} borderRadius={48} />
             </View>
           ) : (
             // Error state - show generic avatar

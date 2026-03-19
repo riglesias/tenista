@@ -215,6 +215,14 @@
     "loadErrorMessage": "There was a problem loading your leagues. Please try again.",
     "tryAgain": "Try Again"
   },
+  "preview": {
+    "joinLeague": "Join League",
+    "joinLeaguePaid": "Join League — ${{price}}",
+    "standings": "Current Standings",
+    "noStandings": "No players yet — be the first to join!",
+    "dateRange": "{{start}} – {{end}}",
+    "players": "{{current}}/{{max}} players"
+  },
   "menu": {
     "openMenu": "Open league menu"
   }

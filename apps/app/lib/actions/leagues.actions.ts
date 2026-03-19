@@ -8,6 +8,7 @@ import {
     LeagueStandingsSchema,
     LeaguesWithStatsSchema,
     LeagueWithStats,
+    LeagueWithStatsSchema,
     RawLeagueStandingsSchema,
     RawMultipleLeagueStandingsSchema,
     RawUserLeagueSchema,
@@ -76,6 +77,54 @@ export async function getAvailableLeagues(cityId: string, playerOrganizationId?:
     return { data: visibleLeagues, error: null }
   } catch (error) {
     const appError = reportError(error, 'getAvailableLeagues')
+    return { data: null, error: appError }
+  }
+}
+
+// Get league preview (for non-members viewing a league before joining)
+export async function getLeaguePreview(leagueId: string): Promise<ApiResponse<LeagueWithStats>> {
+  try {
+    const { data: league, error } = await supabase
+      .from('leagues')
+      .select('*, organizations(name)')
+      .eq('id', leagueId)
+      .single()
+
+    if (error) throw error
+    if (!league) throw new Error('League not found')
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    let userIsMember = false
+    let userIsRetired = false
+
+    if (user) {
+      const { data: membership } = await supabase
+        .from('league_players')
+        .select('status')
+        .eq('league_id', leagueId)
+        .eq('player_id', user.id)
+        .single()
+
+      if (membership) {
+        userIsMember = membership.status === 'active'
+        userIsRetired = membership.status === 'retired'
+      }
+    }
+
+    const leagueWithStats = LeagueWithStatsSchema.parse({
+      ...league,
+      player_count: (league as any).active_player_count || 0,
+      user_is_member: userIsMember,
+      user_is_retired: userIsRetired,
+      organization_name: (league as any).organizations?.name || null,
+    })
+
+    return { data: leagueWithStats, error: null }
+  } catch (error) {
+    const appError = reportError(error, 'getLeaguePreview')
     return { data: null, error: appError }
   }
 }

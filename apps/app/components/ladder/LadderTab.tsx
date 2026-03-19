@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useCallback, useMemo } from 'react'
-import { ActivityIndicator, Text, View, TouchableOpacity, ScrollView, Linking } from 'react-native'
+import { Text, View, TouchableOpacity, ScrollView, Linking } from 'react-native'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { router } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -359,9 +360,7 @@ export default function LadderTab({
   // Loading state
   if (loadingRankings || (isDoublesLeague && loadingTeam)) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      <LoadingSpinner variant="overlay" />
     )
   }
 

@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
+import { Text, View } from 'react-native'
 import { router, Stack, useLocalSearchParams } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -55,9 +56,7 @@ export default function LeagueDetailScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
           <ScreenHeader title="" onBack={() => router.back()} />
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={colors.primary} />
-          </View>
+          <LoadingSpinner variant="overlay" />
         </SafeAreaView>
       </>
     )

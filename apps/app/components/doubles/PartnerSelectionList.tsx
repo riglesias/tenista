@@ -7,8 +7,8 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
 } from 'react-native'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { useAvailablePartners } from '@/hooks/useDoublesTeam'
@@ -130,18 +130,7 @@ export default function PartnerSelectionList({
 
   if (isLoading) {
     return (
-      <View style={{ alignItems: 'center', justifyContent: 'center', padding: 40 }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text
-          style={{
-            fontSize: 14,
-            color: colors.mutedForeground,
-            marginTop: 12,
-          }}
-        >
-          Loading available partners...
-        </Text>
-      </View>
+      <LoadingSpinner variant="inline" />
     )
   }
 

@@ -1,8 +1,8 @@
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import React from 'react'
-import { ActivityIndicator, Text, View, ViewStyle } from 'react-native'
-import { Skeleton } from './LoadingSpinner'
+import { Text, View, ViewStyle } from 'react-native'
+import LoadingSpinner, { Skeleton } from './LoadingSpinner'
 
 interface LoadingStateProps {
   loading: boolean
@@ -34,9 +34,7 @@ export function LoadingState({
     return (
       <View style={[{ flex: 1 }, style]}>
         {loadingComponent || (
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={colors.primary} />
-          </View>
+          <LoadingSpinner variant="overlay" />
         )}
       </View>
     )

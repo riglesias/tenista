@@ -215,6 +215,14 @@
     "loadErrorMessage": "Hubo un problema al cargar tus ligas. Por favor intenta de nuevo.",
     "tryAgain": "Intentar de Nuevo"
   },
+  "preview": {
+    "joinLeague": "Unirse a Liga",
+    "joinLeaguePaid": "Unirse a Liga — ${{price}}",
+    "standings": "Clasificación Actual",
+    "noStandings": "Aún no hay jugadores — ¡sé el primero en unirte!",
+    "dateRange": "{{start}} – {{end}}",
+    "players": "{{current}}/{{max}} jugadores"
+  },
   "menu": {
     "openMenu": "Abrir menú de liga"
   }

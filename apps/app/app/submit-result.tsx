@@ -1,5 +1,6 @@
 'use client'
 
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import ScreenHeader from '@/components/ui/ScreenHeader'
 import { useAppToast } from '@/components/ui/Toast'
 import { useTheme } from '@/contexts/ThemeContext'
@@ -800,12 +801,7 @@ export default function SubmitResultScreen() {
         <Stack.Screen options={{ headerShown: false }} />
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
           <ScreenHeader title={t('submitResult.title')} onBack={handleBack} />
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={{ fontSize: 16, marginTop: 16, color: colors.foreground }}>
-              {t('submitResult.loading')}
-            </Text>
-          </View>
+          <LoadingSpinner variant="overlay" />
         </SafeAreaView>
       </>
     )

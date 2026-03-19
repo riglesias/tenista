@@ -21,7 +21,8 @@ import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import { ArrowDown } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -58,7 +59,7 @@ export default function EditRating() {
         setRequestedRating(profile.rating || 2.0);
       }
 
-      const { canSubmit: eligible, lastRequestDate: lastDate } = await canSubmitRatingChangeRequest(user.id);
+      const { canSubmit: eligible, lastRequestDate: lastDate } = await canSubmitRatingChangeRequest(profile.id);
       setCanSubmit(eligible);
       setLastRequestDate(lastDate);
     } catch (error) {
@@ -92,7 +93,7 @@ export default function EditRating() {
     setLoading(true);
     try {
       const { success, error } = await submitRatingChangeRequest(
-        user.id,
+        playerProfile.id,
         currentRating,
         requestedRating,
         reason.trim()
@@ -158,12 +159,7 @@ export default function EditRating() {
           title={t('editRating.title')}
           onBack={handleCancel}
         />
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 24 }}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={{ fontSize: 16, marginTop: 16, textAlign: 'center', color: colors.mutedForeground }}>
-            {t('editRating.loading')}
-          </Text>
-        </View>
+        <LoadingSpinner variant="overlay" />
       </SafeAreaView>
     );
   }

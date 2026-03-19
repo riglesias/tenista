@@ -23,8 +23,8 @@ import { Building2 } from 'lucide-react-native'
 import CachedImage from '@/components/ui/CachedImage'
 import { router, Stack, useLocalSearchParams, useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useState } from 'react'
+import LoadingSpinner from '@/components/ui/LoadingSpinner'
 import {
-  ActivityIndicator,
   Alert,
   Linking,
   RefreshControl,
@@ -406,24 +406,7 @@ export default function PlayerProfile() {
           style={{ flex: 1, backgroundColor: colors.background }}
         >
           <ScreenHeader title={t('playerProfile.title')} onBack={handleBack} />
-          <View
-            style={{
-              flex: 1,
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <ActivityIndicator size="large" color={colors.primary} />
-            <Text
-              style={{
-                fontSize: 16,
-                marginTop: 16,
-                color: colors.foreground,
-              }}
-            >
-              {t('playerProfile.loading')}
-            </Text>
-          </View>
+          <LoadingSpinner variant="overlay" />
         </SafeAreaView>
       </>
     )

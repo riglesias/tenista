@@ -1,7 +1,6 @@
 'use client'
 
 import { useTheme } from '@/contexts/ThemeContext'
-import { joinLeague } from '@/lib/actions/leagues.actions'
 import {
   getDivisionInfo,
   isPlayerEligibleForLeague,
@@ -18,9 +17,8 @@ import {
 } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import i18n from '@/lib/i18n'
-import { useAppToast } from '@/components/ui/Toast'
-import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { Building2, MapPin, Trophy } from 'lucide-react-native'
+import { Building2, ChevronRight, MapPin, Trophy, Users } from 'lucide-react-native'
+import { useRouter } from 'expo-router'
 import EmptyDiscoverState from './EmptyDiscoverState'
 
 interface LeagueSelectionProps {
@@ -41,11 +39,11 @@ type SectionItem =
 const LeagueCard = React.memo(function LeagueCard({
   league,
   currentPlayer,
-  onJoin,
+  onCardPress,
 }: {
   league: LeagueWithStats
   currentPlayer: LeagueSelectionProps['currentPlayer']
-  onJoin: (leagueId: string) => void
+  onCardPress: (leagueId: string) => void
 }) {
   const { theme } = useTheme()
   const { t } = useTranslation('league')
@@ -64,105 +62,122 @@ const LeagueCard = React.memo(function LeagueCard({
     buttonText = t('list.ratingRequired', { range: divisionInfo?.range || '' })
 
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={() => onCardPress(league.id)}
       style={[
         styles.card,
         { backgroundColor: theme.card, borderColor: theme.border },
       ]}
     >
-      <View style={styles.cardHeader}>
+      {/* Hero image */}
+      <View style={styles.heroContainer}>
         {league.image_url ? (
-          <Image
-            source={{ uri: league.image_url }}
-            style={styles.thumbnail}
-            resizeMode="cover"
-          />
+          <>
+            {/* Blurred zoomed background */}
+            <Image
+              source={{ uri: league.image_url }}
+              style={styles.heroBlurredBg}
+              resizeMode="cover"
+              blurRadius={50}
+            />
+            {/* Centered square image */}
+            <Image
+              source={{ uri: league.image_url }}
+              style={styles.heroSquareImage}
+              resizeMode="cover"
+            />
+          </>
         ) : (
-          <View style={[styles.thumbnailPlaceholder, { backgroundColor: theme.muted }]}>
-            <Trophy size={24} color={theme.mutedForeground} />
+          <View style={[styles.heroPlaceholder, { backgroundColor: theme.muted }]}>
+            <Trophy size={40} color={theme.mutedForeground} />
           </View>
         )}
-        <View style={styles.cardHeaderContent}>
-          <Text style={[styles.leagueName, { color: theme.foreground }]}>
-            {league.name}
-          </Text>
-          <View
-            style={[
-              styles.priceBadge,
-              { backgroundColor: league.is_free ? '#22c55e' : theme.primary },
-            ]}
-          >
-            <Text style={[styles.priceBadgeText, { color: league.is_free ? '#fff' : theme.primaryForeground }]}>
-              {league.is_free ? t('selection.free') : `$${new Intl.NumberFormat(i18n.language).format((league.price_cents || 0) / 100)}`}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      <View style={styles.cardDetails}>
-        <View>
-          <Text style={[styles.detailLabel, { color: theme.mutedForeground }]}>
-            {t('selection.players')}
-          </Text>
-          <Text style={[styles.detailValue, { color: theme.foreground }]}>
-            {league.player_count}/{league.max_players || 50}
-          </Text>
-        </View>
-        {divisionInfo && (
-          <View>
-            <Text style={[styles.detailLabel, { color: theme.mutedForeground }]}>
-              {t('selection.ratingRange')}
-            </Text>
-            <Text style={[styles.detailValue, { color: theme.foreground }]}>
-              {divisionInfo.range}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      {league.location && (
-        <View style={styles.venueRow}>
-          <MapPin size={14} color={theme.mutedForeground} />
-          <Text style={[styles.venueText, { color: theme.mutedForeground }]} numberOfLines={1}>
-            {league.location}
-          </Text>
-        </View>
-      )}
-
-      {league.organization_id && (
-        <View style={styles.venueRow}>
-          <Building2 size={14} color={theme.primary} />
-          <Text style={[styles.venueText, { color: theme.primary, fontWeight: '500' }]} numberOfLines={1}>
-            {(league as any).organization_name || t('selection.clubOnly', { defaultValue: 'Club' })}
-          </Text>
-        </View>
-      )}
-
-      <TouchableOpacity
-        onPress={() => (canJoin ? onJoin(league.id) : null)}
-        disabled={!canJoin}
-        style={[
-          styles.joinButton,
-          { backgroundColor: canJoin ? theme.primary : theme.muted },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={`Join league ${league.name}`}
-        accessibilityHint={!canJoin ? buttonText : undefined}
-      >
-        <Text
+        {/* Price badge overlaid on image */}
+        <View
           style={[
-            styles.joinButtonText,
-            {
-              color: canJoin
-                ? theme.primaryForeground
-                : theme.mutedForeground,
-            },
+            styles.priceBadge,
+            { backgroundColor: league.is_free ? '#22c55e' : theme.primary },
           ]}
         >
-          {buttonText}
+          <Text style={[styles.priceBadgeText, { color: league.is_free ? '#fff' : theme.primaryForeground }]}>
+            {league.is_free ? t('selection.free') : `$${new Intl.NumberFormat(i18n.language).format((league.price_cents || 0) / 100)}`}
+          </Text>
+        </View>
+      </View>
+
+      {/* Card body */}
+      <View style={styles.cardBody}>
+        <Text style={[styles.leagueName, { color: theme.foreground }]} numberOfLines={1}>
+          {league.name}
         </Text>
-      </TouchableOpacity>
-    </View>
+
+        {/* Stats row */}
+        <View style={styles.statsRow}>
+          <View style={styles.statChip}>
+            <Users size={13} color={theme.mutedForeground} />
+            <Text style={[styles.statText, { color: theme.mutedForeground }]}>
+              {league.player_count}/{league.max_players || 50}
+            </Text>
+          </View>
+          {divisionInfo && (
+            <View style={styles.statChip}>
+              <Trophy size={13} color={theme.mutedForeground} />
+              <Text style={[styles.statText, { color: theme.mutedForeground }]}>
+                {divisionInfo.range}
+              </Text>
+            </View>
+          )}
+          {league.location && (
+            <View style={[styles.statChip, { flex: 1 }]}>
+              <MapPin size={13} color={theme.mutedForeground} />
+              <Text style={[styles.statText, { color: theme.mutedForeground }]} numberOfLines={1}>
+                {league.location}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {league.organization_id && (
+          <View style={styles.clubRow}>
+            <Building2 size={13} color={theme.primary} />
+            <Text style={[styles.statText, { color: theme.primary, fontWeight: '500' }]} numberOfLines={1}>
+              {(league as any).organization_name || t('selection.clubOnly', { defaultValue: 'Club' })}
+            </Text>
+          </View>
+        )}
+
+        {/* Action button */}
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation()
+            onCardPress(league.id)
+          }}
+          style={[
+            styles.actionButton,
+            { backgroundColor: canJoin ? theme.primary : theme.muted },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={`View details for ${league.name}`}
+        >
+          <Text
+            style={[
+              styles.actionButtonText,
+              {
+                color: canJoin
+                  ? theme.primaryForeground
+                  : theme.mutedForeground,
+              },
+            ]}
+          >
+            {canJoin ? t('list.viewDetails') : buttonText}
+          </Text>
+          {canJoin && (
+            <ChevronRight size={16} color={theme.primaryForeground} />
+          )}
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
   )
 })
 
@@ -174,8 +189,7 @@ export default function LeagueSelection({
 }: LeagueSelectionProps) {
   const { theme } = useTheme()
   const { t } = useTranslation('league')
-  const { showToast } = useAppToast()
-  const { confirm } = useConfirmDialog()
+  const router = useRouter()
 
   // Filter out already-joined leagues when joinedLeagueIds is provided
   const filteredLeagues = React.useMemo(() => {
@@ -207,26 +221,9 @@ export default function LeagueSelection({
     return { canJoin, cannotJoin }
   }, [filteredLeagues, currentPlayer])
 
-  const handleJoinLeague = useCallback(async (leagueId: string) => {
-    if (!currentPlayer) return
-
-    confirm({
-      title: t('alerts.joinLeague'),
-      message: t('alerts.confirmJoin'),
-      confirmText: t('alerts.join'),
-      cancelText: t('alerts.cancel'),
-      destructive: false,
-      onConfirm: async () => {
-        const { error } = await joinLeague(leagueId, currentPlayer.id)
-        if (error) {
-          showToast((error as any)?.message || t('alerts.failedToJoin'), { type: 'error' })
-        } else {
-          showToast(t('alerts.joinedLeague'), { type: 'success' })
-          onLeagueJoined()
-        }
-      },
-    })
-  }, [currentPlayer, onLeagueJoined, t, confirm, showToast])
+  const handleCardPress = useCallback((leagueId: string) => {
+    router.push(`/league-preview?leagueId=${leagueId}`)
+  }, [router])
 
   // Combine both sections into a single data array for FlatList
   const sections = useMemo((): SectionItem[] => {
@@ -298,7 +295,7 @@ export default function LeagueSelection({
       <LeagueCard
         league={item.league}
         currentPlayer={currentPlayer}
-        onJoin={handleJoinLeague}
+        onCardPress={handleCardPress}
       />
     )
   }
@@ -328,88 +325,91 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 16,
   },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    marginTop: 24,
-    marginBottom: 16,
-  },
   noAvailableText: {
     fontSize: 14,
     lineHeight: 20,
   },
   card: {
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 14,
+    overflow: 'hidden',
+    marginBottom: 16,
   },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 12,
-  },
-  thumbnail: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
-  },
-  thumbnailPlaceholder: {
-    width: 56,
-    height: 56,
-    borderRadius: 8,
+  heroContainer: {
+    width: '100%',
+    height: 150,
+    position: 'relative',
+    overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cardHeaderContent: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  heroBlurredBg: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+    transform: [{ scale: 2.0 }],
   },
-  leagueName: {
-    fontSize: 16,
-    fontWeight: '600',
+  heroSquareImage: {
+    width: 130,
+    height: 130,
+    borderRadius: 12,
+  },
+  heroPlaceholder: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   priceBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
   priceBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
-  cardDetails: {
+  cardBody: {
+    padding: 14,
+    gap: 10,
+  },
+  leagueName: {
+    fontSize: 17,
+    fontWeight: '700',
+  },
+  statsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
+    alignItems: 'center',
+    gap: 12,
   },
-  venueRow: {
+  statChip: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    marginBottom: 12,
   },
-  venueText: {
+  statText: {
     fontSize: 13,
-    flex: 1,
   },
-  detailLabel: {
-    fontSize: 12,
-  },
-  detailValue: {
-    fontSize: 14,
-  },
-  joinButton: {
-    borderRadius: 8,
-    padding: 12,
+  clubRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
   },
-  joinButtonText: {
-    fontSize: 14,
+  actionButton: {
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  actionButtonText: {
+    fontSize: 15,
     fontWeight: '600',
   },
 }) 

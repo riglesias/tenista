@@ -852,14 +852,14 @@ CREATE POLICY "Users can insert their own rating change requests"
   AS PERMISSIVE
   FOR INSERT
   TO public
-  WITH CHECK ((player_id = auth.uid()));
+  WITH CHECK (player_id IN (SELECT id FROM players WHERE auth_user_id = auth.uid()));
 
 CREATE POLICY "Users can view their own rating change requests"
   ON public.rating_change_requests
   AS PERMISSIVE
   FOR SELECT
   TO public
-  USING ((player_id = auth.uid()));
+  USING (player_id IN (SELECT id FROM players WHERE auth_user_id = auth.uid()));
 
 CREATE POLICY "admin_select_rating_change_requests"
   ON public.rating_change_requests

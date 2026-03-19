@@ -10,7 +10,8 @@ import { AvailabilityData, DayOfWeek, TimeSlot } from '@/lib/database.types';
 import { getThemeColors } from '@/lib/utils/theme';
 import { router } from 'expo-router';
 import React, { useEffect } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -108,12 +109,7 @@ export default function EditAvailability() {
           title={t('editAvailability.title')}
           onBack={handleCancel}
         />
-        <View className="flex-1 justify-center items-center px-6">
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text className={`text-base mt-4 text-center ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            {t('editAvailability.loading')}
-          </Text>
-        </View>
+        <LoadingSpinner variant="overlay" />
       </SafeAreaView>
     );
   }
