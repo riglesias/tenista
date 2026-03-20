@@ -4,8 +4,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { getThemeColors } from '@/lib/utils/theme'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import React, { useEffect } from 'react'
-import { Platform, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Platform, Text, TouchableOpacity, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
 import { useAppToast } from '@/components/ui/Toast'
 
@@ -16,11 +16,12 @@ GoogleSignin.configure({
   offlineAccess: false,
 })
 
-export default function GoogleSignInButton({ disabled = false, onError }: { disabled?: boolean, onError?: (error: string) => void }) {
+export default function GoogleSignInButton({ disabled = false, onError, onSignInStart }: { disabled?: boolean, onError?: (error: string) => void, onSignInStart?: () => void }) {
   const { signInWithIdToken } = useAuth()
   const { isDark } = useTheme()
   const colors = getThemeColors(isDark)
   const { showToast } = useAppToast()
+  const [signingIn, setSigningIn] = useState(false)
 
   useEffect(() => {
     // Check if Google Play Services are available (Android only)
@@ -33,6 +34,7 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
   }, [])
 
   const handleError = (errorMessage: string) => {
+    setSigningIn(false)
     if (onError) {
       onError(errorMessage)
     } else {
@@ -42,6 +44,8 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
 
   const handlePress = async () => {
     try {
+      setSigningIn(true)
+      onSignInStart?.()
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
 
       // Sign in with Google
@@ -57,6 +61,7 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
         handleError('Failed to get ID token from Google.')
       }
     } catch (error: any) {
+      setSigningIn(false)
       if (error.code === '-5') {
         // User cancelled the sign-in flow
         return
@@ -80,17 +85,21 @@ export default function GoogleSignInButton({ disabled = false, onError }: { disa
         marginTop: 8,
       }}
       onPress={handlePress}
-      disabled={disabled}
+      disabled={disabled || signingIn}
     >
-      <View style={{ marginRight: 12 }}>
-        <GoogleIcon color={disabled ? colors.mutedForeground : colors.foreground} />
-      </View>
+      {signingIn ? (
+        <ActivityIndicator size="small" color={colors.foreground} style={{ marginRight: 12 }} />
+      ) : (
+        <View style={{ marginRight: 12 }}>
+          <GoogleIcon color={disabled ? colors.mutedForeground : colors.foreground} />
+        </View>
+      )}
       <Text style={{
-        color: disabled ? colors.mutedForeground : colors.foreground,
+        color: (disabled || signingIn) ? colors.mutedForeground : colors.foreground,
         fontSize: 16,
         fontWeight: '600'
       }}>
-        Continue with Google
+        {signingIn ? 'Signing in...' : 'Continue with Google'}
       </Text>
     </TouchableOpacity>
   )

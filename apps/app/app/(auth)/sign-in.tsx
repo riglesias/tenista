@@ -158,14 +158,15 @@ export default function SignIn() {
             </View>
 
             {/* Apple Sign-in Button */}
-            <AppleSignInButton 
-              disabled={loading} 
+            <AppleSignInButton
+              disabled={loading}
               onError={() => setLoading(false)}
             />
             {/* Google Sign-in Button */}
-            <GoogleSignInButton 
-              disabled={loading} 
+            <GoogleSignInButton
+              disabled={loading}
               onError={() => setLoading(false)}
+              onSignInStart={() => setLoading(true)}
             />
 
             {/* Terms and Privacy Text */}

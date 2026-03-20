@@ -20,6 +20,15 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timer)
   }, [])
 
+  // Re-show loading when user state changes (e.g., after sign-in)
+  // This prevents the brief flash of the sign-in screen before navigation
+  useEffect(() => {
+    if (user && !authLoading) {
+      setIsInitializing(true)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id])
+
   useEffect(() => {
     const checkUserStatus = async () => {
       // Skip if still loading auth
@@ -29,7 +38,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
       const inAuthGroup = segments[0] === '(auth)'
       const inOnboardingGroup = segments[0] === 'onboarding'
-      
+
       // No user - redirect to auth unless already there
       if (!user) {
         if (!inAuthGroup) {
@@ -59,7 +68,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
           router.replace('/onboarding/profile')
         }
       }
-      
+
       setIsInitializing(false)
     }
 
