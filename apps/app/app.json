@@ -2,7 +2,7 @@
   "expo": {
     "name": "Tenista",
     "slug": "tenista-app",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "tenistaapp",
@@ -13,7 +13,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tenista.app",
-      "buildNumber": "32",
+      "buildNumber": "34",
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
@@ -28,7 +28,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.tenista.app",
-      "versionCode": 17,
+      "versionCode": 18,
       "permissions": [
         "CAMERA",
         "ACCESS_MEDIA_LIBRARY"
